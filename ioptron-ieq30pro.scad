@@ -30,13 +30,22 @@ dec2_diam = 98.25;
 dec2_radius = dec2_diam / 2;
 dec2_len = 25.4;
 
+// Declination motor cover size.
+dec_motor_w = 85.4;  // left-right on face with logo.
+dec_motor_h = 68.4;  // up-down on face with logo.
+dec_motor_z = 62.4;
 
+// Min dist from face with logo to dec1 cylinder.
+dec_motor_z2 = 42;
+dec_motor_z_offset =
+  dec1_radius + dec_motor_z2 - dec_motor_z;
 
 // Distance from edge of RA bearing
 // to center of DEC axis.
 ra_to_dec_offset = 20.0 + dec1_radius;
 
 dec_body();
+//dec_motor();
 
 module dec_body() {
     color("beige") {
@@ -58,5 +67,50 @@ module dec_body() {
                             [dec1_radius-10, 5],
                             [cw_cs_radius,5]]);
         };
+//    rotate([-90,0,0])
+      dec_motor();
+}
 
+module dec_motor() {
+  w=dec_motor_w;
+  h=dec_motor_h;
+  z=dec_motor_z;
+  
+  
+  translate([-w/2,dec_motor_z_offset,h - dec2_len])
+  rotate([-90,0,0])
+  {
+      color("black")
+        cube([dec_motor_w, dec_motor_h, dec_motor_z]);
+      color("white")
+        translate(
+          [dec_motor_w/2, dec_motor_h/3,dec_motor_z])
+    //    rotate([0, 90, 0])
+          ioptron_logo();    
+      };
+}
+
+module dec_motor_old() {
+  w=dec_motor_w;
+  h=dec_motor_h;
+  z=dec_motor_z;
+  translate([-w/2,0,])
+    rotate([-90,0,0]) {
+      color("black")
+        cube([dec_motor_w, dec_motor_h, dec_motor_z]);
+      color("white")
+        translate(
+          [dec_motor_w/2, dec_motor_h/3,dec_motor_z])
+    //    rotate([0, 90, 0])
+          ioptron_logo();    
+      };
+}
+
+module ioptron_logo() {
+  font = "Liberation Sans"; //["Liberation Sans", "Liberation Sans:style=Bold", "Liberation Sans:style=Italic", "Liberation Mono", "Liberation Serif"]
+  text("iOptron", size=12, font="Liberation Sans:style=Italic",
+       halign="center", valign="bottom", $fn=16);
+  translate([0, -8, 0])
+    text("iEQ30-Pro", size=6, font=font,
+         halign="center", valign="top", $fn=16);
 }
