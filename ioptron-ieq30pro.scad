@@ -67,48 +67,26 @@ module dec_body() {
                             [dec1_radius-10, 5],
                             [cw_cs_radius,5]]);
         };
-//    rotate([-90,0,0])
-      dec_motor();
+  dec_motor();
 }
 
 module dec_motor() {
   w=dec_motor_w;
   h=dec_motor_h;
   z=dec_motor_z;
-  
-  
-  translate([-w/2,dec_motor_z_offset,h - dec2_len])
-  rotate([-90,0,0])
-  {
-      color("black")
-        cube([dec_motor_w, dec_motor_h, dec_motor_z]);
-      color("white")
-        translate(
-          [dec_motor_w/2, dec_motor_h/3,dec_motor_z])
-    //    rotate([0, 90, 0])
-          ioptron_logo();    
-      };
-}
-
-module dec_motor_old() {
-  w=dec_motor_w;
-  h=dec_motor_h;
-  z=dec_motor_z;
-  translate([-w/2,0,])
+  translate([-w/2, dec_motor_z_offset, h - dec2_len + 0.1])
     rotate([-90,0,0]) {
-      color("black")
-        cube([dec_motor_w, dec_motor_h, dec_motor_z]);
-      color("white")
-        translate(
-          [dec_motor_w/2, dec_motor_h/3,dec_motor_z])
-    //    rotate([0, 90, 0])
-          ioptron_logo();    
-      };
+      // TODO Chamfer the motor cover.
+      color("black") cube([w, h, z]);
+      color("white") translate([w/2, h/3,z])
+        ioptron_logo();    
+    };
 }
 
 module ioptron_logo() {
-  font = "Liberation Sans"; //["Liberation Sans", "Liberation Sans:style=Bold", "Liberation Sans:style=Italic", "Liberation Mono", "Liberation Serif"]
-  text("iOptron", size=12, font="Liberation Sans:style=Italic",
+  font = "Liberation Sans";
+  italic_font = str(font, ":style=Italic");
+  text("iOptron", size=12, font=italic_font,
        halign="center", valign="bottom", $fn=16);
   translate([0, -8, 0])
     text("iEQ30-Pro", size=6, font=font,
