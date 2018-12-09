@@ -19,11 +19,15 @@ dec1_len = 131.9;
 // The black cap and the bottom of the dec body, where
 // the counterweight shaft is attached.
 cw_cap_height = 10;
+cw_cap_bevel_height = 5;
 
 // There is a countersink in the bottom of the DEC
 // body to allow for the counterweight shaft.
 cw_cs_diam = 23;
 cw_cs_radius = cw_cs_diam / 2;
+
+cw_thread_diam = 16;
+cw_thread_radius = cw_thread_diam / 2;
 
 ////////////////////////////////////////////////////
 // Diameter of the motor end of the DEC body.
@@ -72,77 +76,37 @@ module ra_and_dec() {
 }
 
 module dec_body() {
-    color(cast_iron_color) {
+  total_dec_len =
+    dec1_len + dec2_len + cw_cap_height +
+    cw_cap_bevel_height;
+  difference() {
+    union() {
+      color(cast_iron_color) {
         cylinder(h=dec1_len, r=dec1_radius);
         translate([0,0, -dec2_len])
-            cylinder(h=dec2_len, r=dec2_radius);
-    };
-    translate([0, 0, dec1_len])
-        union() {
-            color("black")
-                cylinder(h=cw_cap_height,
-                         r=dec1_radius);
+          cylinder(h=dec2_len, r=dec2_radius);
+      };
+      // Cap on the end where the CW shaft is
+      // screwed into the DEC body.
+      color("black")
+        translate([0, 0, dec1_len])
+          union() {
+            cylinder(h=cw_cap_height, r=dec1_radius);
             translate([0, 0, cw_cap_height])
-                color("red")
-                    rotate_extrude()
-                        polygon([
-                            [cw_cs_radius,0],
-                            [dec1_radius,0],
-                            [dec1_radius-10, 5],
-                            [cw_cs_radius,5]]);
-        };
-  dec_motor();
-}
-
-// Chamfer one edge of a cube. The cube has dimensions
-// x,y,z. The edge to be chamfered (one of 12)
-// is indicated by the axis it is parallel to
-// (only one), and whether it is through the
-// origin of the other two axes.
-module chamfer_cube_edge(
-    sx,sy,sz,
-    chamfer_angle=45,
-    chamfer_depth=0,
-    par_x=false,par_y=false,par_z=false,
-    or_x=true,or_y=true,or_z=true) {
-  epsilon = 0.01;
-  smax = max(sx, sy, sz) + epsilon*2;
-//  cs2 = sqrt(chamfer_size * chamfer_size * 2);
-//  cxlen = sx + 0.02;
-  cxoff = 0;
-  cyoff = 0;
-  czoff = 0;
-//  cylen = sy + 0.02;
-//  czlen = sz + 0.02;
-//  czoff = -0.01;
-  if (par_x) {
-    assert(par_y==false);
-    assert(par_z==false);
-//    cylen=chamfer_size;
-    cxoff = -epsilon;
-    if (or_y) {
-      cyoff = -sy/2;
-    } else {
-      cyoff = sy/2;
-    }
-  }
-  if (par_y) {
-    assert(par_x==false);
-    assert(par_z==false);
-  }
-  if (par_z) {
-    assert(par_x==false);
-    assert(par_y==false);
-  }
-
-  echo("offsets");
-  echo(cxoff);
-  echo(cyoff);
-  echo(czoff);
-
-  
-  translate([cxoff, cyoff, czoff])
-    cube([smax, smax, smax]);
+              rotate_extrude()
+                polygon([
+                  [cw_cs_radius,0],
+                  [dec1_radius,0],
+                  [dec1_radius-10, cw_cap_bevel_height],
+                  [cw_cs_radius,cw_cap_bevel_height]]);
+          };
+      dec_motor();
+    };
+    color(cast_iron_color)
+      translate([0,0, -dec2_len-1])
+        cylinder(h=total_dec_len+2,
+                r=cw_thread_radius);
+  };
 }
 
 /**
@@ -165,8 +129,16 @@ module chamfer_cube_edge(
   * @param  chamferZ       Which chamfers to render along the z axis
   *                        in clockwise order starting from the zero
   *                        point, as seen from "Bottom view" (Ctrl + 5)
+  *
+  * Copied from:
+  *  https://raw.githubusercontent.com/SebiTimeWaster/Chamfers-for-OpenSCAD/master/Chamfer.scad
   */
-module chamferCube(sizeX, sizeY, sizeZ, chamferHeight = 1, chamferX = [1, 1, 1, 1], chamferY = [1, 1, 1, 1], chamferZ = [1, 1, 1, 1]) {
+module chamferCube(
+    sizeX, sizeY, sizeZ,
+    chamferHeight = 1,
+    chamferX = [1, 1, 1, 1],
+    chamferY = [1, 1, 1, 1],
+    chamferZ = [1, 1, 1, 1]) {
     chamferCLength = sqrt(chamferHeight * chamferHeight * 2);
     difference() {
         cube([sizeX, sizeY, sizeZ]);
