@@ -75,18 +75,31 @@ ra3_len = 17.13;
 
 ra_bearing_gap = 0.6;
 
-rotate([0,0,$t*360])
-  translate([0, 0, ra_bearing_gap/2])
-    ra_and_dec();
+ioptron_mount($t * 360) {};
+//rotate([0,0,$t*360])
+//  
+//  translate([0, 0, ra_bearing_gap/2])
+//    ra_and_dec();
+//
+//ra_bearing();
+//
+//
+//rotate([180, 0, 0])
+////  translate([200, 0, ra_bearing_gap/2])
+//    ra_body();
 
-ra_bearing();
+module ioptron_mount(ra_angle=0) {
+  rotate([0, 0, ra_angle])
+    translate([0, 0, ra_bearing_gap/2]) {
+      ra_and_dec();
+      children();
+    };
 
-
-rotate([180, 0, 0])
-//  translate([200, 0, ra_bearing_gap/2])
+  ra_bearing();
+  
+  rotate([180, 0, 0])
     ra_body();
-
-
+}
 
 module ra_body() {
   // To avoid modeling more of the RA body,
