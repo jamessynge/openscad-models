@@ -32,7 +32,7 @@ cw_thread_radius = cw_thread_diam / 2;
 ////////////////////////////////////////////////////
 // Diameter of the motor end of the DEC body.
 
-dec2_diam = 98.25;
+dec2_diam = 97.4;  // +/- 0.3mm.
 dec2_radius = dec2_diam / 2;
 dec2_len = 25.4;
 
@@ -51,8 +51,8 @@ dec_motor_z_offset =
 ////////////////////////////////////////////////////
 // RA axis diameter at the bearing, where the moving
 // and stationary parts meet.
-ra1_radius = 62;
-ra1_diam = ra1_radius*2;
+ra1_diam = 120;  // +/- 0.3mm.
+ra1_radius = ra1_diam / 2;
 
 ////////////////////////////////////////////////////
 // Distance from edge of RA bearing to outside and
@@ -76,17 +76,6 @@ ra3_len = 17.13;
 ra_bearing_gap = 0.6;
 
 ioptron_mount($t * 360) {};
-//rotate([0,0,$t*360])
-//  
-//  translate([0, 0, ra_bearing_gap/2])
-//    ra_and_dec();
-//
-//ra_bearing();
-//
-//
-//rotate([180, 0, 0])
-////  translate([200, 0, ra_bearing_gap/2])
-//    ra_body();
 
 module ioptron_mount(ra_angle=0) {
   rotate([0, 0, ra_angle])
