@@ -51,7 +51,7 @@ dec_motor_z_offset =
 ////////////////////////////////////////////////////
 // RA axis diameter at the bearing, where the moving
 // and stationary parts meet.
-ra1_radius = 62;
+ra1_radius = 60;
 ra1_diam = ra1_radius*2;
 
 ////////////////////////////////////////////////////
@@ -74,6 +74,11 @@ ra3_radius = ra2_radius - 19.86;
 ra3_len = 17.13;
 
 ra_bearing_gap = 0.6;
+
+// Functions to enable access from other files that "use"
+// this file.
+function ra_cover_radius() = ra1_radius;
+function dec_cover_radius() = dec2_radius;
 
 ioptron_mount($t * 360) {};
 //rotate([0,0,$t*360])
