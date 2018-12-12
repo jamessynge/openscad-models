@@ -75,6 +75,11 @@ ra3_len = 17.13;
 
 ra_bearing_gap = 0.6;
 
+// Functions to enable access from other files that "use"
+// this file.
+function ra_cover_radius() = ra1_radius;
+function dec_cover_radius() = dec2_radius;
+
 ioptron_mount($t * 360) {};
 
 module ioptron_mount(ra_angle=0) {

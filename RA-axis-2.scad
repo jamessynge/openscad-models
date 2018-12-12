@@ -8,7 +8,7 @@ $fs = 0.1;
 // Don't generate larger angles than this many degrees.
 $fa = 3;
 
-ra1_radius = 62;
+ra1_radius = ra_cover_radius();
 
 echo("ra1_radius");
 echo(ra1_radius);
