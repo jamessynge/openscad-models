@@ -75,8 +75,8 @@ ra3_len = 17.13;
 
 ra_bearing_gap = 0.6;
 
-// Functions to enable access from other files that "use"
-// this file.
+// Functions to enable access from other files
+// that "use" this file.
 function ra_cover_radius() = ra1_radius;
 function dec_cover_radius() = dec2_radius;
 
@@ -134,27 +134,21 @@ module ra_body() {
 //            chamferX=[0,0,0,1], chamferY=[0,1,1,0],
 //            chamferZ=[0,0,0,0]);
           };
-
 }
 
-
-
-
-
-
-
-
-
-
+// A little decoration for the model, so that the
+// two sides of the RA bearing aren't butted up
+// against each other in an unrealistic fashion,
+// and to match the way the mount actually looks;
+// i.e. there is a very small gap between the two
+// sides through which we can see silver colored
+// metal.
 module ra_bearing() {
   h=3;
   color("silver")
     translate([0, 0, -h/2])
       cylinder(h=h, r=ra2_radius-2);
 }
-      
-
-
 
 module ra_and_dec() {
   // Translate and rotate so that the RA bearing

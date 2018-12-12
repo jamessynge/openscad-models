@@ -42,7 +42,7 @@ module ra_bearing_cover() {
 }
 
 if ($preview) {
-  ioptron_mount($t * 360) {
+  ioptron_mount($t * 360 + 90) {
     ra_bearing_cover();
   }
 } else {
