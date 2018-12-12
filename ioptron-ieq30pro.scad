@@ -6,17 +6,27 @@ include <ieq30pro-clutch.scad>
 
 // Global resolution
 // Don't generate smaller facets than this many mm.
-$fs = 0.1;
+$fs = 0.5;
 // Don't generate larger angles than this many degrees.
-$fa = 3;
+$fa = 1;
 
 ioptron_mount($t * 360) {};
+
+translate([200,0,0]) dec_head();
+
+module dec_head() {
+//  linear_extrude
+  color(cast_iron_color)
+    cylinder(h=dec_head_base_height, r=dec_head_base_diam/2);
+}
+
 
 module ioptron_mount(ra_angle=0) {
   rotate([0, 0, ra_angle])
     translate([0, 0, ra_bearing_gap/2]) {
-      ra_and_dec();
-      children();
+      ra_and_dec() {
+        children();
+      }
     };
 
   ra_bearing();
@@ -86,6 +96,12 @@ module ra_and_dec() {
     dec_body();
     ra_to_dec();
   }
+  // TODO Change coordinates of ra_and_dec so
+  // that it rests on the z=0 plane natively.
+  // this will make it easier to add children
+  // to both the RA axis base and to the DEC
+  // head.
+  children();
 }
 
 module dec_body() {
@@ -182,6 +198,5 @@ module ra_to_dec() {
       translate([-(ra1_radius-5), 0, -h1])
         rotate([90,0,270])
         clutch();
-    }
-      
+    };      
 }

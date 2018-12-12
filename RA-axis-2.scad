@@ -1,14 +1,13 @@
+include <ieq30pro-dimensions.scad>
 use <ioptron-ieq30pro.scad>
 
 echo(version=version());
 
 // Global resolution
 // Don't generate smaller facets than this many mm.
-$fs = 0.1;
+$fs = 0.9;
 // Don't generate larger angles than this many degrees.
-$fa = 3;
-
-ra1_radius = ra_cover_radius();
+$fa = 10;
 
 echo("ra1_radius");
 echo(ra1_radius);
@@ -43,15 +42,12 @@ module ra_bearing_cover() {
 
 if ($preview) {
   ioptron_mount($t * 360 + 90) {
-    ra_bearing_cover();
+    #ra_bearing_cover();
   }
 } else {
   ra_bearing_cover();
 }
-
-//rotate([0,0,0]) ra_bearing_cover();
-                
-                
+               
 
 module ra_body_envelope() {
   rotate([180, 0, 0]) {

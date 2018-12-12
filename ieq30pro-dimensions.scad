@@ -94,3 +94,17 @@ clutch_handle_length = 38.9; // screw center to end.
 clutch_handle_width = 8.75; // At widest.
 clutch_handle_depth1 = 10.2;
 clutch_handle_depth2 = 13.7;
+
+////////////////////////////////////////////////////
+// Dimensions for the DEC head (i.e. the part
+// rotated by the DEC motor, which has the dove tail
+// saddle for holding the telescope).
+
+dec_head_base_diam = 97.66;
+dec_head_diam1 = 89.5;
+dec_head_diam2 = 87.67;  // After draft angle.
+dec_head_height1 = 32.5;
+dec_head_height2 = 46.3;
+
+
+
