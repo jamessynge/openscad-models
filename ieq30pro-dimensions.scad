@@ -1,6 +1,7 @@
 // Units: mm
 
-cast_iron_color = "beige";
+cast_iron_color = "gray";//"beige";
+plastic_color = [0.1,0.1,0.1];
 
 ////////////////////////////////////////////////////
 // Diameter of dec body at bottom, near CW shaft.
@@ -101,10 +102,19 @@ clutch_handle_depth2 = 13.7;
 // saddle for holding the telescope).
 
 dec_head_base_diam = 97.66;
-dec_head_diam1 = 89.5;
-dec_head_diam2 = 87.67;  // After draft angle.
-dec_head_height1 = 32.5;
-dec_head_height2 = 46.3;
-
-
-
+dec_head_base_height = 3.83;
+dec_head_height = 46.3;  // Above base.
+dec_head_diam1 = 89.5;  // At top of base.
+dec_head_diam2 = 86.9;  // At top, due to draft angle.
+dec_head_scale = dec_head_diam2 / dec_head_diam1;
+dec_saddle_depth = 13.8;
+dec_saddle_width1 = 43.95; // At top of saddle
+dec_saddle_width2 = 46.66; // At bottom of saddle
+dovetail_width = 45.25;
+dec_slot_corner_radius = 5;
+dec_slot_width = 60.4;
+dec_slot_len = 25.6;
+dec_head_square = 76;
+dec_head_clamp_screw_diam = 7.8;  // OD
+dec_head_clamp_screw_depth = 6.66;  // Top to centerline.
+dec_head_clamp_screw_spacing = 44.4; 

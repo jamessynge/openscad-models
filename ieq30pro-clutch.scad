@@ -37,7 +37,7 @@ module clutch_base(handle_angle) {
 };
 
 module clutch_handle() {
-  color("black") {
+  color(plastic_color) {
     radius = clutch_handle_base_diam / 2;
     hw = clutch_handle_width / 2;
     linear_extrude(height=clutch_handle_depth1)
