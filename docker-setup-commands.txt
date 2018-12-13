@@ -1,0 +1,18 @@
+Start docker in root of openscad-models worktree:
+(should change so that the UID:GID match mine... or should clone the repo inside the container)
+
+docker run -v `pwd`:`pwd` -w `pwd` -i -t  debian:latest
+
+Install openscad-nightly:
+
+echo "deb http://download.opensuse.org/repositories/home:/t-paul/Debian_9.0/ ./" > /etc/apt/sources.list.d/openscad.list
+apt-get update
+apt-get install wget gnupg2
+wget -qO - http://files.openscad.org/OBS-Repository-Key.pub | apt-key add -
+apt-get update
+apt-get install openscad-nightly
+
+Generate an STL file:
+
+openscad-nightly --o measure-RA-axis-radius-60.stl measure-RA-axis.scad
+
