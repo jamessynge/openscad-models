@@ -1,0 +1,12 @@
+# Exclude animated GIFs (very big, binary files).
+animated*.gif
+
+# Exclude the frames that go making into the animated GIFs.
+frame*.png
+
+# Exclude scratchpad OpenSCAD file.
+Untitled.scad
+
+# Exclude file created by hup (used to run openscad in the background).
+nohup.out
+

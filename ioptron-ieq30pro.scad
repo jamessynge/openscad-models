@@ -29,13 +29,14 @@ $fa = 1;
 
 ioptron_mount($t * 360, $t * 360) {
   color("gold") {
+    echo("executing ioptron_mount child 1");
     translate([ra1_radius*2,ra1_radius,10])
       linear_extrude(height=20) square(size=10);
     axis_arrows(total_length=ra1_radius*2);
   };    
 
   color("blue") {
-    echo("executing ra_and_dec child 1");
+    echo("executing ioptron_mount child 2");
     linear_extrude(height=4) {
       difference() {
         circle(r=ra1_radius + 10);
@@ -46,9 +47,23 @@ ioptron_mount($t * 360, $t * 360) {
     };
     axis_arrows(total_length=ra1_radius*1.5);
   };
+  
+  color("yellow") {
+    echo("executing ioptron_mount child 3");
+    r = dec_head_base_diam/2;
+    linear_extrude(height=4) {
+      difference() {
+        circle(r=r + 10);
+        circle(r=r + 5);
+      };
+      translate([r+10,0,0])
+        square(size=10, center=true);
+    };
+    axis_arrows(total_length=r*1.5);
+  };
 
   color("red") {
-    echo("executing dec_head child 1");
+    echo("executing ioptron_mount child 4");
     r = dec_head_base_diam/2;
     linear_extrude(height=4) {
       difference() {
@@ -62,7 +77,7 @@ ioptron_mount($t * 360, $t * 360) {
   };
 
   color("green") {
-    echo("executing dec_head child 2");
+    echo("executing ioptron_mount child 5");
     r = dec_head_base_diam/2;
     translate([20,10,10]) sphere(r=10);
     axis_arrows(total_length=r);
@@ -71,7 +86,7 @@ ioptron_mount($t * 360, $t * 360) {
 
 module ioptron_mount(ra_angle=0, dec_angle=0) {
   echo("ioptron_mount has", $children, "children");
-  assert($children == 4);
+  assert($children == 5);
 
   rotate([0, 0, ra_angle]) {
     translate([0, 0, ra_bearing_gap/2]) {
@@ -79,6 +94,7 @@ module ioptron_mount(ra_angle=0, dec_angle=0) {
         children(1);
         children(2);
         children(3);
+        children(4);
       };
     };
   };

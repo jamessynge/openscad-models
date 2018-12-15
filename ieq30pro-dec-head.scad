@@ -34,7 +34,6 @@ dec_head() {
     };
     axis_arrows(total_length=r*1.5);
   };
-    
 
   color("green") {
     echo("executing dec_head child 2");
