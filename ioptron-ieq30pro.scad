@@ -19,6 +19,7 @@ use <chamfer.scad>
 include <ieq30pro-dimensions.scad>
 use <ieq30pro-ra-to-dec.scad>
 use <ieq30pro-clutch.scad>
+use <axis-arrows.scad>
 
 // Global resolution
 // Don't generate smaller facets than this many mm.
@@ -27,32 +28,44 @@ $fs = 0.5;
 $fa = 1;
 
 ioptron_mount($t * 360, $t * 360) {
-  translate([ra1_radius*2,ra1_radius,10])
-    linear_extrude(height=20) square(size=10);
+  color("gold") {
+    translate([ra1_radius*2,ra1_radius,10])
+      linear_extrude(height=20) square(size=10);
+    axis_arrows(total_length=ra1_radius*2);
+  };    
 
-  color("blue") linear_extrude(height=4) {
+  color("blue") {
     echo("executing ra_and_dec child 1");
-    difference() {
-      circle(r=ra1_radius + 10);
-      circle(r=ra1_radius + 5);
+    linear_extrude(height=4) {
+      difference() {
+        circle(r=ra1_radius + 10);
+        circle(r=ra1_radius + 5);
+      };
+      translate([ra1_radius+10,0,0])
+        square(size=10, center=true);
     };
-    translate([ra1_radius+10,0,0])
-      square(size=10, center=true);
+    axis_arrows(total_length=ra1_radius*1.5);
   };
-  color("red") linear_extrude(height=4) {
-    echo("executing ra_and_dec child 1");
+
+  color("red") {
+    echo("executing dec_head child 1");
     r = dec_head_base_diam/2;
-    difference() {
-      circle(r=r + 10);
-      circle(r=r + 5);
+    linear_extrude(height=4) {
+      difference() {
+        circle(r=r + 10);
+        circle(r=r + 5);
+      };
+      translate([r+10,0,0])
+        square(size=10, center=true);
     };
-    translate([r+10,0,0])
-      square(size=10, center=true);
+    axis_arrows(total_length=r*1.5);
   };
 
-  color("green") translate([20,10,10]) {
-    echo("executing ra_and_dec child 2");
-    sphere(r=10);
+  color("green") {
+    echo("executing dec_head child 2");
+    r = dec_head_base_diam/2;
+    translate([20,10,10]) sphere(r=10);
+    axis_arrows(total_length=r);
   };
 };
 

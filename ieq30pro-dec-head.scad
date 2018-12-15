@@ -18,22 +18,29 @@
 use <chamfer.scad>
 include <ieq30pro-dimensions.scad>
 use <ieq30pro-clutch.scad>
+use <axis-arrows.scad>
 
 dec_head() {
-  color("red") linear_extrude(height=4) {
+  color("red") {
     echo("executing dec_head child 1");
     r = dec_head_base_diam/2;
-    difference() {
-      circle(r=r + 10);
-      circle(r=r + 5);
+    linear_extrude(height=4) {
+      difference() {
+        circle(r=r + 10);
+        circle(r=r + 5);
+      };
+      translate([r+10,0,0])
+        square(size=10, center=true);
     };
-    translate([r+10,0,0])
-      square(size=10, center=true);
+    axis_arrows(total_length=r*1.5);
   };
+    
 
-  color("green") translate([20,10,10]) {
+  color("green") {
     echo("executing dec_head child 2");
-    sphere(r=10);
+    r = dec_head_base_diam/2;
+    translate([20,10,10]) sphere(r=10);
+    axis_arrows(total_length=r);
   };
 };
 
