@@ -1,3 +1,18 @@
+// Models the essential aspects of the iOptron iEQ30 Pro
+// mount w.r.t. designing weatherproofing for the
+// RA and DEC bearings.
+//
+// 
+// Module ioptron_mount() REQUIRES four children.
+// The first is rendered on the plane of the
+// RA bearing, with z>0 being towards the fixed
+// base of the mount (i.e. where the motor is)
+// and with y>0 being towards the RA motor.
+// The remaining 3 children are passed to the
+// to module ra_and_dec().
+// See ieq30pro-ra-to-dec.scad for details on
+// the coordinates for those children.
+
 // Units: mm
 
 use <chamfer.scad>
@@ -11,18 +26,59 @@ $fs = 0.5;
 // Don't generate larger angles than this many degrees.
 $fa = 1;
 
-ioptron_mount($t * 360) {};
+ioptron_mount($t * 360, $t * 360) {
+  translate([ra1_radius*2,ra1_radius,10])
+    linear_extrude(height=20) square(size=10);
+
+  color("blue") linear_extrude(height=4) {
+    echo("executing ra_and_dec child 1");
+    difference() {
+      circle(r=ra1_radius + 10);
+      circle(r=ra1_radius + 5);
+    };
+    translate([ra1_radius+10,0,0])
+      square(size=10, center=true);
+  };
+  color("red") linear_extrude(height=4) {
+    echo("executing ra_and_dec child 1");
+    r = dec_head_base_diam/2;
+    difference() {
+      circle(r=r + 10);
+      circle(r=r + 5);
+    };
+    translate([r+10,0,0])
+      square(size=10, center=true);
+  };
+
+  color("green") translate([20,10,10]) {
+    echo("executing ra_and_dec child 2");
+    sphere(r=10);
+  };
+};
 
 module ioptron_mount(ra_angle=0, dec_angle=0) {
-  rotate([0, 0, ra_angle])
+  echo("ioptron_mount has", $children, "children");
+  assert($children == 4);
+
+  rotate([0, 0, ra_angle]) {
     translate([0, 0, ra_bearing_gap/2]) {
-      ra_and_dec(dec_angle) children();
+      ra_and_dec(dec_angle) {
+        children(1);
+        children(2);
+        children(3);
+      };
     };
+  };
 
   ra_bearing();
   
-  rotate([180, 0, 0])
-    ra_body();
+  rotate([180, 0, 0]) {
+    translate([0, 0, ra_bearing_gap/2]) {
+      ra_body();
+      rotate([0,0,180])
+        children(0);
+    };
+  };
 }
 
 module ra_body() {
@@ -70,8 +126,8 @@ module ra_body() {
 // sides through which we can see silver colored
 // metal.
 module ra_bearing() {
-  h=3;
-  color("silver")
+  h=ra_bearing_gap+1;
+  color(bearing_color)
     translate([0, 0, -h/2])
       cylinder(h=h, r=ra2_radius-2);
 }

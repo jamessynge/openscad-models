@@ -1,7 +1,8 @@
 // Units: mm
 
-cast_iron_color = "gray";//"beige";
+cast_iron_color = "bisque";//"gray";//"beige";
 plastic_color = [0.1,0.1,0.1];
+bearing_color = "silver";
 
 ////////////////////////////////////////////////////
 // Diameter of dec body at bottom, near CW shaft.
@@ -118,3 +119,5 @@ dec_head_square = 76;
 dec_head_clamp_screw_diam = 7.8;  // OD
 dec_head_clamp_screw_depth = 6.66;  // Top to centerline.
 dec_head_clamp_screw_spacing = 44.4; 
+
+dec_bearing_gap = ra_bearing_gap;

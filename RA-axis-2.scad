@@ -40,6 +40,11 @@ module ra_bearing_cover() {
                 [0, 10]]);
 }
 
+
+
+
+
+
 if ($preview) {
   ioptron_mount($t * 360 + 90) {
     #ra_bearing_cover();

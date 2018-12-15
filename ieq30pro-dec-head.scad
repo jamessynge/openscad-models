@@ -3,14 +3,15 @@
 // telescope atop the mount.
 
 // dec_head accepts up to two children:
+//
 // 1) The first is centered on the plane of the base
 //    of the dec_head, with z=0 and the clutch is
-//    on the x-axis at y=0. Suitable for
-//    weatherproofing items.
+//    on the y-axis at x=0.
+//
 // 2) The second is placed into the plane of the
 //    dovetail saddle, with the x-axis aligned with
-//    the long direction of a dovetail.
-//    Suitable for the telescope.
+//    the long direction of a dovetail, and with the
+//    clutch down (i.e. x=0, y negative).
 
 // Units: mm
 
@@ -19,11 +20,26 @@ include <ieq30pro-dimensions.scad>
 use <ieq30pro-clutch.scad>
 
 dec_head() {
-  translate([0,0,0]) #cube(10, center=true);
-  translate([0,0,0]) #cube(10, center=false);
+  color("red") linear_extrude(height=4) {
+    echo("executing dec_head child 1");
+    r = dec_head_base_diam/2;
+    difference() {
+      circle(r=r + 10);
+      circle(r=r + 5);
+    };
+    translate([r+10,0,0])
+      square(size=10, center=true);
+  };
+
+  color("green") translate([20,10,10]) {
+    echo("executing dec_head child 2");
+    sphere(r=10);
+  };
 };
 
 module dec_head() {
+  echo("dec_head has", $children, "children");
+
   base_r = dec_head_base_diam / 2;
   inner_r = dec_head_diam1 / 2;
   color(cast_iron_color) {
@@ -47,16 +63,20 @@ module dec_head() {
     rotate([90,0,90])
       clutch();
   
-  echo("dec_head has", $children, "children");
   if ($children > 0) {
-    children(0);
-  }
-  if ($children > 1) {
-    raise_by = dec_head_base_height + dec_head_height
-        - dec_saddle_depth + 0.01;
-    translate([0,0,raise_by])
-      rotate([0, 0, 90])
-        children(1);
+    rotate([0, 0, 90]) {
+      echo("dec_head rendering child 0");
+      !children(0);
+
+      if ($children > 1) {
+        raise_by = dec_head_base_height
+          + dec_head_height - dec_saddle_depth + 0.01;
+        translate([0,0,raise_by]) {
+          echo("dec_head rendering child 1");
+          children(1);
+        }
+      }
+    }
   }
 }
 
