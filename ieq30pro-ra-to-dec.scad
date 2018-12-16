@@ -224,7 +224,7 @@ module dec_motor() {
   h=dec_motor_h;
   z=dec_motor_z;
   
-  translate([-w/2, dec_motor_z_offset, h - dec2_len + 0.01])
+  translate([-w/2, dec_motor_z_offset, h - dec2_len + dec_motor_setback])
     rotate([-90,0,0]) {
       color(plastic_color) {
         intersection() {

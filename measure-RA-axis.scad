@@ -1,3 +1,4 @@
+include <ieq30pro-dimensions.scad>
 use <ioptron-ieq30pro.scad>
 
 echo(version=version());
@@ -7,8 +8,6 @@ echo(version=version());
 $fs = 0.1;
 // Don't generate larger angles than this many degrees.
 $fa = 3;
-
-ra1_radius = ra_cover_radius();
 
 echo("ra1_radius", ra1_radius);
 

@@ -18,7 +18,6 @@
 use <chamfer.scad>
 include <ieq30pro-dimensions.scad>
 use <ieq30pro-ra-to-dec.scad>
-use <ieq30pro-clutch.scad>
 use <axis-arrows.scad>
 
 // Global resolution

@@ -38,6 +38,9 @@ dec_motor_w = 85.4;  // left-right on face with logo.
 dec_motor_h = 68.4;  // up-down on face with logo.
 dec_motor_z = 62.4;
 
+// Distance away from bearing plane.
+dec_motor_setback = 0.01;
+
 ////////////////////////////////////////////////////
 // Min dist from face with logo to dec1 cylinder.
 dec_motor_z2 = 42;
@@ -51,10 +54,13 @@ ra1_diam = 120;  // +/- 0.3mm.
 ra1_radius = ra1_diam / 2;
 
 ////////////////////////////////////////////////////
-// Distance from edge of RA bearing to outside and
-// center of DEC axis.
+// Distance from edge of RA bearing to outside of
+// DEC body, center of DEC axis, and outside of
+// DEC gear cover.
 ra1_base_to_dec = 21.5;
 ra1_base_to_dec_center = ra1_base_to_dec + dec1_radius;
+ra1_base_to_dec_gear_cover =
+    ra1_base_to_dec_center - dec2_radius;
 
 ////////////////////////////////////////////////////
 // Dimensions for the non-moving portion of the
@@ -70,11 +76,6 @@ ra3_radius = ra2_radius - 19.86;
 ra3_len = 17.13;
 
 ra_bearing_gap = 0.6;
-
-// Functions to enable access from other files
-// that "use" this file.
-function ra_cover_radius() = ra1_radius;
-function dec_cover_radius() = dec2_radius;
 
 ////////////////////////////////////////////////////
 // Dimensions for the DEC and RA clutches. They are
@@ -103,6 +104,7 @@ clutch_handle_depth2 = 13.7;
 // saddle for holding the telescope).
 
 dec_head_base_diam = 97.66;
+dec_head_base_radius = dec_head_base_diam / 2;
 dec_head_base_height = 3.83;
 dec_head_height = 46.3;  // Above base.
 dec_head_diam1 = 89.5;  // At top of base.
@@ -121,3 +123,32 @@ dec_head_clamp_screw_depth = 6.66;  // Top to centerline.
 dec_head_clamp_screw_spacing = 44.4; 
 
 dec_bearing_gap = ra_bearing_gap;
+
+// Maximum distance from DEC head
+// out to the tip of the handle (i.e.
+// how much you'd have to expand the
+// radius of the DEC head to fully
+// engulf the handle at its existing
+// location.
+dec_clutch_handle_max_height = 32;
+
+
+dec_saddle_height =
+    dec_head_base_height +
+    dec_head_height - dec_saddle_depth;
+
+/////////////////////////////////////////////
+// Computed values for the DEC bearing.
+
+// Can't go too large because otherwise we'll
+// hit the RA motor cover.
+dec_cover_max_radius =
+    dec2_radius + ra1_base_to_dec_gear_cover;
+dec_cover_max_diam = dec_cover_max_radius * 2;
+
+// Compute the angle of the circle of the
+// DEC gear cover subtended by the motor
+// cover. See:
+//  https://en.wikipedia.org/wiki/Circular_segment
+dec_motor_cover_angle = 2 * asin(dec_motor_w/dec2_diam);
+
