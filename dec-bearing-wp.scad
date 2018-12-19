@@ -329,15 +329,34 @@ module dec_motor_void() {
 // Space to be occupied by a nut and bolt for
 // attaching the dec_motor_cover_cover to
 // a band around the other half of the DEC axis.
-module nut_slot1() {
+module nut_slot1_OLD() {
   x_offset = dec_motor_w/2 + dec_motor_gap + shell2 - nut_slot_depth + .001;
   y_offset = nut_height+bolt_len-.001;
   
   translate([x_offset,y_offset,dec2_len/2])
-//  rotate([0,90,0]) 
-  rotate([90,0,0])
-  nut_slot(d=nut_diam, h=nut_height, depth=nut_slot_depth, bolt_diam=bolt_diam,
-    bolt_up=bolt_len, bolt_down=10);
+    rotate([0,90,0]) 
+      rotate([90,0,0])
+        nut_slot(d=nut_diam, h=nut_height,
+                 depth=nut_slot_depth,
+                 bolt_diam=bolt_diam,
+                 bolt_up=bolt_len,
+                 bolt_down=10);
+}
+
+// Space to be occupied by a nut and bolt for
+// attaching the dec_motor_cover_cover to
+// a band around the other half of the DEC axis.
+module nut_slot1() {
+  x_offset = (shell2_outside_x + dec2_radius) / 2;
+  y_offset = nut_height+bolt_len-.001;
+  
+  translate([x_offset, y_offset, dec2_len/2])
+    rotate([90,0,0])
+      nut_slot(d=nut_diam, h=nut_height,
+               depth=nut_slot_depth,
+               bolt_diam=bolt_diam,
+               bolt_up=bolt_len,
+               bolt_down=10);
 }
 
 module dmcc_fillet1() {
