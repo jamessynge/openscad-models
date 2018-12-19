@@ -152,3 +152,5 @@ dec_cover_max_diam = dec_cover_max_radius * 2;
 //  https://en.wikipedia.org/wiki/Circular_segment
 dec_motor_cover_angle = 2 * asin(dec_motor_w/dec2_diam);
 
+// This needs to be adjusted for each site.
+mount_latitude = 42;
