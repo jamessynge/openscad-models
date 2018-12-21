@@ -28,7 +28,8 @@ nut_diam = 10;
 nut_height = 4;
 nut_slot_depth = 20;
 bolt_diam=6;
-bolt_len=10;  // Not a real size, just used for
+nut_slot_margin = 10; // 
+bolt_len=50;  // Not a real size, just used for
               // difference().
 
 // This is a radius that would clear
@@ -48,9 +49,9 @@ dec_roof_outer_radius2 = dec_roof_interior_radius + 21;
 dmcc_extra_z=dec_motor_z_offset;
 
 
-dec_motor_cover_cover();
-dec_motor_cover_strap();
-*dec_bearing_upper_roof();
+*dec_motor_cover_cover();
+*dec_motor_cover_strap();
+dec_bearing_upper_roof();
 //dec_bearing_roof_extrusion();
 
 module dec_motor_cover_cover() {
@@ -83,10 +84,9 @@ module dec_motor_cover_cover() {
       mirror([1,0,0]) dmcc_fillet1();
       
     }
+
     // Remove a slot on each side for a 6-sided nut.
-    
-    nut_slot1();
-    mirror([1,0,0]) nut_slot1();
+    strap_attachment_nut_slots();
     
     dec_motor_void();
     dec_bearing_void();
@@ -99,8 +99,7 @@ module dec_motor_cover_strap() {
 
   difference() {
     union() {
-      dmcc_strap_gusset();
-      mirror([1,0,0]) dmcc_strap_gusset();
+      dmcc_strap_gussets();
       intersection() {
         $fn=100;
         difference() {
@@ -122,6 +121,10 @@ module dec_motor_cover_strap() {
       rotate([-90,0,0])
         linear_extrude(height=1000, convexity=10)
           square(size=1000, center=true);
+
+    // Remove a bolt on each side for attaching to
+    // the dec_motor_cover_cover.
+    strap_attachment_nut_slots();
   }
 }
 
@@ -129,15 +132,32 @@ module dec_bearing_upper_roof() {
   difference() {
     union() {
       dec_bearing_roof_extrusion();
-      linear_extrude(height=2, convexity=10)
+      
+      disc_thickness = 2;
+      linear_extrude(height=disc_thickness, convexity=10)
         circle(r=dec_roof_outer_radius1);
 
       
-     #
+     
 //  translate([-shell1_outside_x,0,dec2_len])
 //    rotate([0,180,0])
-//      rotate([-90,0,0])
-        fillet_extrusion(15, 50, scale=1); 
+      
+      fillet_length = 50;
+      
+      translate([shell2_outside_x,
+                 fillet_length,
+                 disc_thickness])
+        rotate([90,0,0])
+          fillet_extrusion(15, fillet_length,
+                           scale=1); 
+      
+      mirror([1,0,0])
+      translate([shell2_outside_x,
+                 fillet_length,
+                 disc_thickness])
+        rotate([90,0,0])
+          fillet_extrusion(15, fillet_length,
+                           scale=1); 
     }
   
     // Remove the portion that is below the y=0
@@ -329,27 +349,10 @@ module dec_motor_void() {
 // Space to be occupied by a nut and bolt for
 // attaching the dec_motor_cover_cover to
 // a band around the other half of the DEC axis.
-module nut_slot1_OLD() {
-  x_offset = dec_motor_w/2 + dec_motor_gap + shell2 - nut_slot_depth + .001;
-  y_offset = nut_height+bolt_len-.001;
-  
-  translate([x_offset,y_offset,dec2_len/2])
-    rotate([0,90,0]) 
-      rotate([90,0,0])
-        nut_slot(d=nut_diam, h=nut_height,
-                 depth=nut_slot_depth,
-                 bolt_diam=bolt_diam,
-                 bolt_up=bolt_len,
-                 bolt_down=10);
-}
-
-// Space to be occupied by a nut and bolt for
-// attaching the dec_motor_cover_cover to
-// a band around the other half of the DEC axis.
 module nut_slot1() {
   x_offset = (shell2_outside_x + dec2_radius) / 2;
-  y_offset = nut_height+bolt_len-.001;
-  
+  y_offset = nut_height+nut_slot_margin;
+
   translate([x_offset, y_offset, dec2_len/2])
     rotate([90,0,0])
       nut_slot(d=nut_diam, h=nut_height,
@@ -357,6 +360,11 @@ module nut_slot1() {
                bolt_diam=bolt_diam,
                bolt_up=bolt_len,
                bolt_down=10);
+}
+
+module strap_attachment_nut_slots() {
+  nut_slot1();
+  mirror([1,0,0]) nut_slot1();
 }
 
 module dmcc_fillet1() {
@@ -375,14 +383,12 @@ module dmcc_strap_gusset() {
   translate([-shell2_outside_x,0,0])
     rotate([90,0,0]) {
       screw_gusset(gx, gy, gz, gd);
-
-      if ($preview) {
-        // Fake bolt for checking.
-        translate([gx/2, gy/2, -gz])
-          linear_extrude(height=gz*2)
-            circle(d=gd/2);
-      }
     }
+}
+
+module dmcc_strap_gussets() {
+  dmcc_strap_gusset();
+  mirror([1,0,0]) dmcc_strap_gusset();
 }
 
 module dec_bearing_roof_screw_hole1() {
