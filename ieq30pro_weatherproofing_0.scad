@@ -15,7 +15,7 @@ show_arrows = false;
 show_axis_hints = false;
 
 // Default location is parked.
-ra_angle = 90 + $t * 360;
+ra_angle = 90 ;// + $t * 360;
 dec_angle = 90 + mount_latitude + $t * 360;
 
 // Distance from motor to shell around it.
@@ -58,6 +58,7 @@ ioptron_mount(ra_angle=ra_angle, dec_angle=dec_angle) {
     echo("executing ioptron_mount child 3");
     color("purple")dec_motor_cover_cover();
     color("plum")dec_motor_cover_strap();
+    color("violet") dec_bearing_upper_roof();
     //dec_motor_bearing_cover();
     color("yellow") {
       if (show_axis_hints) {

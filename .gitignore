@@ -10,3 +10,7 @@ Untitled.scad
 # Exclude file created by hup (used to run openscad in the background).
 nohup.out
 
+# Assume that we mostly don't want to add STL files.
+*.stl
+
+*.sublime-workspace

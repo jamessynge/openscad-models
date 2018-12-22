@@ -124,13 +124,11 @@ dec_head_clamp_screw_spacing = 44.4;
 
 dec_bearing_gap = ra_bearing_gap;
 
-// Maximum distance from DEC head
-// out to the tip of the handle (i.e.
-// how much you'd have to expand the
-// radius of the DEC head to fully
-// engulf the handle at its existing
-// location.
-dec_clutch_handle_max_height = 32;
+// Maximum distance from DEC axis to outer
+// (top) of DEC axis clutch handle. Used to
+// determine how much room the weatherproofing
+// has to allow for.
+dec_clutch_handle_max_height = 65.35;
 
 
 dec_saddle_height =

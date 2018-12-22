@@ -146,7 +146,7 @@ module ra_to_dec() {
     };
     translate([-(ra1_radius-5), 0, -h1])
       rotate([90,0,270])
-      clutch();
+      clutch(handle_angle=5);
   };
 }
 

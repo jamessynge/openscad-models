@@ -1,6 +1,6 @@
 include <ieq30pro-dimensions.scad>
 
-clutch();
+clutch(abs(($t*90)-45)+90*0.75);
 
 module clutch(handle_angle=0) {
   r = clutch_base_diameter/2;
@@ -17,7 +17,7 @@ module clutch(handle_angle=0) {
   };
 };
 
-module clutch_base(handle_angle) {
+module clutch_base() {
   linear_extrude(height=clutch_extrusion)
     union() {
       r = clutch_base_diameter/2;

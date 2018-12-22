@@ -67,7 +67,7 @@ module dec_head() {
 
   translate([inner_r-2,0,0])
     rotate([90,0,90])
-      clutch();
+      clutch(75);
   
   if ($children > 0) {
     rotate([0, 0, 90]) {
