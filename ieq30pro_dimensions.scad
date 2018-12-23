@@ -163,3 +163,6 @@ dec_motor_cover_angle = 2 * asin(dec_motor_w/dec2_diam);
 // This needs to be adjusted for each site. High precision is NOT required
 // (i.e. +/- 5 degrees shouldn't make any difference).
 mount_latitude = 43;
+
+assert(mount_latitude >= 0);
+assert(mount_latitude < 90);

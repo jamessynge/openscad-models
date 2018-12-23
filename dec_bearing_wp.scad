@@ -10,6 +10,9 @@ if ($preview) {
   $fs = 4;
   // Don't generate larger angles than this many degrees.
   $fa = 10;
+} else {
+  $fs = 0.4;
+  $fs = 1;
 }
 
 // Distance from motor to shell around it.
@@ -56,10 +59,7 @@ assert(min_hoop_disc_z <= dec_gap_to_saddle_knob);
 hoop_disc_z = (min_hoop_disc_z + dec_gap_to_saddle_knob) / 2;
 hoop_depth = hoop_disc_z + dec2_len;
 
-
-// This is a radius that would clear
-// clutch regardless of clutch handle
-// position.
+// This is a radius that will clear clutch regardless of clutch handle position.
 dec_roof_interior_radius = dec_clutch_handle_max_height + 3;
 dec_roof_exterior_radius = dec_roof_interior_radius + hoop_disc_wall;
 
@@ -67,8 +67,17 @@ dec_roof_exterior_radius = dec_roof_interior_radius + hoop_disc_wall;
 
 
 color("blue")dec_motor_cover_cover();
-*color("violet")dec_motor_cover_strap();
-translate([0,0,-50]) color("red")dec_bearing_upper_roof();
+color("violet")dec_motor_cover_strap();
+translate([0,0,0]) color("red")dec_bearing_upper_roof();
+
+//translate([0,0,-100]) color("red")dec_bearing_upper_roof();
+
+// Check for intersection. None last time I checked.
+translate([0, 0, -150]) color("green") intersection() {
+dec_motor_cover_cover();
+dec_bearing_upper_roof();
+};
+
 
 module dec_motor_cover_cover() {
   // extra_h covers cable plug/jack.
@@ -150,40 +159,9 @@ module dec_bearing_upper_roof() {
     union() {
       dec_bearing_hoop();
       dec_bearing_hoop_attachment();
-      // disc_thickness = 2;
-      // linear_extrude(height=disc_thickness, convexity=10)
-      //   circle(r=dec_roof_outer_radius1);
-      
-      // fillet_length = 50;
-      
-      // translate([shell2_outside_x,
-      //            fillet_length,
-      //            disc_thickness])
-      //   rotate([90,0,0])
-      //     fillet_extrusion(15, fillet_length,
-      //                      scale=1); 
-      
-      // mirror([1,0,0])
-      // translate([shell2_outside_x,
-      //            fillet_length,
-      //            disc_thickness])
-      //   rotate([90,0,0])
-      //     fillet_extrusion(15, fillet_length,
-      //                      scale=1); 
     }
-  
-    // // Remove the portion that is below the y=0
-    // // plane, thus allowing for the bolts to be
-    // // tightened.
-    // rotate([90,0,0])
-    //   linear_extrude(height=1000, convexity=10)
-    //     square(size=1000, center=true);
 
-    // TODO Come up with a simple void module for the DMCC
-    // but that is just a tad bigger. Doesn't need
-    // to be as detailed.
-
-    dmcc_void(gap=1);
+    dmcc_void(w_gap=0.2, d_gap=0.5);
 
     dec_motor_cover_strap_void();
 
@@ -196,12 +174,24 @@ module dec_bearing_upper_roof() {
     dec_bearing_roof_screw_holes();
 
     // Remove material that would block installation.
+    // First, only encapsulate the top corner of the DEC motor cover shell
+    // 2 (top when in the parked position).
     union() {
       w = 1000;  // Essentially infinite.
       h = shell1_outside_y;
       d = shell1_depth;
       x = -(w + shell_inside_x);
       translate([x, 0, 0]) cube([w, h, d]);
+    }
+    // Need to prevent the overhang of the fillet near that top corner, which
+    // again would block installation. This is customized to the size of
+    // the fillet and the hoop, not exactly what it should be.
+    if (mount_latitude > 0 && mount_latitude < 90) {
+      x = shell1_outside_x + shell_diff * 0.35;
+      y = tan(mount_latitude) * x;
+      d = shell1_depth;
+      linear_extrude(height=d)
+        polygon(points=[[0,0], [x, 0], [0, -y]]);
     }
   }
 }
@@ -210,7 +200,7 @@ module dec_bearing_upper_roof() {
 
 module dec_bearing_hoop_attachment() {
   // Attaches the hoop to the DMCC.
-  roof_thickness = hoop_disc_wall;
+  roof_thickness = 10;
   w = shell2_outside_x*2 + roof_thickness;
   h = shell2_outside_y + roof_thickness;
   d = hoop_depth;
@@ -386,29 +376,29 @@ module dec_motor_void() {
         square([w, z]);
 }
 
-module dmcc_void(gap=0) {
+module dmcc_void(w_gap=0, h_gap=0, d_gap=0) {
+  // Shell 1 simulation.
   if (true) {
-    w = 2 * (shell2_outside_x + gap);
-    h = shell2_outside_y + gap;
-    d = shell2_depth + 2*gap;
+    w = 2 * (shell1_outside_x + w_gap);
+    h = shell1_outside_y + h_gap;
+    d = shell1_depth + 2*d_gap;
 
-    translate([-w/2, 0, -gap])
+    translate([-w/2, 0, -d_gap])
       cube([w, h, d], center=false);
   }
+  // Shell 2 simulation.
   if (true) {
-    w = 2 * (shell1_outside_x + gap);
-    h = shell1_outside_y + gap;
-    d = shell1_depth + 2*gap;
+    w = 2 * (shell2_outside_x + w_gap);
+    h = shell2_outside_y + h_gap;
+    d = shell2_depth + 2*d_gap;
 
-    translate([-w/2, 0, -gap])
+    translate([-w/2, 0, -d_gap])
       cube([w, h, d], center=false);
   }
-  // Haven't included the fillet. Not sure if necessary.
-      // Add a couple of fillets to keep the two
-      // shells in contact down near the DEC bearing
-      // cover.
-      dmcc_fillet1();
-      mirror([1,0,0]) dmcc_fillet1();
+
+  // Haven't simplified or increased the size of the fillets.
+  dmcc_fillet1();
+  mirror([1,0,0]) dmcc_fillet1();
 }
 
 
