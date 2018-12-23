@@ -157,5 +157,9 @@ dec_cover_max_diam = dec_cover_max_radius * 2;
 //  https://en.wikipedia.org/wiki/Circular_segment
 dec_motor_cover_angle = 2 * asin(dec_motor_w/dec2_diam);
 
-// This needs to be adjusted for each site.
-mount_latitude = 19;
+// Latitude (absolute) of the site where the mount will be installed.
+// The reason this is absolute is that the mount is rotated to point
+// to the nearest celestial pole, so latitudes are always non-negative.
+// This needs to be adjusted for each site. High precision is NOT required
+// (i.e. +/- 5 degrees shouldn't make any difference).
+mount_latitude = 43;
