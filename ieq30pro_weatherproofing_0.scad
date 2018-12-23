@@ -6,10 +6,12 @@ use <axis_arrows.scad>
 echo(version=version());
 
 // Global resolution
-// Don't generate smaller facets than this many mm.
-$fs = 0.9;
-// Don't generate larger angles than this many degrees.
-$fa = 10;
+if ($preview) {
+  // Don't generate smaller facets than this many mm.
+  $fs = 2;
+  // Don't generate larger angles than this many degrees.
+  $fa = 10;
+}
 
 show_arrows = false;
 show_axis_hints = false;

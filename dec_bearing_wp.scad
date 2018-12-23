@@ -5,36 +5,44 @@ include <ieq30pro_dimensions.scad>
 use <dec_bearing_utils.scad>
 
 // Global resolution
-// Don't generate smaller facets than this many mm.
-$fs = 0.5;
-// Don't generate larger angles than this many degrees.
-$fa = 3;
+if ($preview) {
+  // Don't generate smaller facets than this many mm.
+  $fs = 4;
+  // Don't generate larger angles than this many degrees.
+  $fa = 10;
+}
 
 // Distance from motor to shell around it.
-dec_motor_gap = 2;
+dec_motor_gap = 1;
 
 // Width of surface mating with DEC bearing cover.
 dec_bearing_mating_length = min(dec2_len, 20);
 
-shell1 = 4;
-shell2 = 20;
+shell1 = 6;
+shell2 = 22;
 shell_diff = shell2-shell1;
 shell_inside_x = dec_motor_w/2 + dec_motor_gap;
 shell1_outside_x = dec_motor_w/2 + dec_motor_gap + shell1;
 shell2_outside_x = dec_motor_w/2 + dec_motor_gap + shell2;
 
 shell_inside_y = dec_motor_z_offset + dec_motor_z + dec_motor_gap;
+shell1_outside_y = shell_inside_y + shell1;
 shell2_outside_y = shell_inside_y + shell2;
 
-// These sizes are arbitrary, and should
-// be adjusted to reflect real nut and bolt sizes.
-nut_diam = 10;
+shell1_depth = dec_motor_h+30;
+shell2_depth = min(dec2_len, 15);
+
+// These sizes are based on an M4 machine screw and nut.
+// They should be adjusted to reflect what you choose to use.
+nut_diam = 7 + 0.1;  // Some margin to be able slide the nut in.
 nut_height = 4;
 nut_slot_depth = 20;
-bolt_diam=6;
-nut_slot_margin = 10; // 
+bolt_diam=4 + 0.5;  // 4mm machine screw, plus some margin.
+nut_slot_margin = 15; // 
 bolt_len=50;  // Not a real size, just used for
               // difference().
+
+strap_gusset_length=30;
 
 // Trying to get better protection
 // for bottom of motor cover, which
@@ -46,7 +54,7 @@ hoop_disc_wall = 4;
 min_hoop_disc_z = clutch_handle_base_diam + hoop_disc_wall;
 assert(min_hoop_disc_z <= dec_gap_to_saddle_knob);
 hoop_disc_z = (min_hoop_disc_z + dec_gap_to_saddle_knob) / 2;
-
+hoop_depth = hoop_disc_z + dec2_len;
 
 
 // This is a radius that would clear
@@ -58,9 +66,9 @@ dec_roof_exterior_radius = dec_roof_interior_radius + hoop_disc_wall;
 
 
 
-*dec_motor_cover_cover();
-*dec_motor_cover_strap();
-dec_bearing_upper_roof();
+color("blue")dec_motor_cover_cover();
+*color("violet")dec_motor_cover_strap();
+translate([0,0,-50]) color("red")dec_bearing_upper_roof();
 
 module dec_motor_cover_cover() {
   // extra_h covers cable plug/jack.
@@ -70,7 +78,7 @@ module dec_motor_cover_cover() {
     union() {
       translate([0, dec_motor_z_offset, 0]) {
         motor_cover_shell(
-          dec_motor_w, dec_motor_h+30, dec_motor_z,
+          dec_motor_w, shell1_depth, dec_motor_z,
           extra_z=dmcc_extra_z, motor_gap=dec_motor_gap,
         shell_wall=shell1,
         bracing1=dec_motor_z/2);
@@ -79,7 +87,7 @@ module dec_motor_cover_cover() {
         extra_z2 = dmcc_extra_z - shell_diff;
         
         motor_cover_shell(
-          dec_motor_w, dec2_len, dec_motor_z,
+          dec_motor_w, shell2_depth, dec_motor_z,
           extra_z=dmcc_extra_z, motor_gap=dec_motor_gap,
           shell_wall=shell2);
       }
@@ -89,7 +97,11 @@ module dec_motor_cover_cover() {
       // cover.
       dmcc_fillet1();
       mirror([1,0,0]) dmcc_fillet1();
-      
+
+      // TODO Add a fillet to the inside of shell1 so that
+      // the bracing1 section is supported better when printing.      
+
+
     }
 
     // Remove a slot on each side for a 6-sided nut.
@@ -101,7 +113,7 @@ module dec_motor_cover_cover() {
   }
 }
 
-module dec_motor_cover_strap(expansion_gap=1, gusset_length=30) {
+module dec_motor_cover_strap(expansion_gap=1, gusset_length=strap_gusset_length) {
   narrows_to = dec2_radius + 3;
 
   difference() {
@@ -110,12 +122,12 @@ module dec_motor_cover_strap(expansion_gap=1, gusset_length=30) {
       intersection() {
         $fn=100;
         difference() {
-          cylinder(r=shell2_outside_x, h=dec2_len);
+          cylinder(r=shell2_outside_x, h=shell2_depth);
           translate([0,0,-1])
-            cylinder(r=dec2_radius, h=dec2_len+2);
+            cylinder(r=dec2_radius, h=shell2_depth+2);
         }
         translate([0, 12, 0])
-          cylinder(r=shell2_outside_x, h=dec2_len);
+          cylinder(r=shell2_outside_x, h=shell2_depth);
       }
     };
 
@@ -167,29 +179,50 @@ module dec_bearing_upper_roof() {
     //   linear_extrude(height=1000, convexity=10)
     //     square(size=1000, center=true);
 
-    // We put a plate in place that partially
-    // intersects
-    // with the motor cover (and cover cover).
-    // Prevent that.
-    hull() dec_motor_cover_cover();
-    hull() dec_motor_cover_strap(expansion_gap=0, gusset_length=dec2_diam);
+    // TODO Come up with a simple void module for the DMCC
+    // but that is just a tad bigger. Doesn't need
+    // to be as detailed.
+
+    dmcc_void(gap=1);
+
+    dec_motor_cover_strap_void();
+
+    dec_bearing_latitude_rain_void();
+
+    // Don't intrude into the RA bearing plane, else will collide
+    // with RA motor cover.
+    dec_bearing_ra_bearing_void();
+
+    dec_bearing_roof_screw_holes();
+
+    // Remove material that would block installation.
+    union() {
+      w = 1000;  // Essentially infinite.
+      h = shell1_outside_y;
+      d = shell1_depth;
+      x = -(w + shell_inside_x);
+      translate([x, 0, 0]) cube([w, h, d]);
+    }
   }
 }
 
-translate([0,0,-50]) color("blue") dec_bearing_hoop_attachment();
+// translate([0,0,-50])dec_bearing_hoop_attachment() ;
 
 module dec_bearing_hoop_attachment() {
   // Attaches the hoop to the DMCC.
+  roof_thickness = hoop_disc_wall;
+  w = shell2_outside_x*2 + roof_thickness;
+  h = shell2_outside_y + roof_thickness;
+  d = hoop_depth;
 
   difference() {
+
+
+
     translate([-shell2_outside_x, 0, -hoop_disc_z])
-      cube([shell2_outside_x*2, shell2_outside_y, hoop_disc_z]);
+      cube([w, h, d]);
 
-    hull() dec_bearing_hoop();
-
-
-    // dec_bearing_latitude_void();
-    dec_bearing_latitude_rain_void();
+    dec_bearing_hoop_void();
 
     // translate([0, 0, -dec_saddle_height]) {
     //   difference() {
@@ -206,42 +239,8 @@ module dec_bearing_hoop_attachment() {
     //                r=dec_roof_interior_radius);
     //   }
     // };
-    dec_bearing_roof_screw_holes();
   }
 }
-
-
-translate([0,0,-125]) dec_bearing_hoop_attachment_OLD();
-module dec_bearing_hoop_attachment_OLD() {
-  // Attaches the hoop to the DMCC.
-
-  color("green") difference() {
-    translate([0, 0, -dec_saddle_height]) {
-      difference() {
-        union() {
-          bar_w = dec_motor_w + (shell2 + dec_motor_gap) * 2;
-          translate([-bar_w/2,shell_inside_y,0])
-            linear_extrude(height=dec_saddle_height, convexity=10)
-              square([bar_w, shell2]);
-
-          cylinder(h=dec_saddle_height, r=dec_roof_exterior_radius);
-        }
-        translate([0, 0, -1])
-          cylinder(h=dec_saddle_height+2,
-                   r=dec_roof_interior_radius);
-      }
-    };
-    dec_bearing_roof_screw_holes();
-  }
-}
-
-
-
-
-translate([0,0,-200]) dec_bearing_hoop();
-
-//translate([0,0,-300]) hull() offset(r=1) dec_motor_cover_strap(gusset_length=dec2_diam);
-translate([0,0,-300]) hull() dec_motor_cover_strap(gusset_length=dec2_diam);
 
 module dec_bearing_hoop() {
   // Module for a hoop over the bearing. Too much material, some will need
@@ -253,7 +252,6 @@ module dec_bearing_hoop() {
   // TODO Add fillets to the inside of the discs where they meet the
   // cylinder.
 
-  hoop_disc_wall = 4;
 
   difference() {
     union() {
@@ -265,12 +263,11 @@ module dec_bearing_hoop() {
             circle(r=dec2_radius);
           };
 
-      zb = dec2_len-0.01;
-      z2 = zb - hoop_disc_wall;
+      zb = hoop_depth - hoop_disc_z;
 
-      // Inner cylinder (not a thin disc), over DEC gear cover.
-      // Not yet removing the DMCC.
-      linear_extrude(height=zb, convexity=10)
+      // Inner disc over DEC gear cover.
+      translate([0,0, zb-hoop_disc_wall])
+        linear_extrude(height=hoop_disc_wall, convexity=10)
           difference() {
             circle(r=dec_roof_interior_radius);
             circle(r=dec2_radius);
@@ -278,33 +275,33 @@ module dec_bearing_hoop() {
 
       // Cylinder joining them.
       translate([0,0,-hoop_disc_z])
-        linear_extrude(height=hoop_disc_z + zb, convexity=10)
+        linear_extrude(height=hoop_depth, convexity=10)
           difference() {
             circle(r=dec_roof_interior_radius + hoop_disc_wall);
             circle(r=dec_roof_interior_radius);
           };
     };
 
-    dec_bearing_latitude_rain_void();
-
-    // Don't intrude into the RA bearing plane, else will collide
-    // with RA motor cover.
-    dec_bearing_ra_bearing_void();
 
     // We put a plate in place that partially
     // intersects
     // with the motor cover (and cover cover).
     // Prevent that.
-    hull() union() {
-      dec_motor_cover_cover();
-      dec_motor_cover_strap(expansion_gap=-0.01, gusset_length=dec2_diam);
-    }
+    // *dec_motor_cover_cover();
+    // *hull() dec_motor_cover_strap(expansion_gap=-0.01, gusset_length=dec2_diam);
   };
 }
 
+module dec_bearing_hoop_void(h_gap=0.01) {
+  translate([0,0,-hoop_disc_z-h_gap])
+    cylinder(h=hoop_depth + 2*h_gap,
+             r=dec_roof_interior_radius + hoop_disc_wall);
+}
+
 // Space to be occupied by the DEC bearing cover.
-module dec_bearing_void() {
-  cylinder(h=dec2_len, r=dec2_radius+.1);
+module dec_bearing_void(radius_gap=0) {
+  translate([0,0,-dec_bearing_gap])
+   cylinder(h=dec2_len+dec_bearing_gap, r=dec2_radius+radius_gap);
 }
 
 // Space that may not be occupied by items attached to the DEC bearing plane
@@ -320,8 +317,6 @@ module dec_bearing_ra_bearing_void() {
       linear_extrude(height=1000, convexity=10)
         square(size=1000, center=true);
 }
-
-//#translate([2000,0,0])dec_bearing_latitude_void();
 
 // Space that may not be occupied by items attached to the DEC
 // bearing plane because they're below a plane parallel to the
@@ -363,6 +358,19 @@ module dec_bearing_latitude_rain_void() {
   //       square([1000, dec2_diam], center=true);
 }
 
+//translate([0,0,-200]) dec_motor_cover_strap_void();
+
+// Simpler version of the strap to be used as
+// a void.
+module dec_motor_cover_strap_void() {
+  gl = strap_gusset_length + 2;
+  union() {
+    cylinder(r=shell2_outside_x, h=shell2_depth);
+    translate([-shell2_outside_x, -gl, 0])
+      cube([shell2_outside_x*2, gl, shell2_depth]);
+  }
+}
+
 // Space to be occupied by motor and cable,
 // so not by weatherproofing.
 module dec_motor_void() {
@@ -378,6 +386,32 @@ module dec_motor_void() {
         square([w, z]);
 }
 
+module dmcc_void(gap=0) {
+  if (true) {
+    w = 2 * (shell2_outside_x + gap);
+    h = shell2_outside_y + gap;
+    d = shell2_depth + 2*gap;
+
+    translate([-w/2, 0, -gap])
+      cube([w, h, d], center=false);
+  }
+  if (true) {
+    w = 2 * (shell1_outside_x + gap);
+    h = shell1_outside_y + gap;
+    d = shell1_depth + 2*gap;
+
+    translate([-w/2, 0, -gap])
+      cube([w, h, d], center=false);
+  }
+  // Haven't included the fillet. Not sure if necessary.
+      // Add a couple of fillets to keep the two
+      // shells in contact down near the DEC bearing
+      // cover.
+      dmcc_fillet1();
+      mirror([1,0,0]) dmcc_fillet1();
+}
+
+
 // Space to be occupied by a nut and bolt for
 // attaching the dec_motor_cover_cover to
 // a band around the other half of the DEC axis.
@@ -385,7 +419,7 @@ module nut_slot1() {
   x_offset = (shell2_outside_x + dec2_radius) / 2;
   y_offset = nut_height+nut_slot_margin;
 
-  translate([x_offset, y_offset, dec2_len/2])
+  translate([x_offset, y_offset, shell2_depth/2])
     rotate([90,0,0])
       nut_slot(d=nut_diam, h=nut_height,
                depth=nut_slot_depth,
@@ -400,15 +434,17 @@ module strap_attachment_nut_slots() {
 }
 
 module dmcc_fillet1() {
-  translate([-shell1_outside_x,0,dec2_len])
+
+  translate([-shell1_outside_x,0,shell2_depth])
     rotate([0,180,0])
+  scale([1,1,2])
       rotate([-90,0,0])
-        fillet_extrusion(15, 50, scale=0.01);
+        fillet_extrusion(shell_diff, 50, scale=0.01);
 }
 
 module dmcc_strap_gusset(gusset_length=30) {
   gx = shell2_outside_x - dec2_radius;
-  gy = dec2_len;
+  gy = shell2_depth;
   gd = bolt_diam;
 
   translate([-shell2_outside_x,0,0])
@@ -423,15 +459,18 @@ module dmcc_strap_gussets(gusset_length=30) {
 }
 
 module dec_bearing_roof_screw_hole1() {
-  dx = shell_inside_x + shell2/2;
-  dy = shell_inside_y + shell2/2;
-  translate([dx,dy,0])  
-    symmetric_z_cylinder(
-      bolt_diam,
-      2 * (dec_saddle_height + dec2_len));
+  dx = (shell1_outside_x + shell2_outside_x) / 2;
+  dy = (shell1_outside_y + shell2_outside_y) / 2;
+  depth = shell2_outside_y - dy + .001;
+
+  translate([dx,dy,(shell2_depth-nut_height)/2])
+      nut_slot(d=nut_diam, h=nut_height,
+               depth=depth,
+               bolt_diam=bolt_diam,
+               bolt_up=bolt_len,
+               bolt_down=10);
 }
 
-//dec_bearing_roof_screw_holes();
 module dec_bearing_roof_screw_holes() {
   dec_bearing_roof_screw_hole1();
   mirror([1,0,0]) dec_bearing_roof_screw_hole1();
