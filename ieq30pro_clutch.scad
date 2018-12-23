@@ -1,4 +1,4 @@
-include <ieq30pro-dimensions.scad>
+include <ieq30pro_dimensions.scad>
 
 clutch(abs(($t*90)-45)+90*0.75);
 

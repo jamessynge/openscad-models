@@ -28,7 +28,8 @@ cw_thread_radius = cw_thread_diam / 2;
 ////////////////////////////////////////////////////
 // Diameter of the motor end of the DEC body.
 
-dec2_diam = 97.4;  // +/- 0.3mm.
+//dec2_diam = 97.4;  // Spec, +/- 0.3mm.
+dec2_diam = 97.6;  // Measured on PAN006.
 dec2_radius = dec2_diam / 2;
 dec2_len = 25.4;
 
@@ -113,6 +114,9 @@ dec_head_scale = dec_head_diam2 / dec_head_diam1;
 dec_saddle_depth = 13.8;
 dec_saddle_width1 = 43.95; // At top of saddle
 dec_saddle_width2 = 46.66; // At bottom of saddle
+dec_saddle_height =
+    dec_head_base_height +
+    dec_head_height - dec_saddle_depth;
 dovetail_width = 45.25;
 dec_slot_corner_radius = 5;
 dec_slot_width = 60.4;
@@ -124,16 +128,19 @@ dec_head_clamp_screw_spacing = 44.4;
 
 dec_bearing_gap = ra_bearing_gap;
 
-// Maximum distance from DEC axis to outer
-// (top) of DEC axis clutch handle. Used to
-// determine how much room the weatherproofing
-// has to allow for.
-dec_clutch_handle_max_height = 65.35;
 
+// Minimum distance from the plane of the DEC bearing gap to the saddle screw
+// knobs.
+dec_gap_to_saddle_knob = 31;
 
-dec_saddle_height =
-    dec_head_base_height +
-    dec_head_height - dec_saddle_depth;
+// Min and max distance from DEC axis to outer (top) of DEC axis clutch handle. 
+// The minimum is when the clutch handle is turned 90 degrees DEC bearing gap,
+// and is thus parallel with the DEC axis itself. The max occurs because the
+// handle is straight, so becomes farther and farther away from the DEC bearing
+// gap as it is tangent to the circle.
+
+dec_clutch_handle_min_height = dec2_radius + 18.6; 
+dec_clutch_handle_max_height = dec2_radius + 26.6; 
 
 /////////////////////////////////////////////
 // Computed values for the DEC bearing.
@@ -151,4 +158,4 @@ dec_cover_max_diam = dec_cover_max_radius * 2;
 dec_motor_cover_angle = 2 * asin(dec_motor_w/dec2_diam);
 
 // This needs to be adjusted for each site.
-mount_latitude = 42;
+mount_latitude = 19;

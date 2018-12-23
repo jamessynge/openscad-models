@@ -16,9 +16,9 @@
 // Units: mm
 
 use <chamfer.scad>
-include <ieq30pro-dimensions.scad>
-use <ieq30pro-ra-to-dec.scad>
-use <axis-arrows.scad>
+include <ieq30pro_dimensions.scad>
+use <ieq30pro_ra_to_dec.scad>
+use <axis_arrows.scad>
 
 // Global resolution
 // Don't generate smaller facets than this many mm.

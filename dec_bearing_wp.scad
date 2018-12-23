@@ -1,59 +1,8 @@
-/*
-Weatherproofing for the declination (DEC) axis of the iOptron iEQ30 Pro, with
-the following constraints (English rather than formulas) taken into
-consideration:
+// Weatherproofing for the declination (DEC) axis of the iOptron iEQ30 Pro.
+// See dec_bearing_wp.md for documentation.
 
-* The DEC axis is horizontal when parked.
-
-* The telescope is to the right of the mount when you stand behind the mount
-  with the RA axis facing the nearest pole (i.e. on the east side when north
-  of the equator).
-
-* The DEC head is rotated such the dovetail plate & saddle horizontal, the
-  DEC clutch is down and the saddle knobs are up.
-
-* The plane of the DEC bearing intersects the RA axis motor cover when the
-  DEC head is rotated to the certain angles, as it would be during normal
-  operation.
-
-* Therefore, the DEC bearing gap must be protected by a roof that attaches
-  to the DEC motor cover side of the gap, else the roof would collide with
-  the RA motor cover.
-
-* The DEC head is slighly tapered (narrower near the saddle than the
-  bearing), but not too much. It is probably better to include an gutter
-  on the DEC head to keep water than makes it under the roof from getting
-  to the bearing & electronics.
-
-* 31mm is the shortest distance between the DEC motor cover and the knobs of
-  the saddle place screws. The weatherproofing for the bearing must fit into
-  that space.
-
-* The clutch handle may be rotated so that the tight position is ~parallel to
-  the DEC axis or ~perpendicular to it (i.e. nearly tangent to the bearing
-  cover). The former (parallel) lowers the maximum clearance above the DEC
-  head that must be allowed for, but also raises the minimum clearance. 
-
-* When the clutch handle is tight at ~parallel to the DEC axis, the top of
-  the handle is at a constant distance from the axis (~63.35mm), and it
-  occupies more than 31mm from the DEC bearing towards the saddle plate
-  (actually reaching almost to the top of the DEC head. If in this position,
-  then whether the clutch is tight or loose doesn't change whether the handle
-  clears the weatherproofing: either the weatherproofing is in a good spot for
-  rotating the DEC axis, or it blocks rotation (bad).
-
-* When the clutch handle is tight at ~perpendicular to to the DEC axis, then
-  the handle sticks up higher above the DEC head (i.e. farther from the DEC
-  axis at the tip of the handle). However, it doesn't block placement of
-  weatherproofing (overhanging roof) IFF we don't require that it be possible
-  to rotate the unlocked axis with the roof in place.
-
-*/
-
-
-
-include <ieq30pro-dimensions.scad>
-use <dec-bearing-utils.scad>
+include <ieq30pro_dimensions.scad>
+use <dec_bearing_utils.scad>
 
 // Global resolution
 // Don't generate smaller facets than this many mm.
@@ -91,27 +40,21 @@ bolt_len=50;  // Not a real size, just used for
 // position.
 dec_roof_interior_radius =
   dec_clutch_handle_max_height + 3;
-dec_roof_outer_radius1 = dec_roof_interior_radius + 21;
-dec_roof_outer_radius2 = dec_roof_interior_radius + 21;
-
-
-
+dec_roof_outer_radius1 = dec_roof_interior_radius + 4;
+dec_roof_outer_radius2 = dec_roof_interior_radius + 4;
 
 // Trying to get better protection
 // for bottom of motor cover, which
 // is a bit exposed.
 dmcc_extra_z=dec_motor_z_offset;
 
-
 *dec_motor_cover_cover();
 *dec_motor_cover_strap();
 dec_bearing_upper_roof();
-//dec_bearing_roof_extrusion();
 
 module dec_motor_cover_cover() {
   // extra_h covers cable plug/jack.
   extra_h=50;
-
 
   difference() {
     union() {
@@ -166,12 +109,10 @@ module dec_motor_cover_strap() {
       }
     };
 
-    // Remove the portion that is above the y=-2
+    // Remove the portion that is above the y=-1
     // plane, thus allowing for the bolts to be
     // tightened.
-    // of the RA bearing; this avoids hitting the
-    // RA motor cover.
-    translate([0,-2,0])
+    translate([0,-1,0])
       rotate([-90,0,0])
         linear_extrude(height=1000, convexity=10)
           square(size=1000, center=true);
@@ -185,38 +126,36 @@ module dec_motor_cover_strap() {
 module dec_bearing_upper_roof() {
   difference() {
     union() {
-      dec_bearing_roof_extrusion();
+      dec_bearing_hoop();
       
-      disc_thickness = 2;
-      linear_extrude(height=disc_thickness, convexity=10)
-        circle(r=dec_roof_outer_radius1);
+      // disc_thickness = 2;
+      // linear_extrude(height=disc_thickness, convexity=10)
+      //   circle(r=dec_roof_outer_radius1);
       
-      fillet_length = 50;
+      // fillet_length = 50;
       
-      translate([shell2_outside_x,
-                 fillet_length,
-                 disc_thickness])
-        rotate([90,0,0])
-          fillet_extrusion(15, fillet_length,
-                           scale=1); 
+      // translate([shell2_outside_x,
+      //            fillet_length,
+      //            disc_thickness])
+      //   rotate([90,0,0])
+      //     fillet_extrusion(15, fillet_length,
+      //                      scale=1); 
       
-      mirror([1,0,0])
-      translate([shell2_outside_x,
-                 fillet_length,
-                 disc_thickness])
-        rotate([90,0,0])
-          fillet_extrusion(15, fillet_length,
-                           scale=1); 
+      // mirror([1,0,0])
+      // translate([shell2_outside_x,
+      //            fillet_length,
+      //            disc_thickness])
+      //   rotate([90,0,0])
+      //     fillet_extrusion(15, fillet_length,
+      //                      scale=1); 
     }
   
-    // Remove the portion that is below the y=0
-    // plane, thus allowing for the bolts to be
-    // tightened.
-    // of the RA bearing; this avoids hitting the
-    // RA motor cover.
-    rotate([90,0,0])
-      linear_extrude(height=1000, convexity=10)
-        square(size=1000, center=true);
+    // // Remove the portion that is below the y=0
+    // // plane, thus allowing for the bolts to be
+    // // tightened.
+    // rotate([90,0,0])
+    //   linear_extrude(height=1000, convexity=10)
+    //     square(size=1000, center=true);
 
     // We put a plate in place that partially
     // intersects
@@ -226,158 +165,84 @@ module dec_bearing_upper_roof() {
   }
 }
 
-module dec_bearing_roof_extrusion() {
-  // The "roof" over the bearing plate: A section of
-  // a hollow cylinder.
+translate([0,0,-200]) dec_bearing_hoop();
 
-  difference() {
-    translate([0, 0, -dec_saddle_height]) {
-      difference() {
-        union() {
-          bar_w = dec_motor_w + (shell2 + dec_motor_gap) * 2;
-          translate([-bar_w/2,shell_top_inside_offset,0])
-            linear_extrude(height=dec_saddle_height, convexity=10)
-              square([bar_w, shell2]);
+module dec_bearing_hoop() {
+  // Module for a hoop over the bearing. Too much material, some will need
+  // to be removed by the caller.
+  // Two hollow discs on either side
+  // of the gap for the DEC clutch handle (normal tightened position), with
+  // a hollow cylinder joining them; all cut at the plane horizontal to the
+  // ground (based on mount_latitude).
+  // TODO Add fillets to the inside of the discs where they meet the
+  // cylinder.
 
-          cylinder(h=dec_saddle_height,
-                  r1=dec_roof_outer_radius1,
-                   r2=dec_roof_outer_radius2);
-        }
-        translate([0, 0, -1])
-          cylinder(h=dec_saddle_height+2,
-                   r=dec_roof_interior_radius);
-      }
-    };
-    dec_bearing_roof_screw_holes();
-  }
-}
-
-// This is modelled in part as if it goes right through
-// the mount. I'll then use difference() to subtract
-// the mount... at some point.
-module dec_motor_bearing_cover() {
-
-
-  // A mating ring (i.e. touching the DEC gear
-  // cover), goes most of the way around but
-  // avoids the motor. Height is short enough
-  // that it doesn't cross the plane of the
-  // RA bearing.
-  rotate([0, 0, 90 + dec_motor_cover_angle / 2 + 1])
-    rotate_extrude(angle=360-dec_motor_cover_angle-2) {
-      translate([dec2_radius, 0,  0])
-        square([ra1_base_to_dec_gear_cover, dec_bearing_mating_length],
-               center=false);
-  };
-  
-  //dec_motor_void();
-//  linear_extrude(height=dec_motor_h)
-//  offset(delta=1)
-//  translate([-dec_motor_w/2,dec_motor_z_offset,0])
-//  #square([dec_motor_w, dec_motor_z]);
-    
-  difference() {
-    dec_motor_cover_cover();
-  }
+  disc_thickness = 4;
 
   difference() {
     union() {
-      // Disc that keeps water from approaching bearing.
-      *translate([0,0,-3])
-      linear_extrude(height=3.1) {
-        difference() {
-          circle(r=dec_roof_outer_radius2);
-          circle(r=dec2_radius);
-        }
-      }
-      
-      dec_motor_cover_cover();
-      
+      // Outer disc (nearest to saddle plate).
+      min_oz = clutch_handle_base_diam + disc_thickness;
+      assert(min_oz <= dec_gap_to_saddle_knob);
+      z = (min_oz + dec_gap_to_saddle_knob) / 2;
 
-    //  
-    //  
-    //  
-    //  rotate_extrude(angle=dec_cover_angle) {
-    //    // Move profile into the X-Z plane
-    //    rotate([0, 90, 0]) {
-    //      
-    //    
-    //    translate
-    //  
-    //  
+      translate([0,0,-z])
+        linear_extrude(height=disc_thickness, convexity=10)
+          difference() {
+            circle(r=dec_roof_interior_radius);
+            circle(r=dec2_radius);
+          };
 
+      zb = dec2_len;
+      z2 = zb - disc_thickness;
 
-    //  rotate([0,0,360-mount_latitude])
-    //  rotate_extrude(angle=mount_latitude) {
-    //      translate([dec2_radius, 0,  0])
-    //        square([ra1_base_to_dec_gear_cover*2, dec_bearing_mating_length],
-    //               center=false);
-    //  }
+      // Inner disc, over DEC gear cover. Not yet removing the DMCC.
+      translate([0, 0, z2])
+        linear_extrude(height=disc_thickness, convexity=10)
+          difference() {
+            circle(r=dec_roof_interior_radius);
+            circle(r=dec2_radius);
+          };
 
-
-    //  // A big plate to which to attach the roof over the
-    //  // DEC bearing gap.
-    //  rotate([0, 0, -mount_latitude])
-    //  translate([-dec_cover_max_radius, 0, 0])
-    //  square([dec_cover_max_diam, dec_cover_max_diam], center=false);
-    //  translate([-dec_cover_max_radius, 0, 0])
-    //  square([dec_cover_max_diam, dec_cover_max_diam], center=false);
-
-      /////////////////////////////////////////////////////
-      // The "roof" over the bearing plate: A section of
-      // a hollow cylinder.
-
-
-      translate([0, 0, -dec_saddle_height]) {
-        difference() {
-          cylinder(h=dec_saddle_height,
-                  r1=dec_roof_outer_radius1,
-                   r2=dec_roof_outer_radius2);
-          translate([0, 0, -1])
-            cylinder(h=dec_saddle_height+2,
-                     r=dec_roof_interior_radius);
-        }
-      }
+      // Cylinder joining them.
+      translate([0,0,-z])
+        linear_extrude(height=z + zb, convexity=10)
+          difference() {
+            circle(r=dec_roof_interior_radius + disc_thickness);
+            circle(r=dec_roof_interior_radius);
+          };
     };
-    // Start of objects that represents the volumes
-    // that may NOT be occupied by the weatherproofing.
 
-    // Remove the portion that crosses the plane
-    // of the RA bearing; this avoids hitting the
-    // RA motor cover.
-    rotate([90,0,0])
-      translate([0,0,dec_cover_max_radius])
-        linear_extrude(height=1000)
+    // Remove the portion that is below the latitude plane, so that
+    // the bottom edges of the half discs are parallel to the ground.
+    rotate([0, 0, mount_latitude-90])
+      rotate([90,0,0])
+        linear_extrude(height=1000, convexity=10)
           square(size=1000, center=true);
-    
-    // Based on mount_latitude, remove the portion that is below
-    // the horizontal plane through the middle of
-    // the DEC axis.
-    rotate([90,0,-mount_latitude])
-        linear_extrude(height=1000)
-          square(size=1000, center=true);
-    
-    dec_motor_void();
 
-    // Make sure it doesn't intersect with the
-    // actual DEC bearing cover.
-    dec_bearing_void();
-    
-    *rotate([0,-90,0]) rotate([90,0,0])
-    nut_slot1();
-    
- 
+    // Don't intrude into the RA bearing plane, else will collide
+    // with RA motor cover.
+    dec_bearing_ra_bearing_void();
   };
-
-      //cylinder(h=min(dec2_len, 10), r=dec_cover_max_radius);
-      
-  
 }
-
 
 // Space to be occupied by the DEC bearing cover.
 module dec_bearing_void() {
   cylinder(h=dec2_len, r=dec2_radius+.1);
+}
+
+// Space that may not be occupied by items attached to the DEC bearing plane
+// because of the RA bearing plane.
+module dec_bearing_ra_bearing_void() {
+  // Remove the portion that is below the latitude plane, so that
+  // the bottom of the half disc
+  // plane, thus allowing for the bolts to be
+  // tightened.
+
+  translate([0, -ra1_base_to_dec_center, 0])
+    rotate([90,0,0])
+      linear_extrude(height=1000, convexity=10)
+        square(size=1000, center=true);
 }
 
 // Space to be occupied by motor and cable,

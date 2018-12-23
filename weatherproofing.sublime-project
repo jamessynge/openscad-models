@@ -4,5 +4,7 @@
 		{
 			"path": "."
 		}
-	]
+	],
+    // Adds a single vertical ruler at column 80
+    "rulers": [80],
 }

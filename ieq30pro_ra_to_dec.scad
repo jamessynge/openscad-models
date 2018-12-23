@@ -45,10 +45,10 @@
 // Units: mm
 
 use <chamfer.scad>
-include <ieq30pro-dimensions.scad>
-use <ieq30pro-clutch.scad>
-use <ieq30pro-dec-head.scad>
-use <axis-arrows.scad>
+include <ieq30pro_dimensions.scad>
+use <ieq30pro_clutch.scad>
+use <ieq30pro_dec_head.scad>
+use <axis_arrows.scad>
 
 ra_and_dec($t * 360) {
   color("blue") {
@@ -104,7 +104,7 @@ module ra_and_dec(dec_angle=0) {
   echo("ra_and_dec has", $children, "children");
   assert($children == 4);
 
-  raise_dec = dec1_radius + ra1_base_to_dec;
+  raise_dec = ra1_base_to_dec_center;
   ra_to_dec();
 
   translate([0, ra1_radius, raise_dec]) {

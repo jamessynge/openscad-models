@@ -1,5 +1,5 @@
-include <ieq30pro-dimensions.scad>
-use <ioptron-ieq30pro.scad>
+include <ieq30pro_dimensions.scad>
+use <ioptron_ieq30pro.scad>
 
 echo(version=version());
 

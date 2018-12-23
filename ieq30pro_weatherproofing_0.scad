@@ -1,7 +1,7 @@
-include <ieq30pro-dimensions.scad>
-use <ioptron-ieq30pro.scad>
-use <dec-bearing-wp.scad>
-use <axis-arrows.scad>
+include <ieq30pro_dimensions.scad>
+use <ioptron_ieq30pro.scad>
+use <dec_bearing_wp.scad>
+use <axis_arrows.scad>
 
 echo(version=version());
 
@@ -23,8 +23,8 @@ dec_motor_gap = 2;
 
 // Width of surface mating with DEC bearing cover.
 dec_bearing_mating_length = min(dec2_len, 20);
-  
-rotate([mount_latitude,0,0])
+
+rotate([90-mount_latitude,0,0])
 ioptron_mount(ra_angle=ra_angle, dec_angle=dec_angle) {
   union() {
     echo("executing ioptron_mount child 1");
