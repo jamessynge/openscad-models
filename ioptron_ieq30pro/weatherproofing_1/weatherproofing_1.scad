@@ -1,7 +1,9 @@
-include <../ieq30pro_dimensions.scad>
+include <wp1_dimensions.scad>
 use <../ieq30pro.scad>
-use <dec_bearing.scad>
 use <../../utils/axis_arrows.scad>
+
+//use <dec_bearing.scad>
+
 
 echo(version=version());
 
@@ -58,9 +60,9 @@ ioptron_mount(ra_angle=ra_angle, dec_angle=dec_angle) {
 
   union() {
     echo("executing ioptron_mount child 3");
-    color("purple")dec_motor_cover_cover();
-    color("plum")dec_motor_cover_strap();
-    color("violet") dec_bearing_upper_roof();
+    // color("purple")dec_motor_cover_cover();
+    // color("plum")dec_motor_cover_strap();
+    // color("violet") dec_bearing_upper_roof();
     //dec_motor_bearing_cover();
     color("yellow") {
       if (show_axis_hints) {
@@ -108,48 +110,3 @@ ioptron_mount(ra_angle=ra_angle, dec_angle=dec_angle) {
     };
   };
 };
-
-module dec_head_bearing_cover() {
-  translate([0,0,dec_head_base_height]) {
-    cylinder(h=10, r1=dec_cover_max_radius, r2=dec_head_base_diam/2);
-  }
-}
-
-module ra_bearing_cover() {
-//  color("green")
-//    rotate_extrude(angle=135)
-//        translate([ra1_radius, 0])
-//            polygon([
-//                [0, 0],
-//                [30, 0],
-//                [45, -15],
-//                [45, -40],
-//                [35, -40],
-//                [35, -21],
-//                [25, -10],
-//                [0, -10]]);
-  color("blue")
-    rotate([0,0, -70])
-    rotate_extrude(angle=135)
-        translate([ra1_radius, 0])
-            polygon([
-                [0, 0],
-                [30, 0],
-                [40, -10],
-                [40, -40],
-                [50, -40],
-                [50, -5],
-                [35, 10],
-                [0, 10]]);
-}
-
-
-module ra_body_envelope() {
-  rotate([180, 0, 0]) {
-    for (angle = [0 : 5 : 360])
-      rotate([0,0,angle])
-        ra_body();
-  }
-}
-
-//ra_body_envelope();

@@ -1,5 +1,6 @@
 include <../ieq30pro_dimensions.scad>
 use <../ieq30pro.scad>
+use <../ieq30pro_dec_head.scad>
 use <dec_bearing.scad>
 use <../../utils/axis_arrows.scad>
 
@@ -109,47 +110,15 @@ ioptron_mount(ra_angle=ra_angle, dec_angle=dec_angle) {
   };
 };
 
+*translate([0,0,-140]) dec_head_bearing_cover() ;
+
 module dec_head_bearing_cover() {
-  translate([0,0,dec_head_base_height]) {
-    cylinder(h=10, r1=dec_cover_max_radius, r2=dec_head_base_diam/2);
+  // TODO Need to rotate this so that the clutch hole is aligned correctly.
+  difference() {
+    translate([0,0,dec_head_base_height]) {
+      cylinder(h=10, r1=dec_cover_max_radius, r2=dec_head_base_diam/2);
+    }
+
+    dec_head();
   }
 }
-
-module ra_bearing_cover() {
-//  color("green")
-//    rotate_extrude(angle=135)
-//        translate([ra1_radius, 0])
-//            polygon([
-//                [0, 0],
-//                [30, 0],
-//                [45, -15],
-//                [45, -40],
-//                [35, -40],
-//                [35, -21],
-//                [25, -10],
-//                [0, -10]]);
-  color("blue")
-    rotate([0,0, -70])
-    rotate_extrude(angle=135)
-        translate([ra1_radius, 0])
-            polygon([
-                [0, 0],
-                [30, 0],
-                [40, -10],
-                [40, -40],
-                [50, -40],
-                [50, -5],
-                [35, 10],
-                [0, 10]]);
-}
-
-
-module ra_body_envelope() {
-  rotate([180, 0, 0]) {
-    for (angle = [0 : 5 : 360])
-      rotate([0,0,angle])
-        ra_body();
-  }
-}
-
-//ra_body_envelope();

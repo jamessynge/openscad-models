@@ -1,6 +1,6 @@
 // Module axis_arrows renders three arrows showing
 // the X, Y and Z axes.
-//
+// Author: James Synge
 
 //// Global resolution
 //// Don't generate smaller facets than this many mm.
@@ -13,16 +13,18 @@ color("green") axis_arrows();
 // Draws an arrow from the origin along the Z axis.
 module arrow(total_length=50, shaft_radius=2,
              head_length=15, head_radius=4, message="") {
+  assert(total_length > head_length);
+  assert(shaft_radius <= head_radius);
   shaft_length = total_length-head_length;
   cylinder(h=shaft_length, r=shaft_radius);
   translate([0,0,shaft_length])
     cylinder(h=head_length, r1=head_radius, r2=0);
   if (message != "") {
-    echo("message is set");
+    // echo("message is set");
     translate([0,0,total_length])
       text(message, halign="center", valign="center");
   } else {
-    echo("no message");
+    // echo("no message");
   }
 }
 
