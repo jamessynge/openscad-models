@@ -7,9 +7,9 @@ use <../../utils/misc.scad>
 // Global resolution
 if ($preview) {
   // Don't generate smaller facets than this many mm.
-  $fs = 4;
+  $fs = 2;
   // Don't generate larger angles than this many degrees.
-  $fa = 10;
+  $fa = 5;
 } else {
   $fs = 0.4;
   $fa = 1;
@@ -155,48 +155,55 @@ module dec_motor_cover_strap(expansion_gap=1, gusset_length=strap_gusset_length)
 }
 
 module dec_bearing_upper_roof() {
+  w_gap = 0.5;
+  d_gap = 0.5;
+  h_gap = 0.5;
+
   difference() {
     union() {
       dec_bearing_hoop();
       dec_bearing_hoop_attachment();
     }
 
-    dmcc_void(w_gap=0.2, d_gap=0.5);
-
-    dec_motor_cover_strap_void();
-
-    dec_bearing_latitude_rain_void();
-
-    // Don't intrude into the RA bearing plane, else will collide
-    // with RA motor cover.
-    dec_bearing_ra_bearing_void();
-
-    dec_bearing_roof_screw_holes();
-
-    // Remove material that would block installation.
-    // First, only encapsulate the top corner of the DEC motor cover shell
-    // 2 (top when in the parked position).
     union() {
-      w = 1000;  // Essentially infinite.
-      h = shell1_outside_y;
-      d = shell1_depth;
-      x = -(w + shell_inside_x);
-      translate([x, 0, 0]) cube([w, h, d]);
-    }
-    // Need to prevent the overhang of the fillet near that top corner, which
-    // again would block installation. This is customized to the size of
-    // the fillet and the hoop, not exactly what it should be.
-    if (mount_latitude > 0 && mount_latitude < 90) {
-      x = shell1_outside_x + shell_diff * 0.35;
-      y = tan(mount_latitude) * x;
-      d = shell1_depth;
-      linear_extrude(height=d)
-        polygon(points=[[0,0], [x, 0], [0, -y]]);
+      dmcc_void(w_gap=w_gap, d_gap=d_gap, h_gap=h_gap);
+
+      dec_motor_cover_strap_void();
+
+      dec_bearing_latitude_rain_void();
+
+      // Don't intrude into the RA bearing plane, else will collide
+      // with RA motor cover.
+      dec_bearing_ra_bearing_void();
+
+      dec_bearing_roof_screw_holes();
+
+      // Remove material that would block installation.
+      // First, only encapsulate the top corner of the DEC motor cover shell
+      // 2 (top when in the parked position).
+      union() {
+        w = 1000;  // Essentially infinite.
+        h = shell1_outside_y + h_gap;
+        d = shell1_depth;
+        x = -(w - shell_inside_x);
+        translate([x, 0, 0]) cube([w, h, d]);
+      }
+      // Need to prevent the overhang of the fillet near that top corner,
+      // which again would block installation. This is "hand customized"
+      // to the size of the fillet and the hoop, not computed based on the
+      // shapes.
+      if (mount_latitude > 0 && mount_latitude < 90) {
+        x = shell1_outside_x + shell_diff * 0.35;
+        y = tan(mount_latitude) * x;
+        d = shell1_depth;
+        linear_extrude(height=d)
+          polygon(points=[[0,0], [x, 0], [0, -y]]);
+      }
     }
   }
 }
 
-// translate([0,0,-50])dec_bearing_hoop_attachment() ;
+*translate([0,0,-150]) dec_bearing_hoop_attachment();
 
 module dec_bearing_hoop_attachment() {
   // Attaches the hoop to the DMCC.
@@ -206,83 +213,52 @@ module dec_bearing_hoop_attachment() {
   d = hoop_depth;
 
   difference() {
-
-
-
     translate([-shell2_outside_x, 0, -hoop_disc_z])
       cube([w, h, d]);
 
     dec_bearing_hoop_void();
-
-    // translate([0, 0, -dec_saddle_height]) {
-    //   difference() {
-    //     union() {
-    //       bar_w = dec_motor_w + (shell2 + dec_motor_gap) * 2;
-    //       translate([-bar_w/2,shell_inside_y,0])
-    //         linear_extrude(height=dec_saddle_height, convexity=10)
-    //           square([bar_w, shell2]);
-
-    //       cylinder(h=dec_saddle_height, r=dec_roof_exterior_radius);
-    //     }
-    //     translate([0, 0, -1])
-    //       cylinder(h=dec_saddle_height+2,
-    //                r=dec_roof_interior_radius);
-    //   }
-    // };
   }
 }
 
 module dec_bearing_hoop() {
   // Module for a hoop over the bearing. Too much material, some will need
   // to be removed by the caller.
-  // Two hollow discs on either side
-  // of the gap for the DEC clutch handle (normal tightened position), with
-  // a hollow cylinder joining them; all cut at the plane horizontal to the
-  // ground (based on mount_latitude).
+  // Two hollow discs (i.e. two annuli) on either side of the gap for the DEC
+  // clutch handle (normal tightened position), with a hollow cylinder joining
+  // them; all cut at the plane horizontal to the ground (based on
+  // mount_latitude).
   // TODO Add fillets to the inside of the discs where they meet the
   // cylinder.
+  union() {
+    // Outer disc (nearest to saddle plate).
+    translate([0,0,-hoop_disc_z])
+      linear_extrude(height=hoop_disc_wall, convexity=10)
+        difference() {
+          circle(r=dec_roof_interior_radius);
+          circle(r=dec2_radius);
+        };
 
+    zb = hoop_depth - hoop_disc_z;
 
-  difference() {
-    union() {
-      // Outer disc (nearest to saddle plate).
-      translate([0,0,-hoop_disc_z])
-        linear_extrude(height=hoop_disc_wall, convexity=10)
-          difference() {
-            circle(r=dec_roof_interior_radius);
-            circle(r=dec2_radius);
-          };
+    // Inner disc over DEC gear cover.
+    translate([0,0, zb-hoop_disc_wall])
+      linear_extrude(height=hoop_disc_wall, convexity=10)
+        difference() {
+          circle(r=dec_roof_interior_radius);
+          circle(r=dec2_radius);
+        };
 
-      zb = hoop_depth - hoop_disc_z;
-
-      // Inner disc over DEC gear cover.
-      translate([0,0, zb-hoop_disc_wall])
-        linear_extrude(height=hoop_disc_wall, convexity=10)
-          difference() {
-            circle(r=dec_roof_interior_radius);
-            circle(r=dec2_radius);
-          };
-
-      // Cylinder joining them.
-      translate([0,0,-hoop_disc_z])
-        linear_extrude(height=hoop_depth, convexity=10)
-          difference() {
-            circle(r=dec_roof_interior_radius + hoop_disc_wall);
-            circle(r=dec_roof_interior_radius);
-          };
-    };
-
-
-    // We put a plate in place that partially
-    // intersects
-    // with the motor cover (and cover cover).
-    // Prevent that.
-    // *dec_motor_cover_cover();
-    // *hull() dec_motor_cover_strap(expansion_gap=-0.01, gusset_length=dec2_diam);
+    // Cylinder joining them.
+    translate([0,0,-hoop_disc_z])
+      linear_extrude(height=hoop_depth, convexity=10)
+        difference() {
+          circle(r=dec_roof_interior_radius + hoop_disc_wall);
+          circle(r=dec_roof_interior_radius);
+        };
   };
 }
 
-module dec_bearing_hoop_void(h_gap=0.01) {
+module dec_bearing_hoop_void(h_gap=0.1) {
   translate([0,0,-hoop_disc_z-h_gap])
     cylinder(h=hoop_depth + 2*h_gap,
              r=dec_roof_interior_radius + hoop_disc_wall);

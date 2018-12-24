@@ -1,7 +1,7 @@
-include <ieq30pro_dimensions.scad>
-use <ieq30pro.scad>
-use <weatherproofing/dec_bearing.scad>
-use <../utils/axis_arrows.scad>
+include <../ieq30pro_dimensions.scad>
+use <../ieq30pro.scad>
+use <dec_bearing.scad>
+use <../../utils/axis_arrows.scad>
 
 echo(version=version());
 
