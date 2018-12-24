@@ -52,64 +52,41 @@ use <../utils/chamfer.scad>
 
 ra_and_dec($t * 360) {
   color("blue") {
-    echo("executing ra_and_dec child 1");
-    linear_extrude(height=4) {
-      difference() {
-        circle(r=ra1_radius + 10);
-        circle(r=ra1_radius + 5);
-      };
-      translate([ra1_radius+10,0,0])
-        square(size=10, center=true);
-    };
-    axis_arrows(total_length=ra1_radius*1.5);
+    //echo("executing ra_and_dec child 1");
+    axis_arrows(total_length=ra1_radius*1.75);
   };
 
   color("yellow") {
-    echo("executing ra_and_dec child 1");
+    //echo("executing ra_and_dec child 1");
     r = dec_head_base_diam/2;
-    linear_extrude(height=4) {
-      difference() {
-        circle(r=r + 10);
-        circle(r=r + 5);
-      };
-      translate([r+10,0,0])
-        square(size=10, center=true);
-    };
-    axis_arrows(total_length=r*1.5);
+    axis_arrows(total_length=r*1.75);
   };
 
   color("red") {
-    echo("executing ra_and_dec child 2");
+    //echo("executing ra_and_dec child 2");
     r = dec_head_base_diam/2;
-    linear_extrude(height=4) {
-      difference() {
-        circle(r=r + 10);
-        circle(r=r + 5);
-      };
-      translate([r+10,0,0])
-        square(size=10, center=true);
-    };
-    axis_arrows(total_length=r*1.5);
+    axis_arrows(total_length=r*1.75);
   };
 
   color("green") {
-    echo("executing ra_and_dec child 3");
-    r = dec_head_base_diam/2;
-    translate([20,10,10]) sphere(r=10);
-    axis_arrows(total_length=r);
+    //echo("executing ra_and_dec child 3");
+    r = dec_head_diam2/2;
+    axis_arrows(total_length=r*1.75);
   };
 };
 
 module ra_and_dec(dec_angle=0) {
-  echo("ra_and_dec has", $children, "children");
-  assert($children == 4);
+  if ($children != 4) {
+    echo("ra_and_dec has", $children, "children");
+    assert($children == 4);
+  }
 
   raise_dec = ra1_base_to_dec_center;
   ra_to_dec();
 
   translate([0, ra1_radius, raise_dec]) {
     rotate([-90,0,0]) {
-      echo("ra_and_dec dec_body at angle", dec_angle);
+      // echo("ra_and_dec dec_body at angle", dec_angle);
       dec_body(dec_angle) {
         children(1);
         children(2);
@@ -131,8 +108,9 @@ module ra_to_dec() {
     color(cast_iron_color) {
       difference() {
         union() {
-          translate([0,0,-h1])
+          translate([0,0,-h1]) {
             cylinder(h=h1, r=ra1_radius);
+          }
           cylinder(h=h2, r=ra1_radius);
         };
         translate([0,ra1_radius,fillet_radius])
@@ -148,6 +126,16 @@ module ra_to_dec() {
       rotate([90,0,270])
       clutch(handle_angle=5);
   };
+
+  // Polar scope port.
+  h3 = ra1_base_to_dec + dec1_diam + polar_port_height;
+  h4 = h3 - polar_port_height * 3;
+  color(cast_iron_color)
+    translate([0, 0, h4])
+      cylinder(h=h3 - h4, d=polar_port_diam);
+  color(plastic_color)
+    translate([0, 0, h3])
+      cylinder(h=polar_port_cap_height, d=polar_port_cap_diam);
 }
 
 module dec_body(dec_angle=0) {
@@ -193,6 +181,12 @@ module dec_body_helper() {
         // bearing and worm gear are located.
         translate([0,0, -dec2_len])
           cylinder(h=dec2_len, r=dec2_radius);
+
+        intersection() {
+          cylinder(h=dec2_len, r=dec2_radius);
+          translate([-dec2_shoulder_width/2, -dec2_radius])
+            cube([dec2_shoulder_width, dec2_radius, 10], center=false);
+        };
       };
       // Cap on the end where the CW shaft is
       // screwed into the DEC body, and a second
@@ -267,6 +261,3 @@ module dec_bearing() {
     translate([0, 0, -h/2])
       cylinder(h=h, r=dec_head_base_diam/2-2);
 }
-
-
-

@@ -54,6 +54,8 @@ module dec_head(show_axis_arrows=false) {
     rotate([90,0,90])
       clutch();
 
+  dec_head_clamp_screws();
+
   if (show_axis_arrows) {
     color("red") {
       axis_arrows(total_length=dec_head_base_radius * 1.5);
@@ -77,30 +79,6 @@ module dec_head(show_axis_arrows=false) {
   }
 }
 
-module dec_saddle_inverse_OLD() {
-  hw1 = dovetail_width / 2;
-  hw2 = dec_saddle_width2 / 2;
-  hw3 = dec_saddle_width1 / 2;
-  dw = dec_saddle_width2 - dec_saddle_width1;
-  raise_by = dec_head_base_height + dec_head_height
-      - dec_saddle_depth + 0.01;
-  
-  translate([0,0,raise_by])
-    rotate([90, 0, 0])
-      translate([0,0,-dec_head_base_diam])
-        linear_extrude(height=dec_head_base_diam*2)
-          // Profile of a dovetail plate on one side, but
-          // vertical on the other wide (where the mount
-          // has screws to secure a dovetail plate).
-          polygon([
-            [0,0],
-            [hw1, 0],
-            [hw1 - dw, dec_saddle_depth],
-            [-hw3, dec_saddle_depth],
-            [-hw3, 0]
-          ]);
-}
-
 module dec_saddle_inverse() {
   raise_by = dec_head_base_height + dec_head_height - dec_saddle_depth + 0.01;
   shift = dec_saddle_width2/2 + 1.3;  // Manual adjustment to make it look right.
@@ -116,30 +94,6 @@ module dec_saddle_inverse() {
             [dec_saddle_width1, dec_saddle_depth],
             [0, dec_saddle_depth]
             ]);
-
-
-  // hw1 = dovetail_width / 2;
-  // hw2 = dec_saddle_width2 / 2;
-  // hw3 = dec_saddle_width1 / 2;
-  // dw = dec_saddle_width2 - dec_saddle_width1;
-  // raise_by = dec_head_base_height + dec_head_height
-  //     - dec_saddle_depth + 0.01;
-  
-  // translate([0,0,raise_by])
-  //   rotate([90, 0, 0])
-  //     translate([0,0,-dec_head_base_diam])
-  //       linear_extrude(height=dec_head_base_diam*2)
-  //         // Profile of a dovetail plate on one side, but
-  //         // vertical on the other wide (where the mount
-  //         // has screws to secure a dovetail plate).
-  //         polygon([
-  //           [0,0],
-  //           []
-  //           [hw1, 0],
-  //           [hw1 - dw, dec_saddle_depth],
-  //           [-hw3, dec_saddle_depth],
-  //           [-hw3, 0]
-  //         ]);
 }
 
 module dec_slot_inverse() {
@@ -161,18 +115,6 @@ module dec_slot_inverse() {
     };
 }
 
-module dec_head_extrusion_profile_OLD() {
-  s = dec_head_square/2;
-  intersection() {
-    union() {
-      circle(r=dec_head_diam1/2);
-      translate([-s, -s])
-        square(size=[s, dec_head_square]);
-    };
-    circle(r=dec_head_base_diam/2);
-  };
-}
-
 module dec_head_extrusion_profile() {
   intersection() {
     union() {
@@ -189,7 +131,6 @@ module dec_head_extrusion_profile() {
 }
 
 
-dec_head_clamp_screws();
 
 module dec_head_clamp_screw() {
   raise_by = dec_head_base_height + dec_head_height

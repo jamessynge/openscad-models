@@ -27,6 +27,14 @@ cw_cs_radius = cw_cs_diam / 2;
 cw_thread_diam = 16;
 cw_thread_radius = cw_thread_diam / 2;
 
+// The polar scope port on the ra_to_dec portion. Naturally it is centered on
+// the RA axis.
+polar_port_diam = 28.4;
+//polar_port_offset = 60;  // To center of port.
+polar_port_height = 2.15;  // Above surface of dec1 body.
+polar_port_cap_diam = 31.9;
+polar_port_cap_height = 8;
+
 ////////////////////////////////////////////////////////////////////////////////
 // Diameter of the motor end of the DEC body.
 
@@ -34,6 +42,11 @@ cw_thread_radius = cw_thread_diam / 2;
 dec2_diam = 97.6;  // Measured on PAN006.
 dec2_radius = dec2_diam / 2;
 dec2_len = 25.4;
+
+// The inside edge of the DEC bearing cover (towards the RA axis) is tangent
+// to the RA bearing cover, but doesn't asymptotically approach the RA
+// bearing cover; instead there is a rectangular shoulder where they meet.
+dec2_shoulder_width = 39.5;
 
 ////////////////////////////////////////////////////////////////////////////////
 // Declination motor cover size.

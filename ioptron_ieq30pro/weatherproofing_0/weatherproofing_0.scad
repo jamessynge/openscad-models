@@ -1,3 +1,6 @@
+// Design for weatherproofing the iEQ30Pro mount.
+// Author: James Synge
+
 include <../ieq30pro_dimensions.scad>
 use <../ieq30pro.scad>
 use <../ieq30pro_dec_head.scad>
