@@ -15,10 +15,10 @@
 
 // Units: mm
 
-use <chamfer.scad>
+use <../utils/chamfer.scad>
 include <ieq30pro_dimensions.scad>
 use <ieq30pro_clutch.scad>
-use <axis_arrows.scad>
+use <../utils/axis_arrows.scad>
 
 dec_head() {
   color("red") {

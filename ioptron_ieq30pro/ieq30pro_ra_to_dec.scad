@@ -44,11 +44,11 @@
 
 // Units: mm
 
-use <chamfer.scad>
 include <ieq30pro_dimensions.scad>
 use <ieq30pro_clutch.scad>
 use <ieq30pro_dec_head.scad>
-use <axis_arrows.scad>
+use <../utils/axis_arrows.scad>
+use <../utils/chamfer.scad>
 
 ra_and_dec($t * 360) {
   color("blue") {

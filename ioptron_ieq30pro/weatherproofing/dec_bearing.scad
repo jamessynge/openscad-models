@@ -1,8 +1,8 @@
 // Weatherproofing for the declination (DEC) axis of the iOptron iEQ30 Pro.
 // See dec_bearing_wp.md for documentation.
 
-include <ieq30pro_dimensions.scad>
-use <dec_bearing_utils.scad>
+include <../ieq30pro_dimensions.scad>
+use <../../utils/misc.scad>
 
 // Global resolution
 if ($preview) {
@@ -12,7 +12,7 @@ if ($preview) {
   $fa = 10;
 } else {
   $fs = 0.4;
-  $fs = 1;
+  $fa = 1;
 }
 
 // Distance from motor to shell around it.
