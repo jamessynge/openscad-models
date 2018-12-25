@@ -50,6 +50,14 @@ use <ieq30pro_dec_head.scad>
 use <../utils/axis_arrows.scad>
 use <../utils/chamfer.scad>
 
+// Global resolution
+if ($preview) {
+  // Don't generate smaller facets than this many mm.
+  $fs = 1;
+  // Don't generate larger angles than this many degrees.
+  $fa = 5;
+}
+
 ra_and_dec($t * 360) {
   color("blue") {
     //echo("executing ra_and_dec child 1");
@@ -182,11 +190,19 @@ module dec_body_helper() {
         translate([0,0, -dec2_len])
           cylinder(h=dec2_len, r=dec2_radius);
 
+        // The shoulder between ra_to_dec() and dec2.
         intersection() {
           cylinder(h=dec2_len, r=dec2_radius);
           translate([-dec2_shoulder_width/2, -dec2_radius])
             cube([dec2_shoulder_width, dec2_radius, 10], center=false);
         };
+
+        // On one side only, there is a support below the DEC motor.
+        // It has a rounded lower edge which meets dec1 at about the midline.
+
+dec_motor_support1();
+
+
       };
       // Cap on the end where the CW shaft is
       // screwed into the DEC body, and a second
@@ -260,4 +276,25 @@ module dec_bearing() {
   color(bearing_color)
     translate([0, 0, -h/2])
       cylinder(h=h, r=dec_head_base_diam/2-2);
+}
+
+module dec_motor_support1() {
+  // Radius based on visual inspection.
+  r=1.5;
+  h=14;
+  d=34.6;
+  w=dec1_radius + r*0.75;
+
+  color(cast_iron_color) {
+    linear_extrude(height=d) {
+      intersection() {
+        translate([-r, r, 0]) {
+          $fs = r/8;
+          // $fa = 1;
+          offset(r=r) square(size=w, center=false);
+        }
+        square([w, h], center=false);
+      }
+    }
+  }
 }

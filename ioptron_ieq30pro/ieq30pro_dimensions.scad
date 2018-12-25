@@ -14,19 +14,24 @@ dec1_radius = dec1_diam / 2;
 // Length of declination cylinder with dec1_diam.
 dec1_len = 131.9;
 
+////////////////////////////////////////////////////////////////////////////////
 // The black cap and the bottom of the dec body, where
 // the counterweight shaft is attached.
 cw_cap_height = 10;
 cw_cap_bevel_height = 5;
 
-// There is a countersink in the bottom of the DEC
-// body to allow for the counterweight shaft.
+// There is a countersink in the bottom of the DEC body to allow for the
+// counterweight shaft to screw into the body.
 cw_cs_diam = 23;
 cw_cs_radius = cw_cs_diam / 2;
 
 cw_thread_diam = 16;
 cw_thread_radius = cw_thread_diam / 2;
 
+cw_shaft_diam = 20;
+
+
+////////////////////////////////////////////////////////////////////////////////
 // The polar scope port on the ra_to_dec portion. Naturally it is centered on
 // the RA axis.
 polar_port_diam = 28.4;
