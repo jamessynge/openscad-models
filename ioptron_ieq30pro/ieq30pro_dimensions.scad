@@ -119,6 +119,16 @@ clutch_handle_width = 8.75; // At widest.
 clutch_handle_depth1 = 10.2;
 clutch_handle_depth2 = 13.7;
 
+// Compute the angle of the circle of the DEC gear cover subtended by the
+// DEC clutch. See:
+//  https://en.wikipedia.org/wiki/Circular_segment
+dec_clutch_angle = 2 * asin(clutch_flange_width/dec2_diam);
+
+// Compute the angle of the circle of the RA gear cover subtended by the
+// RA clutch. See:
+//  https://en.wikipedia.org/wiki/Circular_segment
+ra_clutch_angle = 2 * asin(clutch_flange_width/ra1_diam);
+
 ////////////////////////////////////////////////////
 // Dimensions for the DEC head (i.e. the part
 // rotated by the DEC motor, which has the dove tail
@@ -195,6 +205,8 @@ dec_cover_max_diam = dec_cover_max_radius * 2;
 // cover. See:
 //  https://en.wikipedia.org/wiki/Circular_segment
 dec_motor_cover_angle = 2 * asin(dec_motor_w/dec2_diam);
+
+dec1_len_beyond_ra = dec1_len + cw_cap_height + cw_cap_bevel_height - ra1_diam;
 
 ////////////////////////////////////////////////////////////////////////////////
 // Four star knob dimensions.

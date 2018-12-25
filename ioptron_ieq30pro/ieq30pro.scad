@@ -17,7 +17,7 @@
 
 use <../utils/chamfer.scad>
 include <ieq30pro_dimensions.scad>
-use <ieq30pro_ra_to_dec.scad>
+use <ieq30pro_ra_and_dec.scad>
 use <../utils/axis_arrows.scad>
 
 // Global resolution

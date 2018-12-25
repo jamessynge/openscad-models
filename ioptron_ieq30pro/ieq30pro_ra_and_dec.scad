@@ -1,6 +1,6 @@
-// Defines the moving portion of the RA axis,
-// which includes the "non-moving" portion of
-// the DEC axis of the iOptron iEQ30 Pro.
+// Defines the moving portion of the RA axis, which includes the
+// "non-moving" portion of the DEC axis of the iOptron iEQ30 Pro.
+// Author: James Synge
 
 // ra_to_dec REQUIRES four children:
 //
@@ -84,27 +84,43 @@ ra_and_dec($t * 360) {
 };
 
 module ra_and_dec(dec_angle=0) {
-  if ($children != 4) {
-    echo("ra_and_dec has", $children, "children");
-    assert($children == 4);
+  if ($children > 4) {
+    echo("ra_and_dec has", $children, "children, too many.");
+    assert($children <= 4);
   }
 
   raise_dec = ra1_base_to_dec_center;
   ra_to_dec();
 
-  translate([0, ra1_radius, raise_dec]) {
-    rotate([-90,0,0]) {
-      // echo("ra_and_dec dec_body at angle", dec_angle);
-      dec_body(dec_angle) {
-        children(1);
-        children(2);
-        children(3);
-      }
+  translate_to_dec12_plane() {
+    // echo("ra_and_dec dec_body at angle", dec_angle);
+    dec_body(dec_angle) {
+      union() { if ($children > 1) children(1); }
+      union() { if ($children > 2) children(2); }
+      union() { if ($children > 3) children(3); }
     }
   }
 
-  echo("ra_and_dec rendering child 0");
-  rotate([0,0,-90]) children(0);
+  //echo("ra_and_dec rendering child 0");
+  union() { if ($children > 0) children(0); }
+}
+
+module translate_to_dec12_plane(z_towards_dec_head=true) {
+  raise_dec = ra1_base_to_dec_center;
+  translate([0, ra1_radius, raise_dec]) {
+    rotate([z_towards_dec_head ? -90 : 90,0,0]) {
+      children();
+    }
+  }
+}
+
+module translate_to_dec2() {
+  raise_dec = ra1_base_to_dec_center;
+  translate([0, ra1_radius, raise_dec]) {
+    rotate([-90,0,0]) {
+      children();
+    }
+  }
 }
 
 module ra_to_dec() {

@@ -387,7 +387,7 @@ module nut_slot1() {
 
   translate([x_offset, y_offset, shell2_depth/2])
     rotate([90,0,0])
-      nut_slot(d=nut_diam, h=nut_height,
+      nut_slot(nut_diam=nut_diam, nut_height=nut_height,
                depth=nut_slot_depth,
                bolt_diam=bolt_diam,
                bolt_up=bolt_len,
@@ -430,7 +430,7 @@ module dec_bearing_roof_screw_hole1() {
   depth = shell2_outside_y - dy + .001;
 
   translate([dx,dy,(shell2_depth-nut_height)/2])
-      nut_slot(d=nut_diam, h=nut_height,
+      nut_slot(nut_diam=nut_diam, nut_height=nut_height,
                depth=depth,
                bolt_diam=bolt_diam,
                bolt_up=bolt_len,

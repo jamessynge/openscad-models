@@ -1,3 +1,8 @@
+// A crude roof over the RA bearing and RA motor, attached to the moving
+// portion of the RA axis.
+// Author: James Synge
+
+include <wp1_dimensions.scad>
 
 module ra_bearing_cover() {
 //  color("green")

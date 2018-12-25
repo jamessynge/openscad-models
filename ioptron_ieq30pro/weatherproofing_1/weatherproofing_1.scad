@@ -6,9 +6,6 @@ use <dec_head_bearing_cover.scad>
 use <../ieq30pro.scad>
 use <../../utils/axis_arrows.scad>
 
-//use <dec_bearing.scad>
-
-
 echo(version=version());
 
 // Global resolution
