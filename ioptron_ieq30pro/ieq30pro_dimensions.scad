@@ -14,6 +14,11 @@ dec1_radius = dec1_diam / 2;
 // Length of declination cylinder with dec1_diam.
 dec1_len = 131.9;
 
+// There is a hatch for accessing the DEC shaft; it protrudes from the dec1
+// body a little.
+dec1_hatch_offset = 0.3;
+
+
 ////////////////////////////////////////////////////////////////////////////////
 // The black cap and the bottom of the dec body, where
 // the counterweight shaft is attached.
@@ -67,6 +72,10 @@ dec_motor_setback = 0.01;
 dec_motor_z2 = 42;
 dec_motor_z_offset =
   dec1_radius + dec_motor_z2 - dec_motor_z;
+
+// Distance from RA bearing to bottom of motor.
+ra1_base_to_dec_motor_bottom = 66.94;
+
 
 ////////////////////////////////////////////////////////////////////////////////
 // RA axis diameter at the bearing, where the moving

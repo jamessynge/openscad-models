@@ -84,16 +84,18 @@ ioptron_mount($t * 360, $t * 360) {
 };
 
 module ioptron_mount(ra_angle=0, dec_angle=0) {
-  echo("ioptron_mount has", $children, "children");
-  assert($children == 5);
+  if ($children > 5) {
+    echo("ioptron_mount has", $children, "children, too many");
+    assert($children <= 5);
+  }
 
   rotate([0, 0, ra_angle]) {
     translate([0, 0, ra_bearing_gap/2]) {
       ra_and_dec(dec_angle) {
-        children(1);
-        children(2);
-        children(3);
-        children(4);
+        union() if ($children > 1) children(1);
+        union() if ($children > 2) children(2);
+        union() if ($children > 3) children(3);
+        union() if ($children > 4) children(4);
       };
     };
   };
@@ -104,7 +106,7 @@ module ioptron_mount(ra_angle=0, dec_angle=0) {
     translate([0, 0, ra_bearing_gap/2]) {
       ra_body();
       rotate([0,0,180])
-        children(0);
+        union() if ($children > 0) children(0);
     };
   };
 }

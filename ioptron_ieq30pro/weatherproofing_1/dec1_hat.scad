@@ -22,8 +22,11 @@ if ($preview) {
 }
 
 *dec1_hat(over_port=true, remainder=false, sleeve=false);
-dec1_hat(over_port=false, remainder=true, sleeve=false);
+*dec1_hat(over_port=false, remainder=true, sleeve=false);
 *dec1_hat(over_port=false, remainder=false, sleeve=true);
+
+dec1_hat_sleeve(length=10);
+
 
 module dec1_hat(over_port=true, remainder=true, sleeve=true) {
   difference() {
@@ -74,14 +77,13 @@ module dec1_hat_extrusion(over_port=true, remainder=true, sleeve=true) {
 
 
 
-*dec1_hat_sleeve();
 
-module dec1_hat_sleeve() {
+module dec1_hat_sleeve(length=cw_sleeve_length) {
   translate([0, ra1_base_to_dec+dec1_radius,0])
-  linear_extrude(height=cw_sleeve_length, convexity=2)
+  linear_extrude(height=length, convexity=2)
     difference() {
-      circle(r=dec1_radius+dec1_hat_outer_offset);
-      circle(r=dec1_radius);
+      circle(d=cw_sleeve_od);
+      circle(d=cw_sleeve_id);
     }
 }
 
