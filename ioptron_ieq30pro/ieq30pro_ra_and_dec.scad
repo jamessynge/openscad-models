@@ -83,14 +83,14 @@ ra_and_dec($t * 360) {
   };
 };
 
-module ra_and_dec(dec_angle=0) {
+module ra_and_dec(dec_angle=0, include_polar_port=true) {
   if ($children > 4) {
     echo("ra_and_dec has", $children, "children, too many.");
     assert($children <= 4);
   }
 
   raise_dec = ra1_base_to_dec_center;
-  ra_to_dec();
+  ra_to_dec(include_polar_port=include_polar_port);
 
   translate_to_dec12_plane() {
     // echo("ra_and_dec dec_body at angle", dec_angle);
@@ -123,43 +123,44 @@ module translate_to_dec2() {
   }
 }
 
-module ra_to_dec() {
+function ra_to_dec_fillet_radius() = ra1_radius - dec1_radius + 2;
+
+module ra_to_dec(include_polar_port=true) {
   h1 = ra1_base_to_dec;
   h2 = 45 - h1;
-  fillet_radius = ra1_radius - dec1_radius + 2;
+  fillet_radius = ra_to_dec_fillet_radius();
 
-  translate([0,0,h1]) {
-    color(cast_iron_color) {
-      difference() {
-        union() {
-          translate([0,0,-h1]) {
-            cylinder(h=h1, r=ra1_radius);
-          }
-          cylinder(h=h2, r=ra1_radius);
-        };
-        translate([0,ra1_radius,fillet_radius])
-          rotate([90,0,0]) {
-            translate([-ra1_radius,0,0])
-              cylinder(h=ra1_diam, r=fillet_radius);
-            translate([ra1_radius,0,0])
-              cylinder(h=ra1_diam, r=fillet_radius);
-          };
-      };
+  color(cast_iron_color) {
+    difference() {
+      cylinder(h=h1+h2, r=ra1_radius);
+      translate([0,ra1_radius,fillet_radius+h1]) {
+        ra_to_dec_fillet();
+        mirror([1, 0, 0])ra_to_dec_fillet();
+      }
     };
-    translate([-(ra1_radius-5), 0, -h1])
-      rotate([90,0,270])
-      clutch(handle_angle=5);
   };
+  translate([-(ra1_radius-5), 0, 0])
+    rotate([90,0,270])
+    clutch(handle_angle=5);
 
   // Polar scope port.
-  h3 = ra1_base_to_dec + dec1_diam + polar_port_height;
-  h4 = h3 - polar_port_height * 3;
-  color(cast_iron_color)
-    translate([0, 0, h4])
-      cylinder(h=h3 - h4, d=polar_port_diam);
-  color(plastic_color)
-    translate([0, 0, h3])
-      cylinder(h=polar_port_cap_height, d=polar_port_cap_diam);
+  if (include_polar_port) {
+    h3 = ra1_base_to_dec + dec1_diam + polar_port_height;
+    h4 = h3 - polar_port_height * 3;
+    color(cast_iron_color)
+      translate([0, 0, h4])
+        cylinder(h=h3 - h4, d=polar_port_diam);
+    color(plastic_color)
+      translate([0, 0, h3])
+        cylinder(h=polar_port_cap_height, d=polar_port_cap_diam);
+  }
+}
+
+module ra_to_dec_fillet() {
+  rotate([90,0,0]) {
+    translate([-ra1_radius,0,0])
+      cylinder(h=ra1_diam, r=ra_to_dec_fillet_radius());
+  }
 }
 
 module dec_body(dec_angle=0) {

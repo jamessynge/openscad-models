@@ -9,6 +9,10 @@
 include <wp1_dimensions.scad>
 use <../ieq30pro_dec_head.scad>
 
+// Global resolution
+$fs = $preview ? 3 : 1;
+$fa = $preview ? 3 : 1;
+
 dec_head_bearing_cover();
 
 module dec_head_bearing_cover() {

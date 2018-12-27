@@ -20,3 +20,11 @@ dec2_strap_width = dec2_len;
 
 screw_diam = 4;
 screw_hole_diam = screw_diam + 0.2;
+
+dec1_hat_thickness = ra_ring_thickness;
+dec1_hat_inner_offset = 1;
+dec1_hat_outer_offset = dec1_hat_inner_offset + dec1_hat_thickness;
+
+dec1_hat_over_port_len = (dec1_len + polar_port_cap_diam) / 2;
+dec1_hat_transition_len = dec1_hat_thickness;
+dec1_hat_remainder_len = ra1_diam - dec1_hat_over_port_len - dec1_hat_transition_len;
