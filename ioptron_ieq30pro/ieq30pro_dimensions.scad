@@ -3,7 +3,9 @@
 // Units: mm
 
 cast_iron_color = "bisque";//"gray";//"beige";
-plastic_color = [0.1,0.1,0.1];
+
+// Lighter colors makes it easier to see variations than does black
+plastic_color = "gray"; // [0.1,0.1,0.1];
 bearing_color = "silver";
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -11,7 +13,10 @@ bearing_color = "silver";
 dec1_diam = 67.66;
 dec1_radius = dec1_diam / 2;
 
-// Length of declination cylinder with dec1_diam.
+// Diameter of dec body at motor mount, before dec bearing cover (aka. dec2).
+dec11_diam = 67.8;
+
+// Length of declination cylinder with ~dec1_diam.
 dec1_len = 131.9;
 
 // There is a hatch for accessing the DEC shaft; it protrudes from the dec1
@@ -22,6 +27,7 @@ dec1_hatch_offset = 0.3;
 ////////////////////////////////////////////////////////////////////////////////
 // The black cap and the bottom of the dec body, where
 // the counterweight shaft is attached.
+cw_cap_diam = 68.1;  // Slightly larger than dec1_diam.
 cw_cap_height = 10;
 cw_cap_bevel_height = 5;
 
@@ -66,6 +72,45 @@ dec_motor_z = 62.4;
 
 // Distance away from bearing plane.
 dec_motor_setback = 0.01;
+
+// Updated DEC motor sizes, after finding that the above were a little off,
+// and that there is a draft angle, so it is smaller on the plane with the
+// logo than it is nearest the DEC axis.
+
+// First measurements for the core, not including the truncated pyramid on top
+// that features the logo, nor the bump near the polar scope port. The core is
+// a bit bigger at the bottom, towards the DEC axis due to a draft angle; this
+// is a feature that allows a part to be removed from an injection molding
+// machine.
+dec_motor_core_top_w = 85.3;
+dec_motor_core_bottom_w = 86.2;
+dec_motor_core_top_h = 68.1;
+dec_motor_core_bottom_h = 68.7;
+dec_motor_core_z = 57.4;
+
+// By inspection, the effective draft angle that I've "recreated" is a little
+// less than 0.6 degrees.
+dec_motor_draft_angle = 0.55;
+
+// The DEC motor "top" is the truncated pyramid on top that features the logo.
+dec_motor_top_base_w = dec_motor_core_top_w;
+dec_motor_top_base_h = 59.8;
+dec_motor_top_z = 4.45;
+
+// In addition to the chamfer of the truncated pyramid, the outer edge next to
+// the DEC bearing plane has a bigger chamfer. This is the distance from the
+// edge of the core next to the DEC bearing plane to the line through which the
+// chamfer cuts. We can use this to remove the excess.
+dec_motor_core_chamfer_h_offset = dec_motor_core_top_h - 59.8;
+
+// On the side facing towards the polar scope port there is a little bump out
+// which provides room for the stepper motor wiring.
+dec_motor_bump_drop_from_core_top = 5.75;
+dec_motor_bump_z = 4; // Amount sticks out from core.
+dec_motor_bump_base_w = 19.6;
+dec_motor_bump_outer_w = dec_motor_bump_base_w - 2*dec_motor_bump_z;
+dec_motor_bump_base_h = dec_motor_core_z - dec_motor_bump_drop_from_core_top;
+dec_motor_bump_outer_h = dec_motor_bump_base_h - 2*dec_motor_bump_z;
 
 ////////////////////////////////////////////////////////////////////////////////
 // Min dist from face with logo to dec1 cylinder.
