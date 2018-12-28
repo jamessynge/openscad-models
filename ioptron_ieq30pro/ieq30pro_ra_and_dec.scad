@@ -47,6 +47,7 @@
 include <ieq30pro_dimensions.scad>
 use <ieq30pro_clutch.scad>
 use <ieq30pro_dec_head.scad>
+use <ieq30pro_dec_motor.scad>
 use <../utils/axis_arrows.scad>
 use <../utils/chamfer.scad>
 
@@ -216,10 +217,7 @@ module dec_body_helper() {
 
         // On one side only, there is a support below the DEC motor.
         // It has a rounded lower edge which meets dec1 at about the midline.
-
-dec_motor_support1();
-
-
+        dec_motor_support1();
       };
       // Cap on the end where the CW shaft is
       // screwed into the DEC body, and a second
@@ -236,6 +234,9 @@ dec_motor_support1();
                   [dec1_radius-10, cw_cap_bevel_height],
                   [cw_cs_radius,cw_cap_bevel_height]]);
           };
+
+      translate([-dec_motor_x_offset,dec_motor_z_offset,-(dec2_len - dec_motor_setback)])
+      rotate([-90,0,0])
       dec_motor();
     };
     // Remove the hollow center of the counterweight shaft.
@@ -246,7 +247,7 @@ dec_motor_support1();
   };
 }
 
-module dec_motor() {
+module dec_motor_old() {
   w=dec_motor_w;
   h=dec_motor_h;
   z=dec_motor_z;

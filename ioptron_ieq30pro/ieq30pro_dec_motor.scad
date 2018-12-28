@@ -97,8 +97,18 @@ module dec_motor_bump() {
   sw = w2 / w1;
   sh = h2 / h1;
 
+  // Where should the bump be placed on the face of the DEC motor? We compute
+  // a location by averaging several measurements.
+  offset_x1 = dec_motor_bump_left_offset + w1/2;
+  offset_x2 = dec_motor_core_top_w - dec_motor_bump_right_offset - w1/2;;
+  offset_x = (offset_x1 + offset_x2) / 2;
+  // Sadly, this calculation is wrong. I can tell because the bump ends up
+  // intersecting the polar port cap. So, I'm just offsetting it so it
+  // looks OK.
+  offset_x_visual = offset_x + 2;
+
   rotate([90-dec_motor_draft_angle, 0,0])
-    translate([w1/2+ 48.5, -h1/2 - drop_from_top, 0])
+    translate([offset_x_visual, -h1/2 - drop_from_top, 0])
       linear_extrude(height=dec_motor_bump_z, scale=[sw, sh])
         square(size=[w1, h1], center=true);
 }

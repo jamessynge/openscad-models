@@ -65,64 +65,6 @@ dec2_len = 25.4;
 dec2_shoulder_width = 39.5;
 
 ////////////////////////////////////////////////////////////////////////////////
-// Declination motor cover size.
-dec_motor_w = 85.4;  // left-right on face with logo.
-dec_motor_h = 68.4;  // up-down on face with logo.
-dec_motor_z = 62.4;
-
-// Distance away from bearing plane.
-dec_motor_setback = 0.01;
-
-// Updated DEC motor sizes, after finding that the above were a little off,
-// and that there is a draft angle, so it is smaller on the plane with the
-// logo than it is nearest the DEC axis.
-
-// First measurements for the core, not including the truncated pyramid on top
-// that features the logo, nor the bump near the polar scope port. The core is
-// a bit bigger at the bottom, towards the DEC axis due to a draft angle; this
-// is a feature that allows a part to be removed from an injection molding
-// machine.
-dec_motor_core_top_w = 85.3;
-dec_motor_core_bottom_w = 86.2;
-dec_motor_core_top_h = 68.1;
-dec_motor_core_bottom_h = 68.7;
-dec_motor_core_z = 57.4;
-
-// By inspection, the effective draft angle that I've "recreated" is a little
-// less than 0.6 degrees.
-dec_motor_draft_angle = 0.55;
-
-// The DEC motor "top" is the truncated pyramid on top that features the logo.
-dec_motor_top_base_w = dec_motor_core_top_w;
-dec_motor_top_base_h = 59.8;
-dec_motor_top_z = 4.45;
-
-// In addition to the chamfer of the truncated pyramid, the outer edge next to
-// the DEC bearing plane has a bigger chamfer. This is the distance from the
-// edge of the core next to the DEC bearing plane to the line through which the
-// chamfer cuts. We can use this to remove the excess.
-dec_motor_core_chamfer_h_offset = dec_motor_core_top_h - 59.8;
-
-// On the side facing towards the polar scope port there is a little bump out
-// which provides room for the stepper motor wiring.
-dec_motor_bump_drop_from_core_top = 5.75;
-dec_motor_bump_z = 4; // Amount sticks out from core.
-dec_motor_bump_base_w = 19.6;
-dec_motor_bump_outer_w = dec_motor_bump_base_w - 2*dec_motor_bump_z;
-dec_motor_bump_base_h = dec_motor_core_z - dec_motor_bump_drop_from_core_top;
-dec_motor_bump_outer_h = dec_motor_bump_base_h - 2*dec_motor_bump_z;
-
-////////////////////////////////////////////////////////////////////////////////
-// Min dist from face with logo to dec1 cylinder.
-dec_motor_z2 = 42;
-dec_motor_z_offset =
-  dec1_radius + dec_motor_z2 - dec_motor_z;
-
-// Distance from RA bearing to bottom of motor.
-ra1_base_to_dec_motor_bottom = 66.94;
-
-
-////////////////////////////////////////////////////////////////////////////////
 // RA axis diameter at the bearing, where the moving
 // and stationary parts meet.
 ra1_diam = 120;  // +/- 0.3mm.
@@ -151,6 +93,93 @@ ra3_radius = ra2_radius - 19.86;
 ra3_len = 17.13;
 
 ra_bearing_gap = 0.6;
+
+////////////////////////////////////////////////////////////////////////////////
+// Declination motor cover size.
+dec_motor_w = 85.4;  // left-right on face with logo.
+dec_motor_h = 68.4;  // up-down on face with logo.
+// dec_motor_z = 62.4;
+
+// Distance away from bearing plane.
+dec_motor_setback = 0.01;
+
+// Updated DEC motor sizes, after finding that the above were a little off,
+// and that there is a draft angle, so it is smaller on the plane with the
+// logo than it is nearest the DEC axis.
+
+// First measurements for the core, not including the truncated pyramid on top
+// that features the logo, nor the bump near the polar scope port. The core is
+// a bit bigger at the bottom, towards the DEC axis due to a draft angle; this
+// is a feature that allows a part to be removed from an injection molding
+// machine.
+dec_motor_core_top_w = 85.3;
+dec_motor_core_bottom_w = 86.2;
+dec_motor_core_top_h = 68.1;
+dec_motor_core_bottom_h = 68.7;
+dec_motor_core_z = 57.4;
+
+// By inspection, the effective draft angle that I've "recreated" is a little
+// less than 0.6 degrees.
+dec_motor_draft_angle = 0.55;
+
+// The DEC motor "top" is the truncated pyramid on top that features the logo.
+dec_motor_top_base_w = dec_motor_core_top_w;
+dec_motor_top_base_h = 59.8;
+dec_motor_top_z = 4.45;
+
+dec_motor_z = dec_motor_core_z + dec_motor_top_z;
+
+// In addition to the chamfer of the truncated pyramid, the outer edge next to
+// the DEC bearing plane has a bigger chamfer. This is the distance from the
+// edge of the core next to the DEC bearing plane to the line through which the
+// chamfer cuts. We can use this to remove the excess.
+dec_motor_core_chamfer_h_offset = dec_motor_core_top_h - 59.8;
+
+// On the side facing towards the polar scope port there is a little bump out
+// which provides room for the stepper motor wiring.
+dec_motor_bump_drop_from_core_top = 5.75;
+dec_motor_bump_z = 4; // Amount sticks out from core.
+dec_motor_bump_base_w = 19.6;
+dec_motor_bump_outer_w = dec_motor_bump_base_w - 2*dec_motor_bump_z;
+dec_motor_bump_base_h = dec_motor_core_z - dec_motor_bump_drop_from_core_top;
+dec_motor_bump_outer_h = dec_motor_bump_base_h - 2*dec_motor_bump_z;
+
+// Its challenging to measure the exact position of the bump, so I took a bunch
+// of measurements from both sides.
+// 48.5 48.35 47.93 48.25  average 48.26
+// 17.21 17.62 17.55 17.32  average 17.42
+dec_motor_bump_left_offset = 48.26;
+dec_motor_bump_right_offset = 17.42;
+
+////////////////////////////////////////////////////////////////////////////////
+// Min distance from face with logo to dec1 cylinder.
+dec_motor_z2 = 41.85;
+// Based on that, distance from min distance from dec axis to bottom of
+// dec_motor... as if it were a solid.
+dec_motor_z_offset_based_on_z2 =
+  dec1_radius + dec_motor_z2 - dec_motor_z;
+
+// Min distance from face with logo to far side of dec2 cylinder.
+dec_motor_z3 = 124.7;
+// Based on that, distance from min distance from dec axis to bottom of
+// dec_motor.
+dec_motor_z_offset_based_on_z3 = dec_motor_z3 - dec2_radius - dec_motor_z;
+
+// Distance from RA bearing to bottom of motor.
+ra1_base_to_dec_motor_bottom = 67.19;  // Average of 3 measurements.
+// Based on that, distance from min distance from dec axis to bottom of
+// dec_motor.
+dec_motor_z_offset_based_on_ra1_base =
+  ra1_base_to_dec_motor_bottom - ra1_base_to_dec_center;
+
+// Average these ways of determining the distance.
+dec_motor_z_offset =
+  (dec_motor_z_offset_based_on_z2 + dec_motor_z_offset_based_on_z3 + dec_motor_z_offset_based_on_ra1_base) / 3;
+
+// The DEC motor cover isn't quite symmetricly placed over the DEC axis.
+// Distance measurements on one side: 5.84  5.28  5.09 5.13 5.08 5.23
+// And the other side: 1.74 1.70 1.84 1.70
+dec_motor_x_offset = 1.76;
 
 ////////////////////////////////////////////////////////////////////////////////
 // Dimensions for the DEC and RA clutches. They are
