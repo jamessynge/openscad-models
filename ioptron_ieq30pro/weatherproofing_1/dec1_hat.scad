@@ -25,7 +25,7 @@ if ($preview) {
 *dec1_hat(over_port=false, remainder=true, sleeve=false);
 *dec1_hat(over_port=false, remainder=false, sleeve=true);
 
-dec1_hat_sleeve(length=10);
+*dec1_hat_sleeve(length=10);
 
 
 module dec1_hat(over_port=true, remainder=true, sleeve=true) {
