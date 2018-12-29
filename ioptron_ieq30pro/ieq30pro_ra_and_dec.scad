@@ -1,17 +1,14 @@
-// Defines the moving portion of the RA axis, which includes the
-// "non-moving" portion of the DEC axis of the iOptron iEQ30 Pro.
-// Author: James Synge
+// Defines the moving portion of the RA axis, which includes the "non-moving"
+// portion of the DEC axis of the iOptron iEQ30 Pro. Author: James Synge
 
-// ra_to_dec REQUIRES four children:
+// ra_to_dec accepts up to four children:
 //
-// 1) attached to the coordinate frame of the moving
-//    RA axis, with the bearing of the RA axis centered
-//    on the xy plane at z=0, with positive z being
-//    where the moving RA axis is located, and negative
-//    z being where the stationary portion of the mount
-//    is located. The RA clutch is at x=0, negative y,
-//    in keeping with the fact that we want the clutch
-//    down when parked.
+// 1) Attached to the coordinate frame of the moving RA axis, with the
+//    bearing of the RA axis centered on the xy plane at z=0, with positive
+//    z being where the moving RA axis is located, and negative z being
+//    where the stationary portion of the mount is located. The RA clutch
+//    is at x=0, negative y, in keeping with the fact that we want the
+//    clutch down when parked.
 //
 // 2) attached to the coordinate frame of the
 //    "non-moving" portion of the DEC axis, with the
@@ -36,7 +33,8 @@
 //
 // This allows for adding objects to the model by
 // a "use" of this file. If you don't have something to
-// pass, pass in `union();`
+// pass, for child n-1 but want to pass in child n, pass in `union();`
+// for the missing child n-1.
 //
 // See also:
 //   https://github.com/openscad/openscad/issues/2635
@@ -247,48 +245,10 @@ module dec_body_helper() {
   };
 }
 
-module dec_motor_old() {
-  w=dec_motor_w;
-  h=dec_motor_h;
-  z=dec_motor_z;
-  
-  translate([-w/2, dec_motor_z_offset, h - dec2_len + dec_motor_setback])
-    rotate([-90,0,0]) {
-      color(plastic_color) {
-        intersection() {
-          chamferCube(w,h,z,chamferHeight=12,
-            chamferX=[0,0,1,0], chamferY=[0,0,0,0],
-            chamferZ=[0,0,0,0]);
-          chamferCube(w,h,z,chamferHeight=5,
-            chamferX=[0,0,0,1], chamferY=[0,1,1,0],
-            chamferZ=[0,0,0,0]);
-        }
-      };
-
-      color("white") 
-        translate([w/2, h/3,z])
-          linear_extrude(height = 0.1)
-            ioptron_logo();    
-    };
-}
-
-module ioptron_logo() {
-  font = "Liberation Sans";
-  italic_font = str(font, ":style=Italic");
-  text("iOptron", size=12, font=italic_font,
-       halign="center", valign="bottom", $fn=16);
-  translate([0, -4, 0])
-    text("iEQ30-Pro", size=6, font=font,
-         halign="center", valign="top", $fn=16);
-}
-
-// A little decoration for the model, so that the
-// two sides of the DEC bearing aren't butted up
-// against each other in an unrealistic fashion,
-// and to match the way the mount actually looks;
-// i.e. there is a very small gap between the two
-// sides through which we can see silver colored
-// metal.
+// A little decoration for the model, so that the two sides of the DEC bearing
+// aren't butted up against each other in an unrealistic fashion, and to match
+// the way the mount actually looks; i.e. there is a very small gap between the
+// two sides through which we can see silver colored metal.
 module dec_bearing() {
   h=dec_bearing_gap+1;
   color(bearing_color)

@@ -22,93 +22,75 @@ use <../utils/axis_arrows.scad>
 
 // Global resolution
 // Don't generate smaller facets than this many mm.
-$fs = 0.5;
+$fs = $preview ? 3 : 1;
 // Don't generate larger angles than this many degrees.
-$fa = 1;
+$fa = $preview ? 3 : 1;
 
-ioptron_mount($t * 360, $t * 360) {
-  color("gold") {
-    echo("executing ioptron_mount child 1");
-    translate([ra1_radius*2,ra1_radius,10])
-      linear_extrude(height=20) square(size=10);
-    axis_arrows(total_length=ra1_radius*2);
-  };    
+// Default location is parked.
+lat = mount_latitude;
+ra_angle = 90 + $t * 360;
+dec_angle = 180 - lat + $t * 360;
 
-  color("blue") {
-    echo("executing ioptron_mount child 2");
-    linear_extrude(height=4) {
-      difference() {
-        circle(r=ra1_radius + 10);
-        circle(r=ra1_radius + 5);
-      };
-      translate([ra1_radius+10,0,0])
-        square(size=10, center=true);
+decorated_ioptron_mount(ra_angle=ra_angle,
+  dec_angle=dec_angle, latitude=lat, show_arrows=true);
+
+module decorated_ioptron_mount(ra_angle=0, dec_angle=0, latitude=20, show_arrows=true) {
+  ioptron_mount(ra_angle=ra_angle, dec_angle=dec_angle, latitude=latitude) {
+    color("gold") {
+      if (show_arrows) axis_arrows(total_length=ra1_radius*2);
+      if ($children > 0) children(0);
     };
-    axis_arrows(total_length=ra1_radius*1.5);
-  };
-  
-  color("yellow") {
-    echo("executing ioptron_mount child 3");
-    r = dec_head_base_diam/2;
-    linear_extrude(height=4) {
-      difference() {
-        circle(r=r + 10);
-        circle(r=r + 5);
-      };
-      translate([r+10,0,0])
-        square(size=10, center=true);
+
+    color("blue") {
+      if (show_arrows) axis_arrows(total_length=ra1_radius*1.9);
+      if ($children > 1) children(1);
     };
-    axis_arrows(total_length=r*1.5);
-  };
-
-  color("red") {
-    echo("executing ioptron_mount child 4");
-    r = dec_head_base_diam/2;
-    linear_extrude(height=4) {
-      difference() {
-        circle(r=r + 10);
-        circle(r=r + 5);
-      };
-      translate([r+10,0,0])
-        square(size=10, center=true);
+    
+    color("yellow") {
+      if (show_arrows) axis_arrows(total_length=dec_head_base_diam*0.75);
+      if ($children > 2) children(2);
     };
-    axis_arrows(total_length=r*1.5);
-  };
 
-  color("green") {
-    echo("executing ioptron_mount child 5");
-    r = dec_head_base_diam/2;
-    translate([20,10,10]) sphere(r=10);
-    axis_arrows(total_length=r);
-  };
-};
+    color("red") {
+      if (show_arrows) axis_arrows(total_length=dec_head_base_diam*0.75);
+      if ($children > 3) children(3);
+    };
 
-module ioptron_mount(ra_angle=0, dec_angle=0) {
+    color("green") {
+      if (show_arrows) axis_arrows(total_length=dec_head_base_diam/2);
+      if ($children > 4) children(4);
+    };
+  };
+}
+
+module ioptron_mount(ra_angle=0, dec_angle=0, latitude=20) {
   if ($children > 5) {
     echo("ioptron_mount has", $children, "children, too many");
     assert($children <= 5);
   }
 
-  rotate([0, 0, ra_angle]) {
-    translate([0, 0, ra_bearing_gap/2]) {
-      ra_and_dec(dec_angle) {
-        union() if ($children > 1) children(1);
-        union() if ($children > 2) children(2);
-        union() if ($children > 3) children(3);
-        union() if ($children > 4) children(4);
+  rotate([90-latitude,0,0]) {
+    rotate([0, 0, ra_angle]) {
+      translate([0, 0, ra_bearing_gap/2]) {
+        ra_and_dec(dec_angle) {
+          union() if ($children > 1) children(1);
+          union() if ($children > 2) children(2);
+          union() if ($children > 3) children(3);
+          union() if ($children > 4) children(4);
+        };
       };
     };
-  };
-
-  ra_bearing();
   
-  rotate([180, 0, 0]) {
-    translate([0, 0, ra_bearing_gap/2]) {
-      ra_body();
-      rotate([0,0,180])
-        union() if ($children > 0) children(0);
+    ra_bearing();
+    
+    rotate([180, 0, 0]) {
+      translate([0, 0, ra_bearing_gap/2]) {
+        ra_body();
+        rotate([0,0,180])
+          union() if ($children > 0) children(0);
+      };
     };
-  };
+  }
 }
 
 module ra_body() {
@@ -126,12 +108,10 @@ module ra_body() {
   // x is perpendicular to the ground and to the
   // RA axis; y is parallel to the RA axis; z is
   // distance from the RA axis.
-  x = 95.1;
-  y = 68.5;
-  z = 49;   // top of cover to intersection
+  x = ra_motor_w;
+  y = ra_motor_h;
+  z = ra_motor_z;   // top of cover to intersection
             //with ra2_diam.
-  // Height of top of cover above the ra2_diam.
-  ra_cover_height = 24.0;
   ra_z_offset = ra2_radius + ra_cover_height - z;
   
   translate([0,0,0])

@@ -94,10 +94,11 @@ ra3_len = 17.13;
 
 ra_bearing_gap = 0.6;
 
+
 ////////////////////////////////////////////////////////////////////////////////
 // Declination motor cover size.
-dec_motor_w = 85.4;  // left-right on face with logo.
-dec_motor_h = 68.4;  // up-down on face with logo.
+dec_motor_w = 85.4;  // left-right on face with logo.  OBSOLETE
+dec_motor_h = 68.4;  // up-down on face with logo.  OBSOLETE
 // dec_motor_z = 62.4;
 
 // Distance away from bearing plane.
@@ -107,11 +108,10 @@ dec_motor_setback = 0.01;
 // and that there is a draft angle, so it is smaller on the plane with the
 // logo than it is nearest the DEC axis.
 
-// First measurements for the core, not including the truncated pyramid on top
-// that features the logo, nor the bump near the polar scope port. The core is
-// a bit bigger at the bottom, towards the DEC axis due to a draft angle; this
-// is a feature that allows a part to be removed from an injection molding
-// machine.
+// Measurements for the core, not including the truncated pyramid on top that
+// features the logo, nor the bump near the polar scope port. The core is a bit
+// bigger at the bottom, towards the DEC axis due to a draft angle; this is a
+// feature that allows a part to be removed from an injection molding machine.
 dec_motor_core_top_w = 85.3;
 dec_motor_core_bottom_w = 86.2;
 dec_motor_core_top_h = 68.1;
@@ -180,6 +180,31 @@ dec_motor_z_offset =
 // Distance measurements on one side: 5.84  5.28  5.09 5.13 5.08 5.23
 // And the other side: 1.74 1.70 1.84 1.70
 dec_motor_x_offset = 1.76;
+
+
+
+////////////////////////////////////////////////////////////////////////////////
+// RA core (the non-moving portion "below" RA bearing plane) dimensions.
+// The RA bearing plane is at z=0, with the motor at x=0, y>0.
+
+
+
+////////////////////////////////////////////////////////////////////////////////
+// RA motor dimensions, arranged very much like the DEC motor cover. x is
+// perpendicular to the ground and to the RA axis; y is parallel to the RA axis;
+// z is distance from the RA axis. As with the DEC motor, there is a draft angle
+// to the plastic.
+
+ra_motor_w = 95.1;
+ra_motor_h = 68.5;
+ra_motor_z = 49;   // top of cover to intersection with ra2_diam.
+
+// Height of top of cover above the ra2_diam.
+ra_cover_height = 24.0;
+
+
+
+
 
 ////////////////////////////////////////////////////////////////////////////////
 // Dimensions for the DEC and RA clutches. They are
