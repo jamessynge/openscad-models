@@ -8,6 +8,8 @@ cast_iron_color = "bisque";//"gray";//"beige";
 plastic_color = "gray"; // [0.1,0.1,0.1];
 bearing_color = "silver";
 
+polar_scope_color = "slategray";
+
 ////////////////////////////////////////////////////////////////////////////////
 // Diameter of dec body at bottom, near CW shaft.
 dec1_diam = 67.66;
@@ -43,15 +45,6 @@ cw_shaft_diam = 20;
 
 
 ////////////////////////////////////////////////////////////////////////////////
-// The polar scope port on the ra_to_dec portion. Naturally it is centered on
-// the RA axis.
-polar_port_diam = 28.4;
-//polar_port_offset = 60;  // To center of port.
-polar_port_height = 2.15;  // Above surface of dec1 body.
-polar_port_cap_diam = 31.9;
-polar_port_cap_height = 8;
-
-////////////////////////////////////////////////////////////////////////////////
 // Diameter of the motor end of the DEC body.
 
 //dec2_diam = 97.4;  // Spec, +/- 0.3mm.
@@ -65,10 +58,10 @@ dec2_len = 25.4;
 dec2_shoulder_width = 39.5;
 
 ////////////////////////////////////////////////////////////////////////////////
-// RA axis diameter at the bearing, where the moving
-// and stationary parts meet.
+// RA axis diameter at the bearing, where the moving and stationary parts meet.
 ra1_diam = 120;  // +/- 0.3mm.
 ra1_radius = ra1_diam / 2;
+ra_bearing_gap = 0.6;
 
 ////////////////////////////////////////////////////////////////////////////////
 // Distance from edge of RA bearing to outside of
@@ -80,20 +73,67 @@ ra1_base_to_dec_gear_cover =
     ra1_base_to_dec_center - dec2_radius;
 
 ////////////////////////////////////////////////////////////////////////////////
-// Dimensions for the non-moving portion of the
-// mount. Much less detail is needed here, so only
-// a few objects are modeled.
+// Dimensions for the non-moving portion of the mount. Much less detail is
+// needed here, so only a few objects are modeled.
 
 // RA bearing cover diameter and length.
 ra2_radius = ra1_radius;
-ra2_len = 24.5;
+ra2_len = 24.5;  // Varies quite a bit (e.g. by +/- 0.5), not sure why.
 
-// RA body becomes narrower.
-ra3_radius = ra2_radius - 19.86;
-ra3_len = 17.13;
+// RA body becomes narrower after the bearing cover.
+ra3_diam = 78.2;
+ra3_radius = ra3_diam / 2;
+ra3_len = 16.8;
 
-ra_bearing_gap = 0.6;
+// Next there is a section that is ~rectangular above the midline, and like
+// ra3 below the midline, except it also has "feet" by which the whole piece
+// is attached to the base of the mount. Not modelling those feet as they don't
+// affect the weatherproofing. Instead, treating this as if it extends all the
+// the way back to near the polar scope.
+ra4_diam = ra3_diam;
+ra4_width = 65.7;
+ra4_len = 72;
 
+// Now the section before the polar scope.
+ra5_diam = 73.5;
+ra5_len = 8;
+
+////////////////////////////////////////////////////////////////////////////////
+// Polar scope at bottom of fixed RA body.
+
+ps1_diam = 74.2;
+ps1_len = 8.3;
+
+ps2_diam = 60.25;
+ps2_len = 15;
+
+// Section 3 is a truncated cone, apparently with a 45 degree slope, so
+// the amount that it narrows in radius is the length (cone height).
+ps3_od = ps2_diam;
+ps3_id = 42.1;
+ps3_len = (ps3_od - ps3_id) / 2;
+
+ps4_diam = ps3_id;
+ps4_len = 23.7;
+
+// Section 5 is a truncated cone, apparently with a 45 degree slope, so
+// the amount that it narrows in radius is the length (cone height).
+ps5_od = ps4_diam;
+ps5_id = 29.2;
+ps5_len = (ps5_od - ps5_id) / 2;
+
+
+
+
+////////////////////////////////////////////////////////////////////////////////
+// The polar scope port on the ra_to_dec portion. Naturally it is centered on
+// the RA axis.
+
+polar_port_diam = 28.4;
+//polar_port_offset = 60;  // To center of port.
+polar_port_height = 2.15;  // Above surface of dec1 body.
+polar_port_cap_diam = 31.9;
+polar_port_cap_height = 8;
 
 ////////////////////////////////////////////////////////////////////////////////
 // Declination motor cover size.
@@ -203,6 +243,8 @@ ra_motor_z = 49;   // top of cover to intersection with ra2_diam.
 ra_cover_height = 24.0;
 
 
+// Distance away from bearing plane.
+ra_motor_setback = 1.8;
 
 
 

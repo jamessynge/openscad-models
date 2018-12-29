@@ -16,19 +16,48 @@ use <four_star_knob.scad>
 use <../utils/axis_arrows.scad>
 use <../utils/chamfer.scad>
 
-//ra_body();
+// Global resolution
+// Don't generate smaller facets than this many mm.
+$fs = $preview ? 3 : 1;
+// Don't generate larger angles than this many degrees.
+$fa = $preview ? 3 : 1;
+
+//translate([300, 0, 0])
+  ra_body();
+
+ra_motor_z_offset = ra2_radius + ra_cover_height - ra_motor_z +2;
 
 module ra_body() {
   // To avoid modeling more of the RA body,
   // we extend the ra3 section longer ... for now.
-  ra3_extra_long = ra3_len * 4;
   color(cast_iron_color) {
     cylinder(h=ra2_len, r=ra2_radius);
-    translate([0, 0, ra2_len])
-      cylinder(h=ra3_extra_long, r=ra3_radius);
+    translate([0, 0, ra2_len]) {
+      cylinder(h=ra3_len, r=ra3_radius);
+      translate([-ra4_width/2, 0, 0])
+        cube([ra4_width, ra_motor_z_offset, ra4_len]);
+      translate([0, 0, ra3_len]) {
+        intersection() {
+          cylinder(h=ra4_len, d=ra4_diam);
+          translate([-ra4_width/2, -ra4_width, 0])
+            cube([ra4_width, ra4_width, ra4_len]);
+        }
+        translate([-ra4_width/2, 0, 0])
+          cube([ra4_width, ra_motor_z_offset, ra4_len]);
+
+        translate([0, 0, ra4_len]) {
+          cylinder(h=ra5_len, d=ra5_diam);
+
+
+        }
+      }
+    }
   }
 
-  ra_motor_and_electronics();
+  translate([0,0,ra2_len+ra3_len+ra4_len+ra5_len]) polar_scope();
+
+  translate([0, ra_motor_z_offset, ra_motor_setback])
+    ra_motor_and_electronics();
 }
 
 // A little decoration for the model, so that the
@@ -46,50 +75,34 @@ module ra_bearing() {
 }
 
 module ra_motor_and_electronics() {
-  ra_z_offset = ra2_radius + ra_cover_height - ra_motor_z;
-  rotate([90,0,0])
+  ra_motor_h1 = 96;
+  ra_motor_profile1_wb = 65.1;
 
-        translate([-x/2, 0.01, ra_z_offset])
-    ra_motor();
+  color(plastic_color) {
+    ra_motor_and_upper_electronics();
+    ra_lower_electronics();
+  }
 }
 
-*translate([200, 0, 0]) ra_motor();
-
+module ra_motor_and_upper_electronics() {
+  ra_motor();
+  ra_electronics();
+}
 
 module ra_motor() {
-  // RA motor/electronics cover dimensions, arranged
-  // very much like the DEC motor cover.
-  // x is perpendicular to the ground and to the
-  // RA axis; y is parallel to the RA axis; z is
-  // distance from the RA axis.
-  x = ra_motor_w;
-  y = ra_motor_h;
-  z = ra_motor_z;   // top of cover to intersection
-            //with ra2_diam.
-  
-      color(plastic_color)
-          intersection() {
-            chamferCube(x,y,z,chamferHeight=12,
-              chamferX=[0,0,0,1], chamferY=[0,0,0,0],
-              chamferZ=[0,0,0,0]);
-            chamferCube(x,y,z,chamferHeight=4,
-              chamferX=[0,0,1,0], chamferY=[0,1,1,0],
-              chamferZ=[0,0,0,0]);
-          };
-}
-
-
-ra_motor2();
-
-module ra_motor2() {
   h1 = 96;
   d1 = 5;
   h2 = h1 - 2*d1;
   d2 = 18 + d1;
   h3 = h1 - 2 * d2;
 
-  // The chamfer produced by offset() isn't quite what is desired at the back
-  // of the motor, so intersect with a big cube to cut off a bit better.
+  // Place the motor's base (part nearest the RA axis) onto the z=0 plane,
+  // with the motor rising above that plane.
+  ra_motor_profile1_wb = 65.1;
+
+  translate([-h1/2,0,0])
+  rotate([0, 90,0])
+  translate([-ra_motor_profile1_wb,0,0])
   intersection() {
     union() {
       hull() {
@@ -100,17 +113,16 @@ module ra_motor2() {
           linear_extrude(height=h3) ra_motor_profile3();
       }
       ra_motor_bump();
-    }
-  ra_motor_profile1_hl = 42.15;  // ra_motor_profile1.hl
-  
-  translate([-5, ra_motor_profile1_hl, 0])
-  rotate([0, 0, -45])
-  translate([0, -50, 0])
-  cube([100, 100, 100], center=false);
+    };
+
+    // The chamfer produced by offset() isn't quite what is desired at the back
+    // of the motor, so intersect with a big cube to cut off a bit better.
+    ra_motor_profile1_hl = 42.15;  // ra_motor_profile1.hl
+    translate([-5, ra_motor_profile1_hl, 0])
+      rotate([0, 0, -45])
+        translate([0, -50, 0])
+          cube([100, 100, 100], center=false);
   }
-
-
-
 }
 
 module ra_motor_bump() {
@@ -197,4 +209,84 @@ module ra_motor_profile3() {
     [x2,hl],
     [x1,0],
     ]);
+}
+
+module ra_electronics() {
+  w = 81.75;
+  h = 53.25;  // From original origin of ra_motor_profile1().
+  r = 2.15;
+
+  ra_motor_profile1_wb = 65.1;
+
+  translate([0, 0, ra_motor_profile1_wb+h/2-2]) {
+    translate([0,0,0]) {
+      rotate([-90, 0, 0]) {
+        z = 13.9;
+        linear_extrude(height=z, scale=0.999) {
+          $fs=1;
+          offset(r=r) square([w, h], center=true);
+        }
+        // An approximation of the switch just so that we don't form-fit some
+        // weatherproofing over it.
+        sw = 15;
+        sh = 8.9;
+        sz = 2.75;
+        translate([(w + r)/2 - sw -2,
+          -(h + r) / 2 + sh, z]) {
+          cube([sw, sh, sz], center=false);
+        }
+      }
+    }
+  }
+}
+
+module polar_scope() {
+  color(polar_scope_color) {
+    cylinder(d=ps1_diam, h=ps1_len);
+
+    translate([0, 0, ps1_len]) {
+      cylinder(d=ps2_diam, h=ps2_len);
+
+      translate([0, 0, ps2_len]) {
+        cylinder(d1=ps3_od, d2=ps3_id, h=ps3_len);
+
+        translate([0, 0, ps3_len]) {
+          cylinder(d=ps4_diam, h=ps4_len);
+
+          translate([0, 0, ps4_len]) {
+            cylinder(d1=ps5_od, d2=ps5_id, h=ps5_len);
+          }
+        }
+      }
+    }
+  }
+}
+
+module ra_lower_electronics() {
+  z = 13;
+  z2 = 5;
+
+  translate([0, -z, 0]) {
+    rotate([-90, 0, 0]) {
+      linear_extrude(height=z) ra_lower_electronics_profile();
+      translate([0, 0, -z2]) {
+        s = 0.8;
+        linear_extrude(height=z2, scale=[1/s, 1])
+          scale([s, 1])
+            ra_lower_electronics_profile();
+      }
+    }
+  }
+}
+
+module  ra_lower_electronics_profile() {
+  intersection() {
+    projection() {
+      rotate([90, 0, 0]) ra_motor_and_upper_electronics();
+    }
+    w = 100;
+    h = 100;
+    translate([-w/2, -h - ra2_len, 0])
+      square([w, h], center=false);
+  }
 }

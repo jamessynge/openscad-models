@@ -18,6 +18,7 @@
 use <../utils/chamfer.scad>
 include <ieq30pro_dimensions.scad>
 use <ieq30pro_ra_and_dec.scad>
+use <ieq30pro_ra_core.scad>
 use <../utils/axis_arrows.scad>
 
 // Global resolution
@@ -85,47 +86,13 @@ module ioptron_mount(ra_angle=0, dec_angle=0, latitude=20) {
     
     rotate([180, 0, 0]) {
       translate([0, 0, ra_bearing_gap/2]) {
-        ra_body();
+        rotate([0, 0, 180])
+          ra_body();
         rotate([0,0,180])
           union() if ($children > 0) children(0);
       };
     };
   }
-}
-
-module ra_body() {
-  // To avoid modeling more of the RA body,
-  // we extend the ra3 section longer ... for now.
-  ra3_extra_long = ra3_len * 4;
-  color(cast_iron_color) {
-    cylinder(h=ra2_len, r=ra2_radius);
-    translate([0, 0, ra2_len])
-      cylinder(h=ra3_extra_long, r=ra3_radius);
-  }
-
-  // RA motor/electronics cover dimensions, arranged
-  // very much like the DEC motor cover.
-  // x is perpendicular to the ground and to the
-  // RA axis; y is parallel to the RA axis; z is
-  // distance from the RA axis.
-  x = ra_motor_w;
-  y = ra_motor_h;
-  z = ra_motor_z;   // top of cover to intersection
-            //with ra2_diam.
-  ra_z_offset = ra2_radius + ra_cover_height - z;
-  
-  translate([0,0,0])
-    rotate([90,0,0])
-      color(plastic_color)
-        translate([-x/2, 0.01, ra_z_offset])
-          intersection() {
-            chamferCube(x,y,z,chamferHeight=12,
-              chamferX=[0,0,0,1], chamferY=[0,0,0,0],
-              chamferZ=[0,0,0,0]);
-            chamferCube(x,y,z,chamferHeight=4,
-              chamferX=[0,0,1,0], chamferY=[0,1,1,0],
-              chamferZ=[0,0,0,0]);
-          };
 }
 
 // A little decoration for the model, so that the
