@@ -247,6 +247,7 @@ ra_cover_height = 24.0;
 ra_motor_setback = 1.8;
 
 
+ra_motor_z_offset = ra2_radius + ra_cover_height - ra_motor_z + 2;
 
 ////////////////////////////////////////////////////////////////////////////////
 // Dimensions for the DEC and RA clutches. They are
@@ -292,13 +293,13 @@ dec_head_diam1 = 89.5;  // At top of base (radius is ~4mm less than base).
 dec_head_diam2 = 86.9;  // At top, due to draft angle.
 dec_head_scale = dec_head_diam2 / dec_head_diam1;
 
+dec_head_total_height = dec_head_base_height + dec_head_height;
+
 // Saddle, where the dovetail plate is secured by two screws.
 dec_saddle_depth = 13.8;
 dec_saddle_width1 = 44; // At top of saddle
 dec_saddle_width2 = 46.5; // At bottom of saddle
-dec_saddle_height =
-    dec_head_base_height +
-    dec_head_height - dec_saddle_depth;
+dec_saddle_height = dec_head_total_height - dec_saddle_depth;
 dovetail_width = 45.25;
 
 // Perpendicular to the direction of the saddle plate is a slot with

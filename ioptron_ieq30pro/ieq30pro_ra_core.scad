@@ -22,10 +22,16 @@ $fs = $preview ? 3 : 1;
 // Don't generate larger angles than this many degrees.
 $fa = $preview ? 3 : 1;
 
-//translate([300, 0, 0])
-  ra_body();
+decorated_ra_body();
 
-ra_motor_z_offset = ra2_radius + ra_cover_height - ra_motor_z +2;
+module decorated_ra_body(show_arrows=true) {
+  ra_body() {
+    color("gold") {
+      if (show_arrows) axis_arrows(total_length=ra1_radius*4);
+      if ($children > 0) children(0);
+    }
+  }
+}
 
 module ra_body() {
   // To avoid modeling more of the RA body,
@@ -47,8 +53,6 @@ module ra_body() {
 
         translate([0, 0, ra4_len]) {
           cylinder(h=ra5_len, d=ra5_diam);
-
-
         }
       }
     }
@@ -58,6 +62,10 @@ module ra_body() {
 
   translate([0, ra_motor_z_offset, ra_motor_setback])
     ra_motor_and_electronics();
+
+  if ($children > 0) {
+    children();
+  }
 }
 
 // A little decoration for the model, so that the

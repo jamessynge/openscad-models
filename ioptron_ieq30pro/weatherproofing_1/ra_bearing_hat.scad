@@ -179,6 +179,7 @@ module ra_motor_bearing_hat_profile() {
   }
 }
 
+color("red")
 translate([0, 0, 100]) ra_motor_biggest_profile();
 module ra_motor_biggest_profile() {
   intersection() {
@@ -188,6 +189,7 @@ module ra_motor_biggest_profile() {
   }
 }
 
+color("pink")
 translate([0, 0, 200]) ioptron_mount_biggest_ra_projection();
 module ioptron_mount_biggest_ra_projection() {
   projection(cut=true)

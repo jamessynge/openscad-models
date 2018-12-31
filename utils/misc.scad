@@ -139,3 +139,12 @@ module fillet_extrusion(radius, length, scale=1.0) {
 }
 translate([0,-20,0])
 fillet_extrusion(5,15,scale=0.5);
+
+
+module annulus(d1=undef, r1=undef, d2=undef, r2=undef, solid=false) {
+  difference() {
+    circle(r=r2, d=d2);
+    // solid is support for creating solids for CSG operations.
+    if (!solid) circle(r=r1, d=d1);
+  };
+}

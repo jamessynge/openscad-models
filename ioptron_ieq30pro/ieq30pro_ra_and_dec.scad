@@ -122,6 +122,14 @@ module translate_to_dec2() {
   }
 }
 
+module translate_to_dec_bearing_plane() {
+  translate_to_dec12_plane() {
+    rotate([180, 0, 0]) {
+      translate([0, 0, -dec2_len]) children();
+    }
+  }
+}
+
 function ra_to_dec_fillet_radius() = ra1_radius - dec1_radius + 2;
 
 module ra_to_dec(include_polar_port=true) {
@@ -163,13 +171,15 @@ module ra_to_dec_fillet() {
 }
 
 module dec_body(dec_angle=0) {
-  echo("dec_body has", $children, "children");
-  assert($children == 3);
+  if ($children > 3) {
+    echo("dec_body has", $children, "children, too many");
+    assert($children <= 3);
+  }
 
   // Render the "stationary" body of the DEC axis.
   rotate([180, 0, 0]) {
     dec_body_helper();
-    translate([0, 0, -dec2_len]) #children(0);
+    if ($children > 0) translate([0, 0, -dec2_len]) children(0);
   }
 
   // Render the parts beyond the bearing cover...
@@ -186,8 +196,8 @@ module dec_body(dec_angle=0) {
   translate([0, 0, dec2_len+dec_bearing_gap])
     rotate([0, 0, dec_angle])
       dec_head() {
-        children(1);
-        children(2);
+        union() if ($children > 1) children(1);
+        union() if ($children > 2) children(2);
       };
 }
 

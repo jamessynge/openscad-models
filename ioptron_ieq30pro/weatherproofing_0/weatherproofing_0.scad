@@ -21,8 +21,10 @@ show_arrows = false;
 show_axis_hints = false;
 
 // Default location is parked.
+lat = mount_latitude;
 ra_angle = 90 ;// + $t * 360;
 dec_angle = 90 + mount_latitude + $t * 360;
+show_arrows=false;
 
 // Distance from motor to shell around it.
 dec_motor_gap = 2;
@@ -30,7 +32,27 @@ dec_motor_gap = 2;
 // Width of surface mating with DEC bearing cover.
 dec_bearing_mating_length = min(dec2_len, 20);
 
-rotate([90-mount_latitude,0,0])
+
+decorated_ioptron_mount(ra_angle=ra_angle,
+  dec_angle=dec_angle, latitude=lat, show_arrows=show_arrows) {
+  union() {
+  };
+  union() {
+  };
+  union() {
+    color("lime")dec_motor_cover_cover();
+    color("red")dec_motor_cover_strap();
+    #color("violet") dec_bearing_upper_roof();
+  };
+  union() {
+    color("DeepSkyBlue") dec_head_bearing_cover();
+  };
+  union() {
+  };
+};
+
+
+*rotate([90-mount_latitude,0,0])
 ioptron_mount(ra_angle=ra_angle, dec_angle=dec_angle) {
   union() {
     echo("executing ioptron_mount child 1");

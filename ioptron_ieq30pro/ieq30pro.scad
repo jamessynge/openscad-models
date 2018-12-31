@@ -36,29 +36,30 @@ decorated_ioptron_mount(ra_angle=ra_angle,
   dec_angle=dec_angle, latitude=lat, show_arrows=true);
 
 module decorated_ioptron_mount(ra_angle=0, dec_angle=0, latitude=20, show_arrows=true) {
+  echo("decorated_ioptron_mount ra_angle: ", ra_angle);
   ioptron_mount(ra_angle=ra_angle, dec_angle=dec_angle, latitude=latitude) {
-    color("gold") {
-      if (show_arrows) axis_arrows(total_length=ra1_radius*2);
+    union() {
+      if (show_arrows) color("gold") axis_arrows(total_length=ra1_radius*2);
       if ($children > 0) children(0);
     };
 
-    color("blue") {
-      if (show_arrows) axis_arrows(total_length=ra1_radius*1.9);
+    union() {
+      if (show_arrows) color("blue") axis_arrows(total_length=ra1_radius*1.9);
       if ($children > 1) children(1);
     };
     
-    color("yellow") {
-      if (show_arrows) axis_arrows(total_length=dec_head_base_diam*0.75);
+    union() {
+      if (show_arrows) color("yellow") axis_arrows(total_length=dec_head_base_diam*0.75);
       if ($children > 2) children(2);
     };
 
-    color("red") {
-      if (show_arrows) axis_arrows(total_length=dec_head_base_diam*0.75);
+    union() {
+      if (show_arrows) color("red") axis_arrows(total_length=dec_head_base_diam*0.75);
       if ($children > 3) children(3);
     };
 
-    color("green") {
-      if (show_arrows) axis_arrows(total_length=dec_head_base_diam/2);
+    union() {
+      if (show_arrows) color("green") axis_arrows(total_length=dec_head_base_diam/2);
       if ($children > 4) children(4);
     };
   };
@@ -69,6 +70,8 @@ module ioptron_mount(ra_angle=0, dec_angle=0, latitude=20) {
     echo("ioptron_mount has", $children, "children, too many");
     assert($children <= 5);
   }
+
+  echo("ioptron_mount ra_angle: ", ra_angle);
 
   rotate([90-latitude,0,0]) {
     rotate([0, 0, ra_angle]) {
@@ -86,10 +89,11 @@ module ioptron_mount(ra_angle=0, dec_angle=0, latitude=20) {
     
     rotate([180, 0, 0]) {
       translate([0, 0, ra_bearing_gap/2]) {
-        rotate([0, 0, 180])
-          ra_body();
-        rotate([0,0,180])
-          union() if ($children > 0) children(0);
+        rotate([0, 0, 180]) {
+          ra_body() {
+             union() if ($children > 0) children(0);
+          }
+        }
       };
     };
   }
