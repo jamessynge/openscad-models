@@ -27,6 +27,22 @@ ra_to_dec_bearing_plane = ra1_radius + dec2_len;
 
 
 
+// Dimensions for the hoop et al which attach to the DEC motor cover cover (DMCC).
+hoop_disc_wall = 4;
+min_hoop_disc_z = clutch_handle_base_diam + hoop_disc_wall;
+assert(min_hoop_disc_z <= dec_gap_to_saddle_knob);
+hoop_disc_z = (min_hoop_disc_z + dec_gap_to_saddle_knob) / 2;
+hoop_depth = hoop_disc_z + dec2_len;
+
+// This is a radius that will clear clutch regardless of clutch handle position.
+dec_hoop_interior_radius = dec_clutch_handle_max_height + 5;
+hoop_roof_thickness = 15;
+dec_hoop_exterior_radius = dec_hoop_interior_radius + hoop_roof_thickness;
+
+
+// This is overkill, but will ensure that we don't collide with the clutch.
+dec_clutch_z = clutch_handle_base_diam;
+
 
 
 

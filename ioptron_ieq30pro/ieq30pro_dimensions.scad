@@ -72,6 +72,9 @@ ra1_base_to_dec_center = ra1_base_to_dec + dec1_radius;
 ra1_base_to_dec_gear_cover =
     ra1_base_to_dec_center - dec2_radius;
 
+// Radius of the fillets that join the dec1 body to the ra1 body.
+ra_to_dec_fillet_radius = ra1_radius - dec1_radius + 2;
+
 ////////////////////////////////////////////////////////////////////////////////
 // Dimensions for the non-moving portion of the mount. Much less detail is
 // needed here, so only a few objects are modeled.
@@ -368,6 +371,19 @@ fsk_height = 11.5;
 fsk_shoulder_height = 5.65;
 fsk_shoulder_diam = 14.9;
 fsk_screw_len = 24.4;
+
+////////////////////////////////////////////////////////////////////////////////
+// Selected metric screw and nut size info (maximum dimensions), ISO 4032.
+
+m4_screw_diam = 4;
+m4_nut_diam1 = 7;  // Width across the flats
+m4_nut_diam2 = 7.66;  // Width across the corners
+m4_nut_height = 3.2;
+
+m5_screw_diam = 5;
+m5_nut_diam1 = 8;  // Width across the flats
+m5_nut_diam2 = 8.79;  // Width across the corners
+m5_nut_height = 4.7;
 
 ////////////////////////////////////////////////////////////////////////////////
 

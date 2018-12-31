@@ -130,17 +130,14 @@ module translate_to_dec_bearing_plane() {
   }
 }
 
-function ra_to_dec_fillet_radius() = ra1_radius - dec1_radius + 2;
-
 module ra_to_dec(include_polar_port=true) {
   h1 = ra1_base_to_dec;
   h2 = 45 - h1;
-  fillet_radius = ra_to_dec_fillet_radius();
 
   color(cast_iron_color) {
     difference() {
       cylinder(h=h1+h2, r=ra1_radius);
-      translate([0,ra1_radius,fillet_radius+h1]) {
+      translate([0,ra1_radius,ra_to_dec_fillet_radius+h1]) {
         ra_to_dec_fillet();
         mirror([1, 0, 0])ra_to_dec_fillet();
       }
@@ -166,7 +163,7 @@ module ra_to_dec(include_polar_port=true) {
 module ra_to_dec_fillet() {
   rotate([90,0,0]) {
     translate([-ra1_radius,0,0])
-      cylinder(h=ra1_diam, r=ra_to_dec_fillet_radius());
+      cylinder(h=ra1_diam, r=ra_to_dec_fillet_radius);
   }
 }
 
