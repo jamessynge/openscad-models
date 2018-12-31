@@ -10,8 +10,11 @@ use <../ieq30pro_ra_core.scad>
 include <wp2_dimensions.scad>
 use <../weatherproofing_1/dec_head_bearing_cover.scad>
 use <ra_motor_hat.scad>
+use <dec1_hat.scad>
+use <ra_grip.scad>
 
 use <../../utils/cut.scad>
+include <../../utils/metric_dimensions.scad>
 use <../../utils/misc.scad>
 use <../../utils/strap.scad>
 

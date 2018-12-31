@@ -1,32 +1,10 @@
-
-
-translate([0,0,0])
-screw_gusset(15,15,10,5);
+include <metric_dimensions.scad>
 
 
 translate([100,0,0]) motor_cover_shell(50, 40, 30, shell_wall=1,
 bracing0=10, bracing1=20
 );
 
-translate([0, 50, 0])
-nut_slot(d=10, h=5, depth=15, bolt_diam=5, bolt_len=20);
-
-translate([20, 50, 0])
-nut_slot(d=10, h=5, depth=15, bolt_diam=5, bolt_len=-20);
-
-
-
-
-
-module screw_gusset(x, y, z, d) {
-  linear_extrude(height=z, convexity=10) {
-    difference() {
-      square([x, y]);
-      translate([x/2,y/2,0])
-        circle(d=d);
-    }
-  }
-}
 
 color("blue")
 translate([0,-10,0]) {
@@ -96,31 +74,92 @@ module motor_cover_shell(motor_w, motor_h, motor_z, motor_gap=2, shell_wall=0, s
 // diameter of the smallest circle that will enclose the nut).
 function hex_short_to_long_diag(d) = d * 2.0 / sqrt(3.0);
 
-module nut_slot(nut_diam=0, nut_height=0, depth=0, bolt_diam=0, bolt_up=0, bolt_down=0) {
-  rotate([0,0,360/12])
+
+translate([0, 0, 50]) nut_slot(nut_diam=10, nut_height=5, depth=15, bolt_diam=5, bolt_up=8, bolt_down=16);
+
+module nut_slot(nut_diam=0, nut_height=0, depth=0, bolt_diam=0, bolt_up=0, bolt_down=0, fn=undef) {
+  translate([0, 0, -nut_height/2]) {
+    rotate([0,0,360/12])
+      linear_extrude(height=nut_height)
+        circle(d=hex_short_to_long_diag(nut_diam), $fn=6);
     linear_extrude(height=nut_height)
-      circle(d=hex_short_to_long_diag(nut_diam), $fn=6);
-  linear_extrude(height=nut_height)
-    translate([-nut_diam/2, 0, 0])
-      square([nut_diam, depth], center=false);
-
-  assert(bolt_diam >= 0);
-  assert(bolt_up >= 0);
-  assert(bolt_down >= 0);
-
-  if (bolt_diam > 0) {
-    if (bolt_up > 0) {
-      translate([0,0,nut_height])
-        linear_extrude(height=bolt_up)
-          circle(d=bolt_diam, $fn=20);
-    }
-    if (bolt_down > 0) {
-      translate([0,0,-bolt_down])
-        linear_extrude(height=bolt_down)
-          circle(d=bolt_diam, $fn=20);
+      translate([-nut_diam/2, 0, 0])
+        square([nut_diam, depth], center=false);
+  
+    assert(bolt_diam >= 0);
+    assert(bolt_up >= 0);
+    assert(bolt_down >= 0);
+  
+    if (bolt_diam > 0) {
+      if (bolt_up > 0) {
+        translate([0,0,nut_height])
+          linear_extrude(height=bolt_up)
+            circle(d=bolt_diam, $fn=fn);
+      }
+      if (bolt_down > 0) {
+        translate([0,0,-bolt_down])
+          linear_extrude(height=bolt_down)
+            circle(d=bolt_diam, $fn=fn);
+      }
     }
   }
 }
+
+module screw_gusset(x, y, z, d, center=false, fn=undef) {
+  xlate = center ? [0, 0, -z/2] : [x/2, y/2, 0];
+  translate(xlate) {
+    linear_extrude(height=z, convexity=10) {
+      difference() {
+        square([x, y], center=true);
+        circle(d=d, $fn=fn);
+      }
+    }
+  }
+}
+translate([0,0,0]) screw_gusset(15,15,10,5, center=true);
+translate([0,0,20]) screw_gusset(15,15,10,5);
+
+
+
+
+// Space to be occupied by a nut (show_gusset=false) or a screw gusset (show_gusset=true)
+// for the corresponding bolt.
+module nut_slot_and_screw_gusset(show_gusset=true, nut_diam=0, nut_height=0, depth=0, bolt_diam=0, bolt_up=0, bolt_down=0, gusset_w=0, gusset_h=0, gusset_z=0, gusset_dist=0, fn=undef) {
+  // x_offset = (shell2_outside_x + dec2_radius) / 2;
+  // y_offset = nut_height+nut_slot_margin;
+
+  if (show_gusset) {
+    z_dist = gusset_dist == 0 ? 0 : (nut_height + gusset_z) / 2 + abs(gusset_dist);
+    z_offset = gusset_dist > 0 ? z_dist : -z_dist;
+    translate([0, 0, z_offset])
+      screw_gusset(gusset_w, gusset_h, gusset_z, bolt_diam, center=true, fn=fn);
+  } else {
+    nut_slot(nut_diam=nut_diam, nut_height=nut_height,
+                   depth=depth,
+                   bolt_diam=bolt_diam,
+                   bolt_up=bolt_up,
+                   bolt_down=bolt_down, fn=fn);
+  }
+}
+
+module test_nut_slot_and_screw_gusset(show_gusset=true, below=false) {
+  gusset_dist = below ? -5 : 10;
+  nut_slot_and_screw_gusset(show_gusset=show_gusset, nut_diam=10, nut_height=5, depth=15, bolt_diam=5, bolt_up=30, bolt_down=20, gusset_w=20, gusset_h=12, gusset_z=10, gusset_dist=gusset_dist, fn=20);
+}
+
+translate([-50, 0, 0]) {
+  test_nut_slot_and_screw_gusset(show_gusset=true, below=false);
+  test_nut_slot_and_screw_gusset(show_gusset=false, below=false);
+  test_nut_slot_and_screw_gusset(show_gusset=true, below=true);
+}
+
+
+
+
+
+
+
+
 
 module fillet_outline(radius) {
   intersection() {
@@ -148,3 +187,4 @@ module annulus(d1=undef, r1=undef, d2=undef, r2=undef, solid=false) {
     if (!solid) circle(r=r1, d=d1);
   };
 }
+

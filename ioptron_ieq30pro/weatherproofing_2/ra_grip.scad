@@ -13,6 +13,7 @@ use <ra_motor_hat.scad>
 use <dec1_hat.scad>
 
 use <../../utils/cut.scad>
+include <../../utils/metric_dimensions.scad>
 use <../../utils/misc.scad>
 use <../../utils/strap.scad>
 
@@ -28,7 +29,8 @@ show_arrows=false;
 
 
 
-
+if ($preview && false)
+translate([200, 200, 0])
 decorated_ioptron_mount(ra_angle=ra_angle,
   dec_angle=dec_angle, latitude=lat, show_arrows=show_arrows) {
   union() {
@@ -55,7 +57,7 @@ decorated_ioptron_mount(ra_angle=ra_angle,
     // }
 
     dec_chin_strap();
-    dec1_hat_extrusion_in_position();
+    dec1_hat();
 
 
 
@@ -76,16 +78,24 @@ decorated_ioptron_mount(ra_angle=ra_angle,
   };
 };
 
+if ($preview) dec1_hat();
+dec_chin_strap();
 
 module dec_chin_strap() {
+
   difference() {
     linear_extrude(height=ra1_base_to_dec_center, convexity=3)
       dec_chin_strap_profile();
+    ra_and_dec(include_cw_shaft=false);
+    dec1_hat_nut_slot_near_clutch(show_gusset=false);
+    mirror([1, 0, 0]) dec1_hat_nut_slot_near_clutch(show_gusset=false);
   }
+
+  dec1_hat_nut_slot_near_clutch(show_gusset=true);
+  mirror([1, 0, 0]) dec1_hat_nut_slot_near_clutch(show_gusset=true);
 }
 
-*translate([200, 0,0])
-  dec_chin_strap_profile();
+*translate([200, 0,0]) dec_chin_strap_profile();
 
 module dec_chin_strap_profile() {
     x = ra1_diam;
@@ -95,79 +105,74 @@ module dec_chin_strap_profile() {
     circle(r=ra1_radius);
     square([ra1_diam+1, 40], center=true);
   }
-
 }
 
 
-*translate([400, 0,0])
-  cw_chin_strap();
+// module cw_chin_strap() {
+//   // The first profile is in the plane of the RA bearing.
+//   linear_extrude(height=ra1_base_to_dec, convexity=3)
+//     cw_chin_strap_profile1();
+
+//   // // The second is parallel to the plane of the DEC bearing, but is at the
+//   // // counterweight end of the DEC body.
 
 
-module cw_chin_strap() {
-  // The first profile is in the plane of the RA bearing.
-  linear_extrude(height=ra1_base_to_dec, convexity=3)
-    cw_chin_strap_profile1();
+//   // #
+//   // rotate([90, 0, 0])
+//   // cw_chin_strap_profile2();
 
-  // The second is parallel to the plane of the DEC bearing, but is at the
-  // counterweight end of the DEC body.
+// }
 
 
-  #
-  rotate([90, 0, 0])
-  cw_chin_strap_profile2();
+// *translate([200, 0,0])
+//   cw_chin_strap_profile1();
 
-}
+// module cw_chin_strap_profile1() {
+//     x = ra1_diam;
+//     y = dec1_len - ra1_radius;
+//   difference() {
+//     translate([0, -y/2]) square([x, y], center=true);
+//     circle(r=ra1_radius);
+//     square([ra1_diam+1, 40], center=true);
+//   }
+// }
 
+// *translate([0, 200, 0])
+//   cw_chin_strap_profile2();
 
-*translate([200, 0,0])
-  cw_chin_strap_profile1();
+// // Goes around dec1 at counterweight end, and has side parts that
+// // extend to dec_chin_strap.
+// module cw_chin_strap_profile2() {
+//   id = dec1_radius+2;
+//   od = id + 5;
+//   difference() {
+//       union() {
+//         translate([0, ra1_base_to_dec_center, 0])
+//           circle(r=od);
+//         cw_chin_strap_lower_quarter_fillet();
+//         mirror([1, 0, 0])
+//           cw_chin_strap_lower_quarter_fillet();
+//       }
 
-module cw_chin_strap_profile1() {
-    x = ra1_diam;
-    y = dec1_len - ra1_radius;
-  difference() {
-    translate([0, -y/2]) square([x, y], center=true);
-    circle(r=ra1_radius);
-    square([ra1_diam+1, 40], center=true);
-  }
-}
+//     translate([0, ra1_base_to_dec_center, 0])
+//       circle(r=id);
+//   }
+// }
 
-*translate([0, 200, 0])
-  cw_chin_strap_profile2();
+// module cw_chin_strap_lower_quarter_fillet() {
+//   r = ra_to_dec_fillet_radius;
+//   translate([ra1_radius, ra1_base_to_dec + r, 0]) {
+//     intersection() {
+//       circle(r=r-2, center=true);
+//       translate([-r, -r, 0]) square(size=r, center=false);
+//     }
 
-// Goes around dec1 at counterweight end, and has side parts that
-// extend to dec_chin_strap.
-module cw_chin_strap_profile2() {
-  id = dec1_radius+2;
-  od = id + 5;
-  difference() {
-      union() {
-        translate([0, ra1_base_to_dec_center, 0])
-          circle(r=od);
-        cw_chin_strap_lower_quarter_fillet();
-        mirror([1, 0, 0])
-          cw_chin_strap_lower_quarter_fillet();
-      }
+//     r2 = r / 2;
+//     translate([r2-r+7, r2, 0])
+//     difference() {
+//       translate([-r2, -r2, 0]) square(size=r2, center=false);
+//       circle(r=r2, center=true);
 
-    translate([0, ra1_base_to_dec_center, 0])
-      circle(r=id);
-  }
-}
-
-module cw_chin_strap_lower_quarter_fillet() {
-  r = ra_to_dec_fillet_radius;
-  translate([ra1_radius, ra1_base_to_dec + r, 0]) {
-    intersection() {
-      circle(r=r-2, center=true);
-      translate([-r, -r, 0]) square(size=r, center=false);
-    }
-
-    r2 = r / 2;
-    translate([r2-r+7, r2, 0])
-    difference() {
-      translate([-r2, -r2, 0]) square(size=r2, center=false);
-      circle(r=r2, center=true);
-
-    }
-  }
-}
+//     }
+//   }
+// }

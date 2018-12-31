@@ -82,7 +82,7 @@ ra_and_dec($t * 360) {
   };
 };
 
-module ra_and_dec(dec_angle=0, include_polar_port=true) {
+module ra_and_dec(dec_angle=0, include_polar_port=true, include_cw_shaft=true) {
   if ($children > 4) {
     echo("ra_and_dec has", $children, "children, too many.");
     assert($children <= 4);
@@ -93,7 +93,7 @@ module ra_and_dec(dec_angle=0, include_polar_port=true) {
 
   translate_to_dec12_plane() {
     // echo("ra_and_dec dec_body at angle", dec_angle);
-    dec_body(dec_angle) {
+    dec_body(dec_angle, include_cw_shaft=include_cw_shaft) {
       union() { if ($children > 1) children(1); }
       union() { if ($children > 2) children(2); }
       union() { if ($children > 3) children(3); }
@@ -167,7 +167,7 @@ module ra_to_dec_fillet() {
   }
 }
 
-module dec_body(dec_angle=0) {
+module dec_body(dec_angle=0, include_cw_shaft=true) {
   if ($children > 3) {
     echo("dec_body has", $children, "children, too many");
     assert($children <= 3);
@@ -175,7 +175,7 @@ module dec_body(dec_angle=0) {
 
   // Render the "stationary" body of the DEC axis.
   rotate([180, 0, 0]) {
-    dec_body_helper();
+    dec_body_helper(, include_cw_shaft=include_cw_shaft);
     if ($children > 0) translate([0, 0, -dec2_len]) children(0);
   }
 
@@ -198,7 +198,7 @@ module dec_body(dec_angle=0) {
       };
 }
 
-module dec_body_helper() {
+module dec_body_helper(include_cw_shaft=true) {
   total_dec_len =
     dec1_len + dec2_len + cw_cap_height +
     cw_cap_bevel_height;
@@ -245,10 +245,11 @@ module dec_body_helper() {
       dec_motor();
     };
     // Remove the hollow center of the counterweight shaft.
-    color(cast_iron_color)
-      translate([0,0, -dec2_len-1])
-        cylinder(h=total_dec_len+2,
-                r=cw_thread_radius);
+    if (include_cw_shaft)
+      color(cast_iron_color)
+        translate([0,0, -dec2_len-1])
+          cylinder(h=total_dec_len+2,
+                  r=cw_thread_radius);
   };
 }
 
