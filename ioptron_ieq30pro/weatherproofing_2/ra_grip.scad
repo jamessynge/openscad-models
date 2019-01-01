@@ -82,17 +82,18 @@ if ($preview) dec1_hat();
 dec_chin_strap();
 
 module dec_chin_strap() {
-
-  difference() {
-    linear_extrude(height=ra1_base_to_dec_center, convexity=3)
-      dec_chin_strap_profile();
-    ra_and_dec(include_cw_shaft=false);
-    dec1_hat_nut_slot_near_clutch(show_gusset=false);
-    mirror([1, 0, 0]) dec1_hat_nut_slot_near_clutch(show_gusset=false);
+  color("MediumAquamarine") {
+    difference() {
+      linear_extrude(height=ra1_base_to_dec_center, convexity=3)
+        dec_chin_strap_profile();
+      ra_and_dec(include_cw_shaft=false);
+      dec1_hat_nut_slot_near_clutch(show_gusset=false);
+      mirror([1, 0, 0]) dec1_hat_nut_slot_near_clutch(show_gusset=false);
+    }
+  
+    dec1_hat_nut_slot_near_clutch(show_gusset=true);
+    mirror([1, 0, 0]) dec1_hat_nut_slot_near_clutch(show_gusset=true);
   }
-
-  dec1_hat_nut_slot_near_clutch(show_gusset=true);
-  mirror([1, 0, 0]) dec1_hat_nut_slot_near_clutch(show_gusset=true);
 }
 
 *translate([200, 0,0]) dec_chin_strap_profile();

@@ -34,7 +34,7 @@ dec1_hat();
 module dec1_hat(over_port=true, remainder=true, sleeve=true) {
   difference() {
     dec1_hat_extrusion_in_position(over_port=over_port, remainder=remainder, sleeve=sleeve);
-    ra_and_dec();
+    ra_and_dec(include_cw_shaft=false);
     dec1_hat_nut_slot_near_clutch();
     mirror([1, 0, 0]) dec1_hat_nut_slot_near_clutch();
   }
@@ -135,33 +135,17 @@ module dec1_hat_nut_slot_near_clutch(show_gusset=false) {
           fn=$fn);
 }
 
-module screw_gusset2() {
-  w = 20;  // How far it sticks out from the ra1_radius.
-  h = dec1_radius;
-  z = 40;  // How far it extends tangent to the radius.
-  bolt_hole_diam = m4_screw_diam;
-
-  screw_gusset(w, h, z, bolt_hole_diam);
-}
-
-
-
-
-
 
 if ($preview) translate([150, 500, 0])
   dec1_hat_sleeve();
-
-
-
 
 module dec1_hat_sleeve(length=dec1_len - ra1_diam) {
   translate([0, ra1_base_to_dec+dec1_radius,0])
   linear_extrude(height=length, convexity=2) {
     annulus(d1=cw_sleeve_id, d2=cw_sleeve_od);
   }
-  linear_extrude(height=length, convexity=2) 
-    cw_chin_strap_lower_quarter_fillets();
+  linear_extrude(height=length, convexity=2)
+    below_dec_axis();
 }
 
 //translate([0, 100, 0])
@@ -210,16 +194,14 @@ module dec1_hat_profile_difference() {
     difference() {
       union() {
         offset(r=dec1_hat_outer_offset) ra_to_dec_profile_at_ra_axis(include_polar_port=true);
-        translate([-ra1_radius, 0, 0])
-          square([ra1_diam, ra1_base_to_dec_center], center=false);
-        }
-        offset(r=dec1_hat_inner_offset) ra_to_dec_profile_at_ra_axis(include_polar_port=false);
+        below_dec_axis();
+      }
+      offset(r=dec1_hat_inner_offset) ra_to_dec_profile_at_ra_axis(include_polar_port=false);
     }
     translate([-ra1_radius, ra1_base_to_dec, 0]) {
       square([ra1_diam, ra1_diam*2], center=false);
     }
   }
-  //cw_chin_strap_lower_quarter_fillets();
 }
 
 if ($preview) translate([0, 350, 0]) dec1_hat_profile(include_polar_port=true);
@@ -230,8 +212,7 @@ module dec1_hat_profile(include_polar_port=true) {
       union() {
         offset(r=dec1_hat_outer_offset)
           ra_to_dec_profile_at_ra_axis(include_polar_port=include_polar_port);
-        translate([-ra1_radius, 0, 0])
-          square([ra1_diam, ra1_base_to_dec_center], center=false);
+        below_dec_axis();
       }
       offset(r=dec1_hat_inner_offset) ra_to_dec_profile_at_ra_axis(include_polar_port=include_polar_port);
     }
@@ -239,7 +220,11 @@ module dec1_hat_profile(include_polar_port=true) {
       square([ra1_diam, ra1_diam*2], center=false);
     }
   }
-  //cw_chin_strap_lower_quarter_fillets();
+}
+
+module below_dec_axis() {
+  translate([-ra1_radius, 0, 0])
+    square([ra1_diam, ra1_base_to_dec_center], center=false);
 }
 
 if ($preview) translate([0, 200, 0])ra_to_dec_profile_at_ra_axis();
@@ -249,7 +234,7 @@ module ra_to_dec_profile_at_ra_axis(include_polar_port=true) {
     union() {
       projection(cut=true) {
         rotate([-90, 0, 0])
-          ra_and_dec(include_polar_port=include_polar_port);
+          ra_and_dec(include_polar_port=include_polar_port, include_cw_shaft=false);
       }
       translate([0, ra1_base_to_dec + dec1_radius])
         square(size=cw_shaft_diam, center=true);

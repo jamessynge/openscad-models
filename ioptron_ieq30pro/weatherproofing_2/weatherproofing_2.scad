@@ -39,7 +39,7 @@ decorated_ioptron_mount(ra_angle=ra_angle,
   union() {
     // Moving side of RA bearing.
     difference() {
-      color("white")ra_basic_helmet(solid=false);
+      #color("white")ra_basic_helmet(solid=false);
       // Remove the volume needed for the DEC head and its clutch.
 
       dec_clutch_void();
@@ -47,7 +47,7 @@ decorated_ioptron_mount(ra_angle=ra_angle,
     }
 
     difference() {
-      translate_to_dec_bearing_plane() {
+      #translate_to_dec_bearing_plane() {
         rotate([0, 180, 0])
           rotate([0, 0, mount_latitude])
             translate([0,0,0])
@@ -56,6 +56,8 @@ decorated_ioptron_mount(ra_angle=ra_angle,
       ra_basic_helmet(solid=true);
     }
 
+    dec1_hat();
+    dec_chin_strap();
 
     // translate([0, ra1_radius + dec2_len + dec_bearing_gap +, ra1_base_to_dec + dec1_radius])
       // rotate([90, 90, 0])
