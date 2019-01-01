@@ -2,6 +2,8 @@
 // Author: James Synge
 
 include <../weatherproofing_1/wp1_dimensions.scad>
+include <wp2_dimensions.scad>
+include <ra_and_dec_basic_shell.scad>
 use <../ieq30pro_ra_and_dec.scad>
 
 include <../../utils/metric_dimensions.scad>
@@ -33,10 +35,13 @@ dec1_hat();
 
 module dec1_hat(over_port=true, remainder=true, sleeve=true) {
   difference() {
-    dec1_hat_extrusion_in_position(over_port=over_port, remainder=remainder, sleeve=sleeve);
+    intersection() {
+      dec1_hat_extrusion_in_position(
+        over_port=over_port, remainder=remainder, sleeve=sleeve);
+      helmet_interior();
+    }
     ra_and_dec(include_cw_shaft=false);
-    dec1_hat_nut_slot_near_clutch();
-    mirror([1, 0, 0]) dec1_hat_nut_slot_near_clutch();
+    dec1_hat_nut_slots(show_gusset=false);
   }
 }
 
@@ -79,42 +84,19 @@ module dec1_hat_extrusion(over_port=true, remainder=true, sleeve=true) {
   }
 
   cw_chin_strap();
-
-  // Screw gusset/bracket on the side opposite the RA clutch.
-  //opposite_screw_gusset();
-
-
 }
 
-module opposite_screw_gusset() {
-  w = 20;  // How far it sticks out from the ra1_radius.
-  h = dec1_radius;
-  z = 40;  // How far it extends tangent to the radius.
-  bolt_hole_diam = m4_screw_diam;
-
-  translate([ra1_radius, ra1_base_to_dec, ra1_radius])
-    shared_screw_gusset();
-
-
+module dec1_hat_nut_slots(show_gusset=false, gusset_z=25) {
+  dec1_hat_nut_slot_near_clutch(show_gusset=show_gusset, gusset_z=gusset_z);
+  mirror([1,0,0]) dec1_hat_nut_slot_near_clutch(show_gusset=show_gusset, gusset_z=gusset_z);
 }
-
-module shared_screw_gusset() {
-  w = 20;  // How far it sticks out from the ra1_radius.
-  h = dec1_radius;
-  z = 40;  // How far it extends tangent to the radius.
-  bolt_hole_diam = m4_screw_diam;
-
-  screw_gusset(w, h, z, bolt_hole_diam);
-}
-
-
-
 
 // Space to be occupied by a nut, to receive a bolt from the dec_chin_strap.
-module dec1_hat_nut_slot_near_clutch(show_gusset=false) {
+module dec1_hat_nut_slot_near_clutch(show_gusset=false, gusset_z=25) {
   inset_from_radii = 2*m4_nut_diam1;
   nut_slot_depth = m4_nut_diam2 + 5;
   offset_towards_dec_bearing = 25;
+
   translate([-(ra1_radius-inset_from_radii),
              offset_towards_dec_bearing,
              ra1_base_to_dec_center-nut_slot_depth])
@@ -128,9 +110,9 @@ module dec1_hat_nut_slot_near_clutch(show_gusset=false) {
           bolt_diam=m4_hole_diam,
           bolt_up=10,
           bolt_down=100,
-          gusset_w=15,
+          gusset_w=20,
           gusset_h=nut_slot_depth*2,
-          gusset_z=25,
+          gusset_z=gusset_z,
           gusset_dist=-13,
           fn=$fn);
 }
@@ -298,4 +280,3 @@ module cw_chin_strap() {
     }
   }
 }
-

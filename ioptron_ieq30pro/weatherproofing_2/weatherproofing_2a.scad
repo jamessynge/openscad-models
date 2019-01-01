@@ -42,7 +42,7 @@ if ($preview)
     };
     union() {
       // Moving side of RA bearing.
-      ra_and_dec_basic_shell();
+      #ra_and_dec_basic_shell();
       dec1_hat();
       dec_chin_strap();
     };
@@ -59,11 +59,36 @@ if ($preview)
     };
   };
 
-*translate([300, 0, 0])
+*color("red")translate([0, 0, 0]) {
   intersection() {
+    dec1_hat();
+    dec_chin_strap();
+  };
+  intersection() {
+    ra_and_dec_basic_shell();
+    dec1_hat();
+  };
+  intersection() {
+    ra_and_dec_basic_shell();
+    dec_chin_strap();
+  };
+}
+
+*translate([0, 0, 0])
+  union() {
     // Moving side of RA bearing.
     ra_and_dec_basic_shell();
     dec1_hat();
     dec_chin_strap();
   };
 
+*dec_chin_strap_trimmed();
+
+// The original dec_chin_strap intersects with the shell, so make sure that
+// doesn't happen.
+module dec_chin_strap_trimmed() {
+  intersection() {
+    dec_chin_strap();
+    ra_and_dec_simple_shell(solid=true, shell=false);
+  }
+}

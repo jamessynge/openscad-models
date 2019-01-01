@@ -19,8 +19,6 @@ use <../ieq30pro_ra_core.scad>
 include <wp2_dimensions.scad>
 use <../weatherproofing_1/dec_head_bearing_cover.scad>
 use <ra_motor_hat.scad>
-use <dec1_hat.scad>
-use <ra_grip.scad>
 
 use <../../utils/cut.scad>
 include <../../utils/metric_dimensions.scad>
@@ -51,8 +49,8 @@ if ($preview && false)
     union() {
       // Moving side of RA bearing.
       #ra_and_dec_basic_shell();
-      dec1_hat();
-      dec_chin_strap();
+      *dec1_hat();
+      *dec_chin_strap();
     };
     union() {
       // RA side of DEC bearing.
@@ -67,13 +65,21 @@ if ($preview && false)
     };
   };
 
-*translate([300, 0, 0])
+// Find intersections.
+*color("red")translate([300, 0, 0]) {
   intersection() {
-    // Moving side of RA bearing.
-    ra_and_dec_basic_shell();
     dec1_hat();
     dec_chin_strap();
   };
+  intersection() {
+    ra_and_dec_basic_shell();
+    dec1_hat();
+  };
+  intersection() {
+    ra_and_dec_basic_shell();
+    dec_chin_strap();
+  };
+}
 
 module ra_and_dec_basic_shell() {
   color("white") union() {
@@ -96,9 +102,15 @@ module ra_and_dec_basic_shell() {
     // of the ra_and_dec_basic_shell.
     difference() {
       dec_bearing_hoop_attachment_in_place();
-      ra_and_dec_simple_shell(solid=true, shell=false);
+      helmet_interior();
     }
   }
+}
+
+// The interior of the shell (not including dec_bearing_hoop_attachment) for
+// purpose of intersection with / subtraction from other objects.
+module helmet_interior() {
+  ra_and_dec_simple_shell(solid=true, shell=false);
 }
 
 // The core of the design: a hollow cylinder with a hollow hemi-sphere on top

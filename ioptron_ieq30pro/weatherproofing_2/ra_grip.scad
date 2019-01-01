@@ -1,4 +1,7 @@
 // Design #2 for weatherproofing the iEQ30Pro mount.
+// Defines modules dec_chin_strap and dec1_hat, which grip the moving side
+// of the RA axis.
+
 // Author: James Synge
 
 include <../ieq30pro_dimensions.scad>
@@ -78,102 +81,66 @@ decorated_ioptron_mount(ra_angle=ra_angle,
   };
 };
 
+if ($preview) ra_and_dec();
 if ($preview) dec1_hat();
 dec_chin_strap();
 
 module dec_chin_strap() {
   color("MediumAquamarine") {
     difference() {
-      linear_extrude(height=ra1_base_to_dec_center, convexity=3)
-        dec_chin_strap_profile();
+      intersection() {
+        union() {
+          dec_chin_core();
+        }
+        helmet_interior();
+      }
       ra_and_dec(include_cw_shaft=false);
-      dec1_hat_nut_slot_near_clutch(show_gusset=false);
-      mirror([1, 0, 0]) dec1_hat_nut_slot_near_clutch(show_gusset=false);
+      dec1_hat_nut_slots(show_gusset=false);
+      dec1_hat_nut_slots(show_gusset=true,gusset_z=100);
     }
-  
-    dec1_hat_nut_slot_near_clutch(show_gusset=true);
-    mirror([1, 0, 0]) dec1_hat_nut_slot_near_clutch(show_gusset=true);
+    dec1_hat_nut_slots(show_gusset=true,gusset_z=30);
+  }
+}
+
+
+module dec_chin_core() {
+  linear_extrude(height=ra1_base_to_dec_center, convexity=3)
+    dec_chin_strap_helmet_support_profile();
+  linear_extrude(height=ra1_base_to_dec_center+40, convexity=3) {
+    difference() {
+      dec_chin_strap_helmet_support_profile();
+      square([dec2_diam+1, 2*(ra1_radius+dec2_len+1)], center=true);
+    }
   }
 }
 
 *translate([200, 0,0]) dec_chin_strap_profile();
 
 module dec_chin_strap_profile() {
-    x = ra1_diam;
-    y = ra1_radius+dec2_len;
+  x = ra1_diam;
+  y = ra1_radius+dec2_len;
   difference() {
-    translate([0, y/2]) square([x, y], center=true);
+    intersection() {
+      translate([0, y/2])
+        square([x, y], center=true);
+      dec_trim_strap_dec_axis_extent();
+    }
     circle(r=ra1_radius);
-    square([ra1_diam+1, 40], center=true);
   }
 }
 
+module dec_chin_strap_helmet_support_profile() {
+  intersection() {
+    annulus(r1=ra1_radius, r2=ra_bcbp_ir);
+    dec_trim_strap_dec_axis_extent();
+  }
+}
 
-// module cw_chin_strap() {
-//   // The first profile is in the plane of the RA bearing.
-//   linear_extrude(height=ra1_base_to_dec, convexity=3)
-//     cw_chin_strap_profile1();
-
-//   // // The second is parallel to the plane of the DEC bearing, but is at the
-//   // // counterweight end of the DEC body.
-
-
-//   // #
-//   // rotate([90, 0, 0])
-//   // cw_chin_strap_profile2();
-
-// }
-
-
-// *translate([200, 0,0])
-//   cw_chin_strap_profile1();
-
-// module cw_chin_strap_profile1() {
-//     x = ra1_diam;
-//     y = dec1_len - ra1_radius;
-//   difference() {
-//     translate([0, -y/2]) square([x, y], center=true);
-//     circle(r=ra1_radius);
-//     square([ra1_diam+1, 40], center=true);
-//   }
-// }
-
-// *translate([0, 200, 0])
-//   cw_chin_strap_profile2();
-
-// // Goes around dec1 at counterweight end, and has side parts that
-// // extend to dec_chin_strap.
-// module cw_chin_strap_profile2() {
-//   id = dec1_radius+2;
-//   od = id + 5;
-//   difference() {
-//       union() {
-//         translate([0, ra1_base_to_dec_center, 0])
-//           circle(r=od);
-//         cw_chin_strap_lower_quarter_fillet();
-//         mirror([1, 0, 0])
-//           cw_chin_strap_lower_quarter_fillet();
-//       }
-
-//     translate([0, ra1_base_to_dec_center, 0])
-//       circle(r=id);
-//   }
-// }
-
-// module cw_chin_strap_lower_quarter_fillet() {
-//   r = ra_to_dec_fillet_radius;
-//   translate([ra1_radius, ra1_base_to_dec + r, 0]) {
-//     intersection() {
-//       circle(r=r-2, center=true);
-//       translate([-r, -r, 0]) square(size=r, center=false);
-//     }
-
-//     r2 = r / 2;
-//     translate([r2-r+7, r2, 0])
-//     difference() {
-//       translate([-r2, -r2, 0]) square(size=r2, center=false);
-//       circle(r=r2, center=true);
-
-//     }
-//   }
-// }
+module dec_trim_strap_dec_axis_extent() {
+  limit_w = 2 * ra_bcbp_ir;
+  limit_h = ra1_radius+dec2_len-1;
+  y_offset = 20;
+  h = limit_h - y_offset;
+  translate([0, h/2 + y_offset])
+    square([limit_w, h], center=true);
+}
