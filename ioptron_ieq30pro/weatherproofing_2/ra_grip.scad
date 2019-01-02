@@ -14,6 +14,8 @@ include <wp2_dimensions.scad>
 use <../weatherproofing_1/dec_head_bearing_cover.scad>
 use <ra_motor_hat.scad>
 use <dec1_hat.scad>
+use <ra_and_dec_basic_shell.scad>
+use <wp_utils.scad>
 
 use <../../utils/cut.scad>
 include <../../utils/metric_dimensions.scad>
@@ -28,7 +30,7 @@ $fa = $preview ? 6 : 1;
 lat = mount_latitude;
 ra_angle = 90 + $t * 360;
 dec_angle = 90 + mount_latitude + $t * 360;
-show_arrows=false;
+show_arrows=true;
 
 
 
@@ -61,6 +63,7 @@ decorated_ioptron_mount(ra_angle=ra_angle,
 
     dec_chin_strap();
     dec1_hat();
+    cw_chin_strap_helmet_support();
 
 
 
@@ -81,9 +84,15 @@ decorated_ioptron_mount(ra_angle=ra_angle,
   };
 };
 
-if ($preview) ra_and_dec();
-if ($preview) dec1_hat();
+if ($preview) {
+  ra_and_dec();
+  dec1_hat();
+  cw_chin_strap_helmet_support();
+}
 dec_chin_strap();
+
+
+
 
 module dec_chin_strap() {
   color("MediumAquamarine") {
@@ -92,7 +101,7 @@ module dec_chin_strap() {
         union() {
           dec_chin_core();
         }
-        helmet_interior();
+        helmet_interior(inner_offset=0.1);
       }
       ra_and_dec(include_cw_shaft=false);
       dec1_hat_nut_slots(show_gusset=false);
@@ -106,7 +115,7 @@ module dec_chin_strap() {
 module dec_chin_core() {
   linear_extrude(height=ra1_base_to_dec_center, convexity=3)
     dec_chin_strap_helmet_support_profile();
-  linear_extrude(height=ra1_base_to_dec_center+40, convexity=3) {
+  linear_extrude(height=helmet_supports_height_above_ra_bearing, convexity=3) {
     difference() {
       dec_chin_strap_helmet_support_profile();
       square([dec2_diam+1, 2*(ra1_radius+dec2_len+1)], center=true);

@@ -1,5 +1,5 @@
 include <../ieq30pro_dimensions.scad>
-include <../ieq30pro.scad>
+use <../ieq30pro.scad>
 
 echo(version=version());
 

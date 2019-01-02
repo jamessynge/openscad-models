@@ -12,11 +12,12 @@ translate([0,-10,0]) {
   symmetric_z_cylinder(6,20);
 }
 
-module symmetric_z_cylinder(d, l) {
-  assert(d>0);
-  assert(l>0);
+module symmetric_z_cylinder(d=undef, l=undef, r=undef, convexity=3) {
+  assert((d>0 && r==undef) || (d==undef && r>0));
+  assert(l!=undef && l>0);
   translate([0,0,-l/2])
-    cylinder(h=l, d=d);
+    linear_extrude(height=l, convexity=convexity)
+      circle(d=d, r=r);
 }
 
 

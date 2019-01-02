@@ -109,19 +109,19 @@ module ra_and_dec_basic_shell() {
 
 // The interior of the shell (not including dec_bearing_hoop_attachment) for
 // purpose of intersection with / subtraction from other objects.
-module helmet_interior() {
-  ra_and_dec_simple_shell(solid=true, shell=false);
+module helmet_interior(inner_offset=0.0) {
+  ra_and_dec_simple_shell(solid=true, shell=false, inner_offset=inner_offset);
 }
 
 // The core of the design: a hollow cylinder with a hollow hemi-sphere on top
 // of it, a shape like that of the body of R2-D2 or quite a few trash cans.
-module ra_and_dec_simple_shell(solid=false, shell=true) {
+module ra_and_dec_simple_shell(solid=false, shell=true, inner_offset=0.0) {
   beyond_dec = dec1_radius * 0.75;
   above_bearing = ra1_base_to_dec + dec1_radius + beyond_dec;
   translate([0, 0, -ra_bcbp_ex]) {
     linear_extrude(height=ra_bcbp_ex+above_bearing, convexity=10) {
       intersection() {
-        dec_bearing_hoop_profile(solid=solid, shell=shell);
+        dec_bearing_hoop_profile(solid=solid, shell=shell, inner_offset=inner_offset);
 
         // Need to avoid colliding with the DEC clutch when it rotates.
         // This first attempt is a bit too much.
@@ -134,21 +134,23 @@ module ra_and_dec_simple_shell(solid=false, shell=true) {
   translate([0, 0, above_bearing])
     rotate([90,0,0])
       rotate_extrude(angle=180)
-        dec_bearing_hoop_profile(half=true, solid=solid, shell=shell);
+        dec_bearing_hoop_profile(half=true, solid=solid, shell=shell, inner_offset=inner_offset);
 }
 
 // This is the cross section through the basic shell, an annulus that will
 // just surround the ra_motor_hat with a little bit of room to spare.
-module dec_bearing_hoop_profile(half=false, solid=false, shell=true) {
+module dec_bearing_hoop_profile(half=false, solid=false, shell=true, inner_offset=0.0) {
   assert(solid || shell);
+  assert(inner_offset >= 0);
+  r1 = ra_bcbp_ir - inner_offset;
   intersection() {
     union() {
       if (shell) {
-        annulus(r1=ra_bcbp_ir, r2=ra_bcbp_or, solid=solid);
+        annulus(r1=r1, r2=ra_bcbp_or, solid=solid);
       } else {
         // Caller didn't want the shell, but instead the volume enclosed by
         // the shell.
-        circle(r=ra_bcbp_ir);
+        circle(r=r1);
       }
     }
     union() {

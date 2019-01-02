@@ -197,7 +197,7 @@ dec_motor_bump_right_offset = 17.42;
 ////////////////////////////////////////////////////////////////////////////////
 // Min distance from face with logo to dec1 cylinder.
 dec_motor_z2 = 41.85;
-// Based on that, distance from min distance from dec axis to bottom of
+// Based on that, min distance from dec axis to bottom of
 // dec_motor... as if it were a solid.
 dec_motor_z_offset_based_on_z2 =
   dec1_radius + dec_motor_z2 - dec_motor_z;
@@ -272,6 +272,7 @@ clutch_handle_length = 38.9; // screw center to end.
 clutch_handle_width = 8.75; // At widest.
 clutch_handle_depth1 = 10.2;
 clutch_handle_depth2 = 13.7;
+clutch_screw_axis_height = clutch_base_height - clutch_base_diameter / 2;
 
 // Compute the angle of the circle of the DEC gear cover subtended by the
 // DEC clutch. See:
@@ -360,7 +361,8 @@ dec_cover_max_diam = dec_cover_max_radius * 2;
 //  https://en.wikipedia.org/wiki/Circular_segment
 dec_motor_cover_angle = 2 * asin(dec_motor_w/dec2_diam);
 
-dec1_len_beyond_ra = dec1_len + cw_cap_height + cw_cap_bevel_height - ra1_diam;
+dec1_body_len_beyond_ra = dec1_len - ra1_diam;
+dec_len_beyond_ra = dec1_body_len_beyond_ra + cw_cap_height + cw_cap_bevel_height;
 
 ////////////////////////////////////////////////////////////////////////////////
 // Four star knob dimensions.

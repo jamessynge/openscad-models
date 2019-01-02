@@ -7,12 +7,14 @@ use <../ieq30pro_dec_head.scad>
 use <../ieq30pro_ra_and_dec.scad>
 use <../ieq30pro_ra_core.scad>
 
-include <wp2_dimensions.scad>
 use <../weatherproofing_1/dec_head_bearing_cover.scad>
+
+include <wp2_dimensions.scad>
 use <ra_motor_hat.scad>
 use <dec1_hat.scad>
 use <ra_grip.scad>
 use <ra_and_dec_basic_shell.scad>
+use <cw_chin_strap_helmet_support.scad>
 
 use <../../utils/cut.scad>
 include <../../utils/metric_dimensions.scad>
@@ -30,11 +32,10 @@ dec_angle = 90 + mount_latitude + $t * 360;
 show_arrows=false;
 
 
-*translate([0, 0, 0])
-  ra_and_dec_basic_shell();
+if ($preview && false) translate([0, 0, 0]) ra_and_dec_basic_shell();
 
 
-if ($preview)
+if ($preview && false)
   decorated_ioptron_mount(ra_angle=ra_angle,
     dec_angle=dec_angle, latitude=lat, show_arrows=show_arrows) {
     union() {
@@ -45,6 +46,7 @@ if ($preview)
       #ra_and_dec_basic_shell();
       dec1_hat();
       dec_chin_strap();
+      cw_chin_strap_helmet_support();
     };
     union() {
       // RA side of DEC bearing.
@@ -59,18 +61,57 @@ if ($preview)
     };
   };
 
-*color("red")translate([0, 0, 0]) {
-  intersection() {
+if ($preview)
+  ra_and_dec(dec_angle=dec_angle) {
+    union() {
+      // Moving side of RA bearing.
+      #ra_and_dec_basic_shell();
+      dec1_hat();
+      dec_chin_strap();
+      cw_chin_strap_helmet_support();
+    };
+    union() {
+      // RA side of DEC bearing.
+      color("red")dec_bearing_outer_hoop();
+    };
+    union() {
+      // DEC head side of DEC bearing.
+      color("DeepSkyBlue") dec_head_bearing_cover();
+    };
+    union() {
+      // Saddle plate
+    };
+  };
+
+
+
+
+
+
+if ($preview && false) render() translate([0, 0, 0]) {
+  color("red")intersection() {
     dec1_hat();
     dec_chin_strap();
   };
-  intersection() {
-    ra_and_dec_basic_shell();
+  color("pink")intersection() {
     dec1_hat();
-  };
-  intersection() {
     ra_and_dec_basic_shell();
+  };
+  color("orange")intersection() {
+    dec1_hat();
+    cw_chin_strap_helmet_support();
+  };
+  color("green")intersection() {
     dec_chin_strap();
+    ra_and_dec_basic_shell();
+  };
+  color("blue")intersection() {
+    dec_chin_strap();
+    cw_chin_strap_helmet_support();
+  };
+  color("violet")intersection() {
+    ra_and_dec_basic_shell();
+    cw_chin_strap_helmet_support();
   };
 }
 
@@ -80,15 +121,5 @@ if ($preview)
     ra_and_dec_basic_shell();
     dec1_hat();
     dec_chin_strap();
+    cw_chin_strap_helmet_support();
   };
-
-*dec_chin_strap_trimmed();
-
-// The original dec_chin_strap intersects with the shell, so make sure that
-// doesn't happen.
-module dec_chin_strap_trimmed() {
-  intersection() {
-    dec_chin_strap();
-    ra_and_dec_simple_shell(solid=true, shell=false);
-  }
-}

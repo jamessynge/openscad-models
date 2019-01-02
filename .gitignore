@@ -5,7 +5,7 @@ animated*.gif
 frame*.png
 
 # Exclude scratchpad OpenSCAD file.
-Untitled.scad
+Untitled*.scad
 
 # Exclude file created by hup (used to run openscad in the background).
 nohup.out

@@ -249,3 +249,84 @@ module cw_chin_strap_profile() {
     square([ra1_diam+1, 40], center=true);
   }
 }
+
+*translate([-200, -200, 0]) dec1_hat_draft_angle_body();
+// For intersection with the dec1_hat to add a draft angle to allow reliable
+// connection with the cw_chin_strap_helmet_support.
+module dec1_hat_draft_angle_body(height=200, raise_by=dec1_hat_ra_bearing_gap) {
+  translate([0, 0, raise_by])
+  intersection() {
+    union() {
+      inset = 5;
+      x1 = -ra1_radius;
+      x2 = x1 + inset;
+      x4 = ra1_radius;
+      x3 = x4 - inset;
+      // Deliberately going too far beyond the ra_and_dec body.
+      y1 = -ra1_diam;
+      y2 = 0;
+      y3 = ra1_radius;
+
+      linear_extrude(height=height, convexity=3)
+        polygon([
+          [x2, y1],
+          [x3, y1],
+          [x4, y2],
+          [x4, y3],
+          [x1, y3],
+          [x1, y2],
+          ]);
+    }
+    union() {
+      cs = 3*ra1_diam; // Very large relative to the dec1_hat.
+      translate([0, 0, cs/2])
+        rotate([-2, 0, 0])
+          cube(size=cs, center=true);
+    }
+  }
+}
+
+if ($preview) translate([200, 0, 0]) cw_chin_strap_helmet_support();
+
+
+module cw_chin_strap_helmet_support() {
+  difference() {
+    intersection() {
+      cw_chin_strap_helmet_support_core();
+
+      // Don't get too close to the RA axis, else some parts become too thin.
+      cs=ra_bcbp_or*2;
+      translate([0, -ra_bcbp_or - 20, 0])
+        cube(size=cs, center=true);
+      helmet_interior(inner_offset=0.1);
+    }
+    dec1_hat_draft_angle_body(height=ra1_base_to_dec_center-dec1_hat_ra_bearing_gap);
+//  ra_and_dec(include_cw_shaft=false);
+//    dec1_hat();
+    extra_long_dec_body_cylinder(extra_radius=dec1_hat_outer_offset+.01);
+    ra_clutch_volume();
+
+    
+    translate([-ra_bcbp_or, -70, 0])
+      rotate([-20, 0, 40])
+      cube([ra_bcbp_or, ra_bcbp_or, 200]);
+
+  }
+}
+
+//if ($preview) translate([200, 0, -200]) cw_chin_strap_helmet_support_core();
+module cw_chin_strap_helmet_support_core() {
+  linear_extrude(height=helmet_supports_height_above_ra_bearing, convexity=3)
+    cw_chin_strap_helmet_support_profile();
+}
+
+
+module cw_chin_strap_helmet_support_profile() {
+  difference() {
+    intersection() {
+      annulus(r1=ra1_radius+0.15, r2=ra_bcbp_ir);
+      translate([-ra_bcbp_ir, -ra_bcbp_ir*2])
+        square(size=ra_bcbp_ir*2);
+    }
+  }
+}

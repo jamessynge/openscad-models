@@ -26,6 +26,14 @@ ra_to_dec_bearing_plane = ra1_radius + dec2_len;
 
 
 
+// Misc dimensions, to be moved into wp2_dimensions.
+dec1_hat_ra_bearing_gap = ra1_base_to_dec / 2;
+
+
+
+helmet_supports_height_above_ra_bearing = ra1_base_to_dec_center + 50;
+
+
 
 // Dimensions for the hoop et al which attach to the DEC motor cover cover (DMCC).
 hoop_disc_wall = 4;
@@ -44,11 +52,8 @@ dec_hoop_exterior_radius = dec_hoop_interior_radius + hoop_roof_thickness;
 dec_clutch_z = clutch_handle_base_diam;
 
 
-
-
-
-// // Thickness of the basic ring around the RA axis.
-// ra_ring_thickness = ra1_base_to_dec_gear_cover;
+// Thickness of the basic ring around the RA axis.
+ra_ring_thickness = ra1_base_to_dec_gear_cover;
 
 
 // // Thickness of the strap around the DEC2 axis (i.e. the DEC gear cover).
@@ -62,16 +67,17 @@ dec_clutch_z = clutch_handle_base_diam;
 // screw_diam = 4;
 // screw_hole_diam = screw_diam + 0.2;
 
-// dec1_hat_thickness = ra_ring_thickness;
-// dec1_hat_inner_offset = 1;
-// dec1_hat_outer_offset = dec1_hat_inner_offset + dec1_hat_thickness;
 
-// dec1_hat_over_port_len = (dec1_len + polar_port_cap_diam) / 2;
-// dec1_hat_transition_len = dec1_hat_thickness;
-// dec1_hat_remainder_len = ra1_diam - dec1_hat_over_port_len - dec1_hat_transition_len;
+dec1_hat_thickness = 5;
+dec1_hat_inner_offset = 1;
+dec1_hat_outer_offset = dec1_hat_inner_offset + dec1_hat_thickness;
+
+dec1_hat_over_port_len = (dec1_len + polar_port_cap_diam) / 2;
+dec1_hat_transition_len = dec1_hat_thickness;
+dec1_hat_remainder_len = ra1_diam - dec1_hat_over_port_len - dec1_hat_transition_len;
 
 
-// cw_sleeve_od = dec1_diam + 2 * dec1_hat_outer_offset;
-// cw_sleeve_id = cw_cap_diam + 0.6;
-// assert(cw_sleeve_od > cw_sleeve_id + 2);
-// cw_sleeve_length = 30 + dec1_len_beyond_ra;
+cw_sleeve_od = dec1_diam + 2 * dec1_hat_outer_offset;
+cw_sleeve_id = dec1_diam + 2 * dec1_hat_inner_offset; // == cw_cap_diam + 0.6;
+assert(cw_sleeve_od > cw_sleeve_id + 2);
+cw_sleeve_length = 30 + dec_len_beyond_ra;
