@@ -18,13 +18,26 @@ use <../../utils/strap.scad>
 $fs = $preview ? 6 : 1;
 $fa = $preview ? 6 : 1;
 
-ra_body();
+if ($preview) {
+  ra_body() {
+    ra_motor_hat();
+  }
+  translate([400, 0, 0])
+    ra_motor_hat();
+} else {
 ra_motor_hat();
 
+}
+
 module ra_motor_hat(solid=false) {
-  plate();
-  translate([0, ra_motor_z_offset, ra_motor_collar_z0])
-    ra_me_shell_1(40, solid=solid);
+  difference() {
+    union() {
+      plate();
+      *translate([0, ra_motor_z_offset, ra_motor_collar_z0])
+        ra_me_shell_1(40, solid=solid);
+    }
+    ra_body();
+  }
 }
 
 module plate() {

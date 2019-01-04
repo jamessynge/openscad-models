@@ -15,6 +15,11 @@ $fa = $preview ? 3 : 1;
 
 dec_head_bearing_cover();
 
+translate([200, 0, 0]) {
+  dec_head_bearing_cover_basic();
+  dec_head();
+};
+
 module dec_head_bearing_cover() {
   difference() {
     dec_head_bearing_cover_basic();

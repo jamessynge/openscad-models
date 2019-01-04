@@ -28,8 +28,8 @@ module decorated_ra_body(show_arrows=true) {
   ra_body() {
     color("gold") {
       if (show_arrows) axis_arrows(total_length=ra1_radius*4);
-      if ($children > 0) children(0);
     }
+    if ($children > 0) children();
   }
 }
 
@@ -60,7 +60,7 @@ module ra_body() {
 
   translate([0,0,ra2_len+ra3_len+ra4_len+ra5_len]) polar_scope();
 
-  translate([0, ra_motor_z_offset, ra_motor_setback])
+  translate([0, ra_motor_z_offset, 0*ra_motor_setback])
     ra_motor_and_electronics();
 
   if ($children > 0) {
@@ -221,7 +221,7 @@ module ra_motor_profile3() {
 
 module ra_electronics() {
   w = 81.75;
-  h = 53.25;  // From original origin of ra_motor_profile1().
+  h = 54.25;  // From original origin of ra_motor_profile1().
   r = 2.15;
 
   ra_motor_profile1_wb = 65.1;
@@ -274,7 +274,7 @@ module ra_lower_electronics() {
   z = 13;
   z2 = 5;
 
-  translate([0, -z, 0]) {
+  translate([0, -z+0.01, 0]) {
     rotate([-90, 0, 0]) {
       linear_extrude(height=z) ra_lower_electronics_profile();
       translate([0, 0, -z2]) {
@@ -286,7 +286,7 @@ module ra_lower_electronics() {
     }
   }
 }
-
+if ($preview) translate([-300, 0, 0]) ra_lower_electronics_profile();
 module  ra_lower_electronics_profile() {
   intersection() {
     projection() {

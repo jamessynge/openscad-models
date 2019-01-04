@@ -7,15 +7,14 @@ use <../ieq30pro_dec_head.scad>
 use <../ieq30pro_ra_and_dec.scad>
 use <../ieq30pro_ra_core.scad>
 
-use <../weatherproofing_1/dec_head_bearing_cover.scad>
-
 include <wp2_dimensions.scad>
-use <ra_motor_hat.scad>
-use <dec1_hat.scad>
-use <helmet_support_at_dec_head.scad>
 use <basic_helmet.scad>
 use <cw_chin_strap_helmet_support.scad>
+use <dec1_hat.scad>
 use <dec_bearing_rain_plate.scad>
+use <dec_head_bearing_cover.scad>
+use <helmet_support_at_dec_head.scad>
+use <ra_motor_hat.scad>
 
 use <../../utils/cut.scad>
 include <../../utils/metric_dimensions.scad>
