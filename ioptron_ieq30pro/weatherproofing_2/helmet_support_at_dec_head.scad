@@ -1,6 +1,6 @@
 // Design #2 for weatherproofing the iEQ30Pro mount.
-// Defines modules dec_chin_strap and dec1_hat, which grip the moving side
-// of the RA axis.
+// Defines modules helmet_support_at_dec_head, which grips the moving side
+// of the RA axis under the DEC motor & DEC bearing cover.
 
 // Author: James Synge
 
@@ -14,7 +14,7 @@ include <wp2_dimensions.scad>
 use <../weatherproofing_1/dec_head_bearing_cover.scad>
 use <ra_motor_hat.scad>
 use <dec1_hat.scad>
-use <ra_and_dec_basic_shell.scad>
+use <basic_helmet.scad>
 use <wp_utils.scad>
 
 use <../../utils/cut.scad>
@@ -61,7 +61,7 @@ decorated_ioptron_mount(ra_angle=ra_angle,
     //   ra_basic_helmet(solid=true);
     // }
 
-    dec_chin_strap();
+    helmet_support_at_dec_head();
     dec1_hat();
     cw_chin_strap_helmet_support();
 
@@ -73,7 +73,7 @@ decorated_ioptron_mount(ra_angle=ra_angle,
   };
   union() {
     // RA side of DEC bearing.
-    // color("red")dec_bearing_outer_hoop();
+    // color("red")dec_bearing_rain_plate();
   };
   union() {
     // DEC head side of DEC bearing.
@@ -89,12 +89,12 @@ if ($preview) {
   dec1_hat();
   cw_chin_strap_helmet_support();
 }
-dec_chin_strap();
+helmet_support_at_dec_head();
 
 
 
 
-module dec_chin_strap() {
+module helmet_support_at_dec_head() {
   color("MediumAquamarine") {
     difference() {
       intersection() {

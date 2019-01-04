@@ -8,6 +8,12 @@ Weatherproofing the mount requires that the following constraints
 * The latitude range is from ~zero to ~60 degrees, though the PANOPTES pier
   design probably doesn't work too well below perhaps 10 degrees.
   It would be best if the design accomodates a large range of latitudes.
+  The closest site to the equator currently is on Hawaii, at 19 degrees north.
+  I'm aiming to accomodate 19 to 60 degrees, but not closer to the equator than
+  that. I think we'd need a wedge under the base of the mount to handle being
+  closer to the equator, so this doesn't seem like a great limitation; iOptron
+  offers their CEM series of mounts specifically to accomodate folks closer to
+  the equator.
 
 * The RA axis is rotated such that the DEC axis is horizontal when parked.
 

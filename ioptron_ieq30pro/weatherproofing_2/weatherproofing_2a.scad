@@ -12,9 +12,10 @@ use <../weatherproofing_1/dec_head_bearing_cover.scad>
 include <wp2_dimensions.scad>
 use <ra_motor_hat.scad>
 use <dec1_hat.scad>
-use <ra_grip.scad>
-use <ra_and_dec_basic_shell.scad>
+use <helmet_support_at_dec_head.scad>
+use <basic_helmet.scad>
 use <cw_chin_strap_helmet_support.scad>
+use <dec_bearing_rain_plate.scad>
 
 use <../../utils/cut.scad>
 include <../../utils/metric_dimensions.scad>
@@ -31,11 +32,9 @@ ra_angle = 90 + $t * 360;
 dec_angle = 90 + mount_latitude + $t * 360;
 show_arrows=false;
 
+if ($preview && false) translate([0, 0, 0]) basic_helmet();
 
-if ($preview && false) translate([0, 0, 0]) ra_and_dec_basic_shell();
-
-
-if ($preview && false)
+if ($preview)
   decorated_ioptron_mount(ra_angle=ra_angle,
     dec_angle=dec_angle, latitude=lat, show_arrows=show_arrows) {
     union() {
@@ -43,14 +42,14 @@ if ($preview && false)
     };
     union() {
       // Moving side of RA bearing.
-      #ra_and_dec_basic_shell();
+      #basic_helmet();
       dec1_hat();
-      dec_chin_strap();
+      helmet_support_at_dec_head();
       cw_chin_strap_helmet_support();
     };
     union() {
       // RA side of DEC bearing.
-      color("red")dec_bearing_outer_hoop();
+      color("red")dec_bearing_rain_plate();
     };
     union() {
       // DEC head side of DEC bearing.
@@ -61,18 +60,18 @@ if ($preview && false)
     };
   };
 
-if ($preview)
+if ($preview && false)
   ra_and_dec(dec_angle=dec_angle) {
     union() {
       // Moving side of RA bearing.
-      #ra_and_dec_basic_shell();
+      #basic_helmet();
       dec1_hat();
-      dec_chin_strap();
+      helmet_support_at_dec_head();
       cw_chin_strap_helmet_support();
     };
     union() {
       // RA side of DEC bearing.
-      color("red")dec_bearing_outer_hoop();
+      color("red")dec_bearing_rain_plate();
     };
     union() {
       // DEC head side of DEC bearing.
@@ -82,35 +81,30 @@ if ($preview)
       // Saddle plate
     };
   };
-
-
-
-
-
 
 if ($preview && false) render() translate([0, 0, 0]) {
   color("red")intersection() {
     dec1_hat();
-    dec_chin_strap();
+    helmet_support_at_dec_head();
   };
   color("pink")intersection() {
     dec1_hat();
-    ra_and_dec_basic_shell();
+    basic_helmet();
   };
   color("orange")intersection() {
     dec1_hat();
     cw_chin_strap_helmet_support();
   };
   color("green")intersection() {
-    dec_chin_strap();
-    ra_and_dec_basic_shell();
+    helmet_support_at_dec_head();
+    basic_helmet();
   };
   color("blue")intersection() {
-    dec_chin_strap();
+    helmet_support_at_dec_head();
     cw_chin_strap_helmet_support();
   };
   color("violet")intersection() {
-    ra_and_dec_basic_shell();
+    basic_helmet();
     cw_chin_strap_helmet_support();
   };
 }
@@ -118,8 +112,8 @@ if ($preview && false) render() translate([0, 0, 0]) {
 *translate([0, 0, 0])
   union() {
     // Moving side of RA bearing.
-    ra_and_dec_basic_shell();
+    basic_helmet();
     dec1_hat();
-    dec_chin_strap();
+    helmet_support_at_dec_head();
     cw_chin_strap_helmet_support();
   };

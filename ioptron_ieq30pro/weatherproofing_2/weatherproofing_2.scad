@@ -11,7 +11,7 @@ include <wp2_dimensions.scad>
 use <../weatherproofing_1/dec_head_bearing_cover.scad>
 use <ra_motor_hat.scad>
 use <dec1_hat.scad>
-use <ra_grip.scad>
+use <helmet_support_at_dec_head.scad>
 
 use <../../utils/cut.scad>
 include <../../utils/metric_dimensions.scad>
@@ -57,14 +57,14 @@ decorated_ioptron_mount(ra_angle=ra_angle,
     }
 
     dec1_hat();
-    dec_chin_strap();
+    helmet_support_at_dec_head();
 
     // translate([0, ra1_radius + dec2_len + dec_bearing_gap +, ra1_base_to_dec + dec1_radius])
       // rotate([90, 90, 0])
   };
   union() {
     // RA side of DEC bearing.
-    color("red")dec_bearing_outer_hoop();
+    color("red")dec_bearing_rain_plate();
   };
   union() {
     // DEC head side of DEC bearing.
@@ -119,7 +119,7 @@ module dec_clutch_void(minimal=true) {
     }
 }
 
-module dec_bearing_outer_hoop() {
+module dec_bearing_rain_plate() {
   rotate([0, 0, -(90-mount_latitude)])
   difference() {
     // Outer disc (nearest to saddle plate).
@@ -137,7 +137,7 @@ module dec_bearing_outer_hoop() {
 
 
 
-// Part between helmet and dec_bearing_outer_hoop; a part of/permanently
+// Part between helmet and dec_bearing_rain_plate; a part of/permanently
 // attached to the helpment, with screw holes for attaching the hoop. Planning
 // to use threaded metal inserts that can be glued into the 3D printed plastic.
 module dec_bearing_hoop_attachment() {

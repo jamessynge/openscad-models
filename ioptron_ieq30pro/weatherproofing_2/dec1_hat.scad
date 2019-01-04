@@ -4,7 +4,7 @@
 //include <../weatherproofing_1/wp1_dimensions.scad>
 include <wp2_dimensions.scad>
 use <wp_utils.scad>
-use <ra_and_dec_basic_shell.scad>
+use <basic_helmet.scad>
 
 use <../ieq30pro_ra_and_dec.scad>
 
@@ -95,7 +95,7 @@ module dec1_hat_nut_slots(show_gusset=false, gusset_z=25) {
   mirror([1,0,0]) dec1_hat_nut_slot_near_clutch(show_gusset=show_gusset, gusset_z=gusset_z);
 }
 
-// Space to be occupied by a nut, to receive a bolt from the dec_chin_strap.
+// Space to be occupied by a nut, to receive a bolt from the helmet_support_at_dec_head.
 module dec1_hat_nut_slot_near_clutch(show_gusset=false, gusset_z=25) {
   inset_from_radii = 2*m4_nut_diam1;
   nut_slot_depth = m4_nut_diam2 + 5;

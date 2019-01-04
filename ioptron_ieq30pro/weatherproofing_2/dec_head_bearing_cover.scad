@@ -6,7 +6,7 @@
 // model, so the ieq30pro_dec_head.scad file is only approximately correct.
 // Can be made by hand using Sugru or similar moldable plastic.
 
-include <wp1_dimensions.scad>
+include <wp2_dimensions.scad>
 use <../ieq30pro_dec_head.scad>
 
 // Global resolution
@@ -23,7 +23,7 @@ module dec_head_bearing_cover() {
 }
 
 module dec_head_bearing_cover_basic() {
-  inner_x = dec_head_diam2/2;
+  inner_x = dec_head_diam2 / 2;
   outer_x = dec_cover_max_radius;
   w = outer_x - inner_x;
   gap_frac = 0.15;  // Room for the clutch.
