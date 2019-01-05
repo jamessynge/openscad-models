@@ -70,10 +70,6 @@ module motor_cover_shell(motor_w, motor_h, motor_z, motor_gap=2, shell_wall=0, s
   }
 }
 
-// Given the width across a six sided nut (flat side to flat side),
-// how wide is the nut from point to farthest point (i.e. what is the
-// diameter of the smallest circle that will enclose the nut).
-function hex_short_to_long_diag(d) = d * 2.0 / sqrt(3.0);
 
 
 translate([0, 0, 50]) nut_slot(nut_diam=10, nut_height=5, depth=15, bolt_diam=5, bolt_up=8, bolt_down=16);
@@ -102,6 +98,15 @@ module nut_slot(nut_diam=0, nut_height=0, depth=0, bolt_diam=0, bolt_up=0, bolt_
           linear_extrude(height=bolt_down)
             circle(d=bolt_diam, $fn=fn);
       }
+    }
+  }
+}
+
+module nut(nut_hex_diam=undef, screw_diam=undef, nut_height=undef) {
+  linear_extrude(height=nut_height) {
+    difference() {
+      circle(d=hex_short_to_long_diag(nut_hex_diam), $fn=6);
+      circle(d=screw_diam, $fn=30);
     }
   }
 }

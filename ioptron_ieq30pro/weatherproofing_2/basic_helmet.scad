@@ -15,7 +15,7 @@ use <../ieq30pro_ra_and_dec.scad>
 use <../ieq30pro_ra_core.scad>
 
 include <wp2_dimensions.scad>
-use <../weatherproofing_1/dec_head_bearing_cover.scad>
+use <dec_head_bearing_cover.scad>
 use <ra_motor_hat.scad>
 
 use <../../utils/cut.scad>
@@ -39,11 +39,7 @@ dflt_dec_port_ir=dec_hoop_interior_radius;
 dflt_dec_port_or=dec_hoop_exterior_radius;
 dflt_cws_port_d=cw_shaft_diam*2;
 
-translate([0, 0, 0])
-  basic_helmet();
-
-
-if ($preview && false)
+if ($preview) {
   decorated_ioptron_mount(ra_angle=ra_angle,
     dec_angle=dec_angle, latitude=lat, show_arrows=show_arrows) {
     union() {
@@ -68,20 +64,23 @@ if ($preview && false)
     };
   };
 
-// Find intersections.
-*color("red")translate([300, 0, 0]) {
-  intersection() {
-    dec1_hat();
-    helmet_support_at_cws();
-  };
-  intersection() {
-    basic_helmet();
-    dec1_hat();
-  };
-  intersection() {
-    basic_helmet();
-    helmet_support_at_cws();
-  };
+  // Find intersections.
+  *color("red")translate([300, 0, 0]) {
+    intersection() {
+      dec1_hat();
+      helmet_support_at_cws();
+    };
+    intersection() {
+      basic_helmet();
+      dec1_hat();
+    };
+    intersection() {
+      basic_helmet();
+      helmet_support_at_cws();
+    };
+  }
+} else {
+  basic_helmet();
 }
 
 module basic_helmet(helmet_ir=dflt_helmet_ir, helmet_or=dflt_helmet_or, dec_port_ir=dflt_dec_port_ir, dec_port_or=dflt_dec_port_or, cws_port_d=dflt_cws_port_d) {
