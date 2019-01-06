@@ -125,8 +125,13 @@ module screw_gusset(x, y, z, d, center=false, fn=undef) {
 translate([0,0,0]) screw_gusset(15,15,10,5, center=true);
 translate([0,0,20]) screw_gusset(15,15,10,5);
 
-
-
+module demo_screw(shaft_diam, shaft_length, head_diam, head_height) {
+  color("silver") {
+    cylinder(d=head_diam, h=head_height);
+    translate([0, 0, head_height])
+      cylinder(d=shaft_diam, h=shaft_length);
+  }
+}
 
 // Space to be occupied by a nut (show_gusset=false) or a screw gusset (show_gusset=true)
 // for the corresponding bolt.
