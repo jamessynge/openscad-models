@@ -1,3 +1,5 @@
+# TO DOs for Weatherproofing Design
+
 * Put each part in its own file, move necessary shared modules to wp_utils
   and dimensions to wp2_dimensions.
 
@@ -8,9 +10,6 @@
 
 * Use a full ra_clutch_volume, apply to both cw_chin_strap_helmet_support and
   helmet_support_at_dec_head.
-
-* Add a rib inside the helmet at the bottom. There is some risk of accumulating
-  water, so consider a rib shape to compensate or leave a gap at the bottom.
 
 * Add a rib inside the helmet just above the interior supports
   (i.e. cw_chin_strap_helmet_support and helmet_support_at_dec_head),
@@ -31,18 +30,26 @@
   connections (ala the alignment cones) to guide the rain shield into the
   correct location.
 
+* Determine real measurements/shape of the lower RA motor/electronics package.
+
+* Trim the rib at the bottom of the helmet to not intersect the DEC rain plate.
+
+* Figure out how to deter water from entering at the cut in the helmet.
+  E.g. an o-ring or a furrow/hump.
+
+# DONE
+
+* Add a rib to the helmet at the bottom. There is some risk of accumulating
+  water, so consider a rib shape to compensate.
+
 * Cut the helmet vertically with a plane through both the RA and DEC axes.
   Design a rib for joining the two halves such that the two halves will
   (sort of) stick together (e.g. with a groove along the cut in one side and
   a ridge on the other side).
- 
+
 * Design a screw & threaded insert connection for two halves of the helmet.
   The screws would insert from the lower half (when parked), making it harder
   for water to get into the holes (NOT impossible... consider printing little
   blocks with short handles to go in on top of the screw heads).
 
-* Figure out why the cw sleeve isn't a consistent diameter.
 
-* Determine real measurements/shape of the lower RA motor/electronics package.
-
-* Trim the rib at the bottom of the helmet to not intersect the DEC rain plate.

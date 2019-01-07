@@ -3,12 +3,13 @@
 // Units: mm
 
 include <../ieq30pro_dimensions.scad>
+include <../../utils/metric_dimensions.scad>
 
 // Note that this position of the collar assumes that the abs(latitude) is >= 20
 // else the RA bearing roof will collide with the mount base.
 ra_motor_collar_thickness = 5;
 ra_motor_collar_radius = 100.8;
-ra_motor_collar_z0 = ra2_len;
+ra_motor_collar_z0 = ra2_len - ra_motor_collar_thickness / 2;
 ra_motor_collar_z1 = ra_motor_collar_z0 + ra_motor_collar_thickness;
 
 
@@ -26,6 +27,21 @@ ra_bcbp_ex = ra2_len + ra3_len + ra_bearing_gap;
 ra_to_dec_bearing_plane = ra1_radius + dec2_len;
 
 
+rtp_gusset_diam = m4_washer_diam * 1.5;
+rtp_gusset_height = m4_nut_diam2;
+
+// Dimensions for rib at bottom. Goal is to provide enough room for a slotted
+// gusset for an M4 screw. Will require that the DEC bearing rain plate be
+// notched to allow room for the rib.
+// Note that the rib can't be on the inside because it would very nearly collide
+// with the plate of the RA motor hat.
+
+helmet_bottom_rib_thickness = rtp_gusset_diam;
+helmet_bottom_rib_height = rtp_gusset_diam;
+
+
+cws_port_ir = cw_shaft_diam;
+cws_port_or = cws_port_ir + ra_bcbp_thickness;
 
 // Misc dimensions, to be moved into wp2_dimensions.
 dec1_hat_ra_bearing_gap = ra1_base_to_dec / 2;

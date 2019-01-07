@@ -264,7 +264,7 @@ translate([30, 30, 0])
 module generic_slotted_nut_gusset(
     solid=false, screw_hole_diam=undef, gusset_height=undef, nut_depth=0, screw_extension=0,
     nut_hex_diam=undef, nut_height=undef, nut_hole_scale_factor=1.02,
-    slot_depth=undef, nut_diam_to_slot_depth_multiplier=2, nut_slot_angle=0,
+    slot_depth=undef, nut_diam_to_slot_depth_multiplier=3, nut_slot_angle=0,
     cone_height=0, cone_diam1=undef, cone_diam2=undef, cone_fn=undef) {
   assert($children == 1);
   assert(screw_hole_diam > 0);
@@ -287,6 +287,9 @@ module generic_slotted_nut_gusset(
   nut_height_extra = nut_height_final - nut_height;
 
   assert(gusset_height >= nut_depth + nut_height_final);
+  slot_depth_final =
+    slot_depth>0 ? slot_depth :
+      nut_rnd_diam*nut_diam_to_slot_depth_multiplier;
 
   difference() {
     linear_extrude(height=gusset_height, convexity=3) {
@@ -299,9 +302,6 @@ module generic_slotted_nut_gusset(
       }
       // Cut out the nut slot.
       translate([0, 0, nut_depth - nut_height_extra / 2]) {
-        slot_depth_final =
-          slot_depth>0 ? slot_depth :
-            nut_rnd_diam*nut_diam_to_slot_depth_multiplier;
         linear_extrude(height=nut_height_final, convexity=3) {
           rotate([0, 0, nut_slot_angle]) {
             circle(d=hex_short_to_long_diag(nut_hex_diam_final), $fn=6);
@@ -325,6 +325,25 @@ module generic_slotted_nut_gusset(
           solid=solid, screw_hole_diam=screw_hole_diam,
           cone_height=cone_height, cone_diam1=cone_diam1,
           cone_diam2=cone_diam2, cone_fn=cone_fn);
+    }
+  }
+  if (solid) {
+    // Include the nut slot so that it will be removed from the body from which
+    // this whole gusset is being removed.
+    translate([0, 0, nut_depth - nut_height_extra / 2]) {
+      the_nut_slot(
+          nut_height=nut_height_final, nut_slot_angle=nut_slot_angle,
+          nut_hex_diam=nut_hex_diam_final, slot_depth=slot_depth_final);
+    }
+  }
+}
+
+module the_nut_slot(nut_height=undef, nut_slot_angle=undef, nut_hex_diam=undef, slot_depth=undef) {
+  linear_extrude(height=nut_height, convexity=3) {
+    rotate([0, 0, nut_slot_angle]) {
+      circle(d=hex_short_to_long_diag(nut_hex_diam), $fn=6);
+      translate([0, -nut_hex_diam/2])
+        square(size=[slot_depth, nut_hex_diam], center=false);
     }
   }
 }

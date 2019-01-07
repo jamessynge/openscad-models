@@ -102,7 +102,7 @@ module basic_helmet(helmet_ir=dflt_helmet_ir, helmet_or=dflt_helmet_or, dec_port
       translate_to_dec_bearing_plane() {
         translate([0, 0, dec1_len + dec2_len])
           linear_extrude(height=50, convexity=3)
-            circle(d=cws_port_d);
+            circle(r=cws_port_ir);
       }
     }
   
@@ -118,7 +118,7 @@ module basic_helmet(helmet_ir=dflt_helmet_ir, helmet_or=dflt_helmet_or, dec_port
     translate_to_dec_bearing_plane() {
       translate([0, 0, dec2_len+ra1_radius+helmet_ir])
         linear_extrude(height=20, convexity=3)
-          annulus(d1=cws_port_d, d2=cws_port_d+ra_bcbp_thickness*2);
+          annulus(r1=cws_port_ir, r2=cws_port_or);
     }
 
   }
@@ -128,6 +128,10 @@ module basic_helmet(helmet_ir=dflt_helmet_ir, helmet_or=dflt_helmet_or, dec_port
 // purpose of intersection with / subtraction from other objects.
 module helmet_interior(helmet_ir=dflt_helmet_ir, helmet_or=dflt_helmet_or, inner_offset=0.0) {
   ra_and_dec_simple_shell(solid=true, shell=false, inner_offset=inner_offset);
+}
+
+module basic_helmet_solid() {
+  ra_and_dec_simple_shell(solid=true);
 }
 
 // The core of the design: a hollow cylinder with a hollow hemi-sphere on top
@@ -144,13 +148,12 @@ module ra_and_dec_simple_shell(helmet_ir=dflt_helmet_ir, helmet_or=dflt_helmet_o
             shell=shell, inner_offset=inner_offset, show_cut_rib=false);
       }
       if (shell) {
-        // Rib to reinforce bottom of the shell.
-        bottom_rib_width = 5;
-        bottom_rib_height = 10;
-        linear_extrude(height=bottom_rib_height, convexity=10, scale=helmet_ir/helmet_or) {
+        // Rib to reinforce bottom of the shell, and allow room for gussets.
+        linear_extrude(height=helmet_bottom_rib_height, convexity=10) {
           dec_bearing_hoop_profile(
-              helmet_ir=helmet_or, helmet_or=helmet_or+bottom_rib_width, half=false, solid=solid,
-              shell=shell, inner_offset=inner_offset, show_cut_rib=false);
+              helmet_ir=helmet_ir, helmet_or=helmet_ir+helmet_bottom_rib_thickness,
+              half=false, solid=solid, shell=shell,
+              inner_offset=inner_offset, show_cut_rib=false);
         }
       }
     };
