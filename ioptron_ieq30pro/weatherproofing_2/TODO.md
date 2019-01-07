@@ -43,4 +43,6 @@
 
 * Figure out why the cw sleeve isn't a consistent diameter.
 
-* Determine the measurements of ... 
+* Determine real measurements/shape of the lower RA motor/electronics package.
+
+* Trim the rib at the bottom of the helmet to not intersect the DEC rain plate.

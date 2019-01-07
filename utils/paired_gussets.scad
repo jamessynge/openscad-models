@@ -217,7 +217,7 @@ module generic_recessed_nut_gusset(
 }
 
 module example_generic_recessed_nut_gusset(solid=false) {
-  // Without recess or alignment cone.
+  // Without extra recess or alignment cone.
   generic_recessed_nut_gusset(
     solid=solid, screw_hole_diam=m4_hole_diam, nut_hex_diam=m4_nut_diam1,
     nut_height=m4_nut_height, nut_depth=12) {
@@ -233,7 +233,7 @@ module example_generic_recessed_nut_gusset(solid=false) {
         cone_diam2=m4_hole_diam*1.75) {
     circle(d=max(2.5*m4_hole_diam, m4_washer_diam));
   }
-  // With recess and alignment hole.
+  // With extra recess and alignment hole.
   translate([0, 60, 0])
   generic_recessed_nut_gusset(
     solid=solid, screw_hole_diam=m4_hole_diam, nut_hex_diam=m4_nut_diam1,
@@ -264,7 +264,7 @@ translate([30, 30, 0])
 module generic_slotted_nut_gusset(
     solid=false, screw_hole_diam=undef, gusset_height=undef, nut_depth=0, screw_extension=0,
     nut_hex_diam=undef, nut_height=undef, nut_hole_scale_factor=1.02,
-    slot_depth=undef, nut_diam_to_slot_depth_multiplier=1, nut_slot_angle=0,
+    slot_depth=undef, nut_diam_to_slot_depth_multiplier=2, nut_slot_angle=0,
     cone_height=0, cone_diam1=undef, cone_diam2=undef, cone_fn=undef) {
   assert($children == 1);
   assert(screw_hole_diam > 0);
@@ -290,14 +290,13 @@ module generic_slotted_nut_gusset(
 
   difference() {
     linear_extrude(height=gusset_height, convexity=3) {
-      difference() {
-        children(0);
-        if (!solid) {
-          circle(d=screw_hole_diam);
-        }
-      }
+      children(0);
     }
     if (!solid) {
+      // Cut out the screw hole.
+      linear_extrude(height=total_height, convexity=3) {
+        circle(d=screw_hole_diam);
+      }
       // Cut out the nut slot.
       translate([0, 0, nut_depth - nut_height_extra / 2]) {
         slot_depth_final =
@@ -374,10 +373,121 @@ translate([90, -90, 0])
   color("palegreen")
     example_generic_slotted_nut_gusset(solid=true);
 
+////////////////////////////////////////////////////////////////////////////////
+// matching_m4_recessed_gussets creates a pair of a recessed nut gusset and a screw
+// gusset for a screw on the z-axis (i.e. x=0, y=0), with the nut on the
+// z>0 side. A single child must be provided with a 2D profile that can be
+// extruded to be the outer surface of the gussets.
+
+module matching_m4_recessed_gussets(show_nut_gusset=true, show_screw_gusset=true, nut_depth=6, screw_head_depth=15, screw_head_recess=45, solid=false) {
+  assert($children == 1);
+  cone_height = 5;
+  cone_diam1 = m4_hole_diam*2.25;
+  cone_diam2 = m4_hole_diam*1.75;
+  if (show_nut_gusset) {
+    generic_recessed_nut_gusset(
+        solid=solid, screw_hole_diam=m4_hole_diam, nut_hex_diam=m4_nut_diam1,
+        nut_height=m4_nut_height, nut_depth=nut_depth+max(0, -cone_height),
+        cone_height=-(cone_height+.1), cone_diam1=cone_diam1+.1,
+        cone_diam2=cone_diam2+.1) {
+      children(0);
+    }
+  }
+  if (show_screw_gusset) {
+    generic_screw_gusset(
+        solid=solid, screw_hole_diam=m4_hole_diam, washer_diam=m4_washer_diam,
+        screw_head_depth=screw_head_depth, screw_head_recess=screw_head_recess,
+        cone_height=cone_height-.1, cone_diam1=cone_diam1-.1, cone_diam2=cone_diam2-.1) {
+      children(0);
+    }
+  }
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// matching_m4_slotted_gussets creates a pair of a slotted nut gusset and a screw gusset for a screw
+// on the z-axis (i.e. x=0, y=0), with the nut on the z>0 side.
+// A single child must be provided with a 2D profile that can be extruded to
+// be the outer surface of the gussets.
+module matching_m4_slotted_gussets(show_nut_gusset=true, show_screw_gusset=true, nut_slot_angle=0, nut_depth=6, screw_extension=10, gusset_height=20, screw_head_depth=15, screw_head_recess=45, solid=false) {
+  assert($children == 1);
+  assert(nut_depth > -cone_height);  // If have a hole, must not go too deep.
+  cone_height = 5;
+  cone_diam1 = m4_hole_diam*2.25;
+  cone_diam2 = m4_hole_diam*1.75;
+  if (show_nut_gusset) {
+    generic_slotted_nut_gusset(
+        solid=solid, screw_hole_diam=m4_hole_diam, gusset_height=gusset_height, nut_depth=nut_depth,
+        screw_extension=screw_extension, nut_hex_diam=m4_nut_diam1, nut_height=m4_nut_height,
+        nut_slot_angle=nut_slot_angle,
+        cone_height=-(cone_height+.1), cone_diam1=cone_diam1+.1,
+        cone_diam2=cone_diam2+.1) {
+      children(0);
+    }
+  }
+  if (show_screw_gusset) {
+    generic_screw_gusset(
+        solid=solid, screw_hole_diam=m4_hole_diam, washer_diam=m4_washer_diam,
+        screw_head_depth=screw_head_depth, screw_head_recess=screw_head_recess,
+        cone_height=cone_height-.1, cone_diam1=cone_diam1-.1, cone_diam2=cone_diam2-.1) {
+      children(0);
+    }
+  }
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+module round_top_rectangle(diam=undef, height=undef) {
+  circle(d=diam);
+  translate([-diam/2, -height, 0])
+    square(size=[diam, height]);
+}
+
+module round_top_pyramid(diam=undef, height=undef, angle=20) {
+  assert(angle <= 45);
+  circle(d=diam);
+  r = diam / 2;
+  // Lazy approach. Should just use some trigonometry to compute polygon.
+  if (angle > 0) {
+    intersection() {
+      extra_wide = 30*diam;
+      translate([-extra_wide/2, -height])
+        square([extra_wide, height+r]);
+      union() {
+        translate([-diam/2, -height, 0])
+          square(size=[diam, height]);
+        extra_tall = 10*height;
+        intersection() {
+          rotate([0, 0, angle])
+            translate([-extra_wide+r,-extra_tall,0])
+              square([extra_wide,extra_tall]);
+          translate([-r,-extra_tall+r,0])
+            square([extra_wide,extra_tall]);
+        }
+        intersection() {
+          rotate([0, 0, -angle])
+            translate([-r,-extra_tall,0])
+              square([extra_wide,extra_tall]);
+          translate([-extra_wide+r,-extra_tall+r,0])
+            square([extra_wide,extra_tall]);
+        }
+      }
+    }
+  } else {
+    translate([-diam/2, -height, 0])
+      square(size=[diam, height]);
+  }
+}
+
+*translate([0, 0, 40])
+  round_top_pyramid(diam=20, height=40, angle=45);
 
 
 
-// ////////////////////////////////////////////////////////////////////////////////
+
+
+
+
+
 
 // module round_nut_gusset(solid=false, nut_gusset_diam=undef, screw_hole_diam=undef, nut_hex_diam=undef, nut_height=undef, nut_recess=0, nut_depth=undef) {
 //   generic_recessed_nut_gusset(solid=solid, screw_hole_diam=screw_hole_diam, nut_hex_diam=nut_hex_diam, nut_height=nut_height, nut_recess=nut_recess, nut_depth=nut_depth) {

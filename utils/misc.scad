@@ -199,3 +199,8 @@ module annulus(d1=undef, r1=undef, d2=undef, r2=undef, solid=false) {
   };
 }
 
+
+module mirrored(v=undef) {
+  children();
+  mirror(v=v) children();
+}

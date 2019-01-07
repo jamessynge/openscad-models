@@ -6,9 +6,10 @@ include <../ieq30pro_dimensions.scad>
 
 // Note that this position of the collar assumes that the abs(latitude) is >= 20
 // else the RA bearing roof will collide with the mount base.
+ra_motor_collar_thickness = 5;
 ra_motor_collar_radius = 100.8;
-ra_motor_collar_z0 = ra2_len + ra3_len * 0.1;
-ra_motor_collar_z1 = ra2_len + ra3_len * 0.5;
+ra_motor_collar_z0 = ra2_len;
+ra_motor_collar_z1 = ra_motor_collar_z0 + ra_motor_collar_thickness;
 
 
 ////////////////////////////////////////////////////////////////////////////////
