@@ -34,8 +34,6 @@ module decorated_ra_body(show_arrows=true) {
 }
 
 module ra_body() {
-  // To avoid modeling more of the RA body,
-  // we extend the ra3 section longer ... for now.
   color(cast_iron_color) {
     cylinder(h=ra2_len, r=ra2_radius);
     translate([0, 0, ra2_len]) {

@@ -9,9 +9,14 @@ Extra Considerations:
 
 *  Given the large internal support structures, we need to make sure
    that water which does enter has a place to go. For example, at the
-   counterwieght shaft hole, some water will undoubtedly enter the enclosure. We need to allow it to run down between the inside of
+   counterwieght shaft hole, some water will undoubtedly enter the enclosure.
+   We need to allow it to run down between the inside of
    the enclosure rather than penetrate to the mount. To allow for use
    at multiple latitudes, we can place small channels between the
    counterweight shaft and the bottom of the enclosure, radiating
    away so that some channel is down regardless of latitude (within
    limits).
+
+*  Because the rainplate will be secured to the helmet with screws, we'll use it
+   to hold the two halves of the helmet together instead of a screws between the
+   two at the bottom of the DEC opening in the helmet.

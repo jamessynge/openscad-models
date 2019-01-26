@@ -461,6 +461,8 @@ module round_top_rectangle(diam=undef, height=undef) {
     square(size=[diam, height]);
 }
 
+// angle: angle of the pyramid sides, where zero is vertical
+//        (i.e. not a pyramid).
 module round_top_pyramid(diam=undef, height=undef, angle=20) {
   assert(angle <= 45);
   circle(d=diam);

@@ -14,6 +14,7 @@ use <../ieq30pro_dec_head.scad>
 use <../ieq30pro_ra_and_dec.scad>
 use <../ieq30pro_ra_core.scad>
 
+use <dec1_hat.scad>
 use <dec_bearing_rain_plate.scad>
 use <dec_head_bearing_cover.scad>
 use <ra_motor_hat.scad>
@@ -30,8 +31,14 @@ $fa = $preview ? 6 : 1;
 
 // Default location is parked.
 lat = mount_latitude;
-ra_angle = 25;//abs($t - 0.5) * 360 - 90;
-dec_angle = 58;//  90 + mount_latitude + $t * 360 * 3.14;
+RA_angle = abs($t - 0.5) * 360 - 90;
+DEC_angle = 90 + mount_latitude + $t * 360 * 3.14;
+
+fixed_position = false;
+
+ra_angle = fixed_position ? 25 : RA_angle;
+dec_angle = fixed_position ? 58 : DEC_angle;
+
 show_arrows=false;
 
 dflt_helmet_ir=ra_bcbp_ir;
@@ -57,11 +64,11 @@ if ($preview) {
     union() {
       // RA side of DEC bearing.
       
-      #color("red")dec_bearing_rain_plate();
+      *color("red")dec_bearing_rain_plate();
     };
     union() {
       // DEC head side of DEC bearing.
-      color("DeepSkyBlue") dec_head_bearing_cover();
+      *color("DeepSkyBlue") dec_head_bearing_cover();
     };
     union() {
       // Saddle plate
