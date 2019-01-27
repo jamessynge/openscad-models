@@ -41,7 +41,11 @@ dec_angle = fixed_position ? 58 : DEC_angle;
 
 show_arrows=false;
 
-if ($preview) {
+if (!$preview) {
+  basic_helmet();
+} else if (true) {
+  basic_helmet();
+} else {
   rotate([0, 27, 0])
   translate([0, -70, 0])
   decorated_ioptron_mount(ra_angle=ra_angle,
@@ -58,7 +62,7 @@ if ($preview) {
     union() {
       // RA side of DEC bearing.
       
-      *color("red")dec_bearing_rain_plate();
+      color("red")dec_bearing_rain_plate();
     };
     union() {
       // DEC head side of DEC bearing.
@@ -85,10 +89,8 @@ if ($preview) {
     };
   }
 
-  translate([400, -400, 0]) basic_helmet();
-  *translate([800, -400, 0]) dec_bearing_hoop_profile();
-} else {
-  basic_helmet();
+  *translate([400, -400, 0]) basic_helmet();
+  *translate([800, -400, 0]) ra_and_dec_hoop_profile();
 }
 
 // A projection (slice) of the cut line of the helmet.
@@ -102,8 +104,8 @@ module thinner_basic_helmet_slice(helmet_ir=dflt_helmet_ir, helmet_or=dflt_helme
   assert(cws_port_t > 4);
 
   new_helmet_or = helmet_ir + helmet_t * 0.5;
-  new_dec_port_or = dec_port_ir + dec_port_t * 0.6;
-  new_cws_port_or = cws_port_ir + cws_port_t * 0.3;
+  new_dec_port_or = dec_port_ir + dec_port_t * 0.7;
+  new_cws_port_or = cws_port_ir + cws_port_t * 0.4;
 
 
   projection(cut=true) {
@@ -121,47 +123,50 @@ module basic_helmet_slice(helmet_ir=dflt_helmet_ir, helmet_or=dflt_helmet_or, de
 }
 
 module basic_helmet(helmet_ir=dflt_helmet_ir, helmet_or=dflt_helmet_or, dec_port_ir=dflt_dec_port_ir, dec_port_or=dflt_dec_port_or, cws_port_ir=dflt_cws_port_ir, cws_port_or=dflt_cws_port_or, solid=false) {
-  union() {
-    difference() {
-      ra_and_dec_simple_shell(helmet_ir=helmet_ir, helmet_or=helmet_or, solid=solid);
-  
-      if (!solid) {
-        // Remove the volume needed for the DEC head and its clutch.
-        dec_bearing_hoop_attachment_in_place(dec_port_ir=dec_port_ir, dec_port_or=dec_port_or, solid=true);
-    
-        // Leave a hole for the counterweight shaft.
-        translate_to_dec_bearing_plane() {
-          translate([0, 0, dec1_len + dec2_len])
-            linear_extrude(height=50, convexity=3)
-              circle(r=cws_port_ir);
-        }
-      }
 
-      // Remove everything beyond the plane where the DEC port
-      // ends (i.e. where the rain plate attaches).
+  // The basic shell, with holes for the DEC and CW shaft ports.
+  difference() {
+    ra_and_dec_simple_shell(helmet_ir=helmet_ir, helmet_or=helmet_or, solid=solid);
 
-      translate_to_dec_bearing_plane() {
-        s = 300;
-        translate([0, 0, -s/2 - hoop_disc_z + hoop_disc_wall])
-          cube(size=s, center=true);
-      }
-    }
+    if (!solid) {
+      // Remove the volume needed for the DEC head and its clutch. OpenSCAD
+      // produces some non-manifold faces here, so I'm attempting to avoid
+      // these by cutting out a smaller hole, so that there is material from
+      // both the helmet and the port.
+      dec_port_r = (dec_port_ir + dec_port_or) / 2;
+      dec_bearing_hoop_attachment_in_place(dec_port_ir=dec_port_r, dec_port_or=dec_port_r, solid=true);
   
-    // The hole and flange for attaching the dec_bearing_rain_plate(), i.e.
-    // the plate that keeps rain from blowing in through the hole in the side
-    // of the basic_helmet.
-    difference() {
-      dec_bearing_hoop_attachment_in_place(dec_port_ir=dec_port_ir, dec_port_or=dec_port_or, solid=solid);
-      if (!solid) {
-        helmet_interior(helmet_ir=helmet_ir, helmet_or=helmet_or);
-      }
+      // Leave a hole for the counterweight shaft.
+      cws_port_r = (cws_port_ir + cws_port_or) / 2;
+      cw_shaft_port_in_place(cws_port_ir=cws_port_r, cws_port_or=cws_port_r, solid=true);
+      // translate_to_dec_bearing_plane() {
+      //   translate([0, 0, dec1_len + dec2_len])
+      //     linear_extrude(height=50, convexity=3)
+      //       circle(r=cws_port_r);
+      // }
     }
 
-    // Tube around the counterweight shaft.
+    // Remove everything beyond the plane where the DEC port
+    // ends (i.e. where the rain plate attaches).
+
     translate_to_dec_bearing_plane() {
-      translate([0, 0, dec2_len+ra1_radius+helmet_ir])
-        linear_extrude(height=20, convexity=3)
-          annulus(r1=cws_port_ir, r2=cws_port_or, solid=solid);
+      s = 300;
+      translate([0, 0, -s/2 - hoop_disc_z + hoop_disc_wall])
+        cube(size=s, center=true);
+    }
+  }
+
+  difference() {
+    union() {
+      // The hole and flange for attaching the dec_bearing_rain_plate(), i.e.
+      // the plate that keeps rain from blowing in through the hole in the side
+      // of the basic_helmet.
+      dec_bearing_hoop_attachment_in_place(dec_port_ir=dec_port_ir, dec_port_or=dec_port_or, solid=solid);
+      // Tube around the counterweight shaft.
+      cw_shaft_port_in_place(cws_port_ir=cws_port_ir, cws_port_or=cws_port_or, solid=solid);
+    }
+    if (!solid) {
+      helmet_interior(helmet_ir=helmet_ir, helmet_or=helmet_or);
     }
   }
 }
@@ -185,14 +190,14 @@ module ra_and_dec_simple_shell(helmet_ir=dflt_helmet_ir, helmet_or=dflt_helmet_o
     cylinder_height = ra_bcbp_ex + above_bearing;
     translate([0, 0, -ra_bcbp_ex]) {
       linear_extrude(height=ra_bcbp_ex, convexity=10) {
-        dec_bearing_hoop_profile(
+        ra_and_dec_hoop_profile(
             helmet_ir=helmet_ir, helmet_or=helmet_or, half=false, solid=solid,
             shell=shell, inner_offset=inner_offset, show_cut_rib=false);
       }
       if (shell) {
         // Rib to reinforce bottom of the shell, and allow room for gussets.
         linear_extrude(height=helmet_bottom_rib_height, convexity=10) {
-          dec_bearing_hoop_profile(
+          ra_and_dec_hoop_profile(
               helmet_ir=helmet_ir, helmet_or=helmet_ir+helmet_bottom_rib_thickness,
               half=false, solid=solid, shell=shell,
               inner_offset=inner_offset, show_cut_rib=false);
@@ -200,14 +205,14 @@ module ra_and_dec_simple_shell(helmet_ir=dflt_helmet_ir, helmet_or=dflt_helmet_o
       }
     };
     linear_extrude(height=above_bearing, convexity=10) {
-      dec_bearing_hoop_profile(
+      ra_and_dec_hoop_profile(
           helmet_ir=helmet_ir, helmet_or=helmet_or, half=false, solid=solid,
           shell=shell, inner_offset=inner_offset);
     }
     translate([0, 0, above_bearing])
       rotate([90,0,0])
         rotate_extrude(angle=180)
-          dec_bearing_hoop_profile(
+          ra_and_dec_hoop_profile(
               helmet_ir=helmet_ir, helmet_or=helmet_or, half=true,
               solid=solid, shell=shell, inner_offset=inner_offset);
   }
@@ -215,7 +220,7 @@ module ra_and_dec_simple_shell(helmet_ir=dflt_helmet_ir, helmet_or=dflt_helmet_o
 
 // This is the cross section through the basic shell, an annulus that will
 // just surround the ra_motor_hat with a little bit of room to spare.
-module dec_bearing_hoop_profile(helmet_ir=dflt_helmet_ir, helmet_or=dflt_helmet_or, half=false, solid=false, shell=true, inner_offset=0.0, show_cut_rib=true) {
+module ra_and_dec_hoop_profile(helmet_ir=dflt_helmet_ir, helmet_or=dflt_helmet_or, half=false, solid=false, shell=true, inner_offset=0.0, show_cut_rib=true) {
   assert(solid || shell);
   assert(inner_offset >= 0);
   r1 = helmet_ir - inner_offset;
@@ -256,13 +261,7 @@ module dec_bearing_hoop_profile(helmet_ir=dflt_helmet_ir, helmet_or=dflt_helmet_
     }
 }
 
-module dec_bearing_hoop_attachment_in_place(dec_port_ir=dflt_dec_port_ir, dec_port_or=dflt_dec_port_or, solid=false) {
-  translate_to_dec_bearing_plane() {
-    rotate([0, 180, 0])
-      dec_bearing_hoop_attachment(dec_port_ir=dec_port_ir, dec_port_or=dec_port_or, solid=solid);
-  }
-}
-
+////////////////////////////////////////////////////////////////////////////////
 // Part between helmet and dec_bearing_rain_plate; a part of/permanently
 // attached to the helmet, with screw holes for attaching the hoop. Planning
 // to use nut slots or threaded metal inserts that can be glued into the
@@ -273,70 +272,43 @@ module dec_bearing_hoop_attachment(dec_port_ir=dflt_dec_port_ir, dec_port_or=dfl
       dec_bearing_hoop_attachment_profile(dec_port_ir=dec_port_ir, dec_port_or=dec_port_or, solid=solid);
 }
 
-*translate([-300, 0, 0])
-    dec_bearing_hoop_attachment_profile();
-
 module dec_bearing_hoop_attachment_profile(dec_port_ir=dflt_dec_port_ir, dec_port_or=dflt_dec_port_or, solid=false) {
   if (solid) {
     circle(r=dec_port_or);
   } else {
-    annulus(r1=dflt_dec_port_ir, r2=dec_port_or);
+    annulus(r1=dec_port_ir, r2=dec_port_or);
   }
 }
 
-*translate([-300, 0, 0]) ra_and_dec_simple_shell_profile();
-
-
-// Profile for the core of the helmet, to be rotated around the y (RA) axis.
-module ra_and_dec_simple_shell_profile(solid=false, half=true, helmet_ir=dflt_helmet_ir, helmet_or=dflt_helmet_or) {
-
-  // The bottom rib shouldn't be thinner than the helmet.
-  assert(helmet_or - helmet_ir <= helmet_bottom_rib_thickness);
-  // The bottom rib shouldn't be taller than the drop below the y=0 plane
-  // (i.e. the x-axis).
-  assert(ra_bcbp_ex > helmet_bottom_rib_height);
-
-  y0 = -ra_bcbp_ex;
-  y1 = y0 + helmet_bottom_rib_height;
-  y2 = 0;
-  y3 = helmet_cyl_above_bearing;
-  y4 = y3 + helmet_ir;
-  y5 = y3 + helmet_or;
-
-  x0 = 0;
-  x1 = helmet_ir;
-  x2 = helmet_or;
-  x3 = x1 + helmet_bottom_rib_thickness;
-
-  inner_edge = [
-    // Start at the inside of the bottom of the helmet.
-    [x1, y0],
-    [x1, y2],
-    [x1, y0],
-    [x1, y0],
-    [x1, y0],
-    [x1, y0],
-
-
-  ];
-
-
-
-
-
-  mirror([half ? 0 : 0, 0, 0]) {
-    polygon([
-      // Start at the inside of the bottom of the helmet.
-      [x2, y1],
-      [x3, y1],
-      [x4, y2],
-      [x4, y3],
-      [x1, y3],
-      [x1, y2],
-      ]);
-
+module dec_bearing_hoop_attachment_in_place(dec_port_ir=dflt_dec_port_ir, dec_port_or=dflt_dec_port_or, solid=false) {
+  translate_to_dec_bearing_plane() {
+    rotate([0, 180, 0])
+      dec_bearing_hoop_attachment(dec_port_ir=dec_port_ir, dec_port_or=dec_port_or, solid=solid);
   }
+}
 
+////////////////////////////////////////////////////////////////////////////////
+// Tube surrounding the counterweight shaft as it goes through the side of the
+// helmet. Allows us room for a small disc that keeps rain from entering the
+// helmet.
+// TODO come up with better dims, move to wp2_dimensions.
 
+module cw_shaft_port(cws_port_ir=dflt_cws_port_ir, cws_port_or=dflt_cws_port_or, solid=false) {
+  linear_extrude(height=40, convexity=10)
+    cw_shaft_port_profile(cws_port_ir=cws_port_ir, cws_port_or=cws_port_or, solid=solid);
+}
 
+module cw_shaft_port_profile(cws_port_ir=dflt_cws_port_ir, cws_port_or=dflt_cws_port_or, solid=false) {
+  if (solid) {
+    circle(r=cws_port_or);
+  } else {
+    annulus(r1=cws_port_ir, r2=cws_port_or);
+  }
+}
+
+module cw_shaft_port_in_place(cws_port_ir=dflt_cws_port_ir, cws_port_or=dflt_cws_port_or, solid=false) {
+  translate_to_dec_bearing_plane() {
+    translate([0, 0, dec1_len/2 + dec2_len + dflt_helmet_ir-20])
+      cw_shaft_port(cws_port_ir=cws_port_ir, cws_port_or=cws_port_or, solid=solid);
+  }
 }

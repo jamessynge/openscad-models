@@ -42,21 +42,20 @@ rtp_diam = rtp_gusset_diam;
 rtp_height = rtp_gusset_height;
 
 
-distance = 20 * (cos($t*360) + 1);
+distance = 40 * (cos($t*360) + 1);
 
 
 
 if (!$preview) {
-  scale(1) {
-    translate([distance, 0, 0]) color("orange")
-      half_helmet(nut_side=true);
-    *translate([-distance, 0, 0]) color("palegreen")
-      half_helmet(nut_side=false);
-
+  scale(0.5) {
+    *translate([distance, 0, 0]) color("orange")
+      half_helmet_nut_side();
+    translate([-distance, 0, 0]) color("palegreen")
+      half_helmet_screw_side();
   }
 } else if (true) {
   rotate([0, 0, $t * 360]) {
-    translate([distance, 0, 0]) color("orange")
+    translate([distance, 0, 0]) //color("orange")
       half_helmet(nut_side=true);
     translate([-distance, 0, 0]) color("palegreen")
       half_helmet(nut_side=false);
@@ -132,6 +131,14 @@ if (!$preview) {
   *translate([800, -400, 0]) dec_bearing_hoop_profile();
 }
 
+module half_helmet_nut_side() {
+  half_helmet(nut_side=true);
+}
+
+module half_helmet_screw_side() {
+  half_helmet(nut_side=false);
+}
+
 module half_helmet(nut_side=true) {
   difference() {
     if (nut_side) {
@@ -165,7 +172,7 @@ module basic_helmet_nut_side() {
     }
 
     union() {
-      overhang = 11;
+      overhang = 9;
       s=400;
       translate([-overhang, -s/2, -s/2])
         cube(size=s, center=false);
@@ -202,17 +209,19 @@ module gussets(solid=false, nut_side=true) {
   // Below and above the counterweight port.
   gussets_around_cw_port(
       solid=solid, nut_side=nut_side, do_intersect=!solid,
-      z=ra1_base_to_dec_center-(dflt_cws_port_d+rtp_diam)/2);
+      z=ra1_base_to_dec_center-(dflt_cws_port_d+rtp_diam)/2 - 3,
+      angle=15);
   gussets_around_cw_port(
       solid=solid, nut_side=nut_side, do_intersect=!solid,
-      z=ra1_base_to_dec_center+(dflt_cws_port_d+rtp_diam)/2);
+      z=ra1_base_to_dec_center+(dflt_cws_port_d+rtp_diam)/2 + 3,
+      angle=15);
   // At the top.
   gussets_around_hemisphere(
-      solid=solid, nut_side=nut_side, do_intersect=!solid, hemi_angle=0);
+      solid=solid, nut_side=nut_side, do_intersect=!solid, hemi_angle=0, angle=15);
   // Near DEC port, and opposite side.
   mirrored([0, 1, 0])
     gussets_around_hemisphere(
-        solid=solid, nut_side=nut_side, do_intersect=!solid, hemi_angle=-45);
+        solid=solid, nut_side=nut_side, do_intersect=!solid, hemi_angle=-45, angle=15);
 }
 
 // Gusset at the bottom rim, below the CW shaft port.
@@ -243,24 +252,17 @@ module gussets_below_cw_port(solid=false, nut_side=true, do_intersect=false) {
   }
 }
 
-module gussets_around_cw_port(solid=false, nut_side=true, do_intersect=false, above=true, z=undef) {
+module gussets_around_cw_port(solid=false, nut_side=true, do_intersect=false, angle=0, z=undef) {
   r1=dflt_helmet_ir;
   r2=dflt_helmet_or;
-  angle=0;
   nut_depth=15;
   screw_extension=20;
   screw_head_depth=20;
   screw_head_recess=50;
-  h = m4_nut_diam2 * 1.25;
-
-  // dz = max()
-
-  // z = ra1_base_to_dec_center + max()
-
-
+  h = m4_nut_diam2;
 
   intersection() {
-    translate([0, -r1+h, z]) {
+    translate([0, -r1+h*1.25, z]) {
       rotate([0, 90, 0]) {
        matching_rtp_m4_recessed_gussets(
             d=rtp_diam, h=h,
@@ -278,10 +280,9 @@ module gussets_around_cw_port(solid=false, nut_side=true, do_intersect=false, ab
 }
 
 
-module gussets_around_hemisphere(solid=false, nut_side=true, do_intersect=false, hemi_angle=undef) {
+module gussets_around_hemisphere(solid=false, nut_side=true, do_intersect=false, hemi_angle=undef, angle=0) {
   r1=dflt_helmet_ir;
   r2=dflt_helmet_or;
-  angle=0;
   nut_depth=15;
   screw_extension=20;
   screw_head_depth=20;
