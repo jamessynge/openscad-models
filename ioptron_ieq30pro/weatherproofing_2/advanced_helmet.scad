@@ -62,9 +62,14 @@ if (!$preview) {
       half_helmet(nut_side=false);
   }
 
-  rotate([0, -90, 0]) basic_helmet_slice(solid=true);
+  *rotate([0, -90, 0]) basic_helmet_slice(solid=true);
 
-  translate([3, 0, 0]) rotate([0, -90, 0]) thinner_basic_helmet_slice(solid=true);
+  *translate([3, 0, 0]) rotate([0, -90, 0]) thinner_basic_helmet_slice(solid=true);
+
+  *translate([distance, 500, 0]) color("orange")
+    basic_helmet_nut_side();
+  *translate([-distance, 500, 0]) color("palegreen")
+    basic_helmet_screw_side();
 
 } else if (true) {
   scale(1) {
@@ -129,11 +134,67 @@ if (!$preview) {
 
 module half_helmet(nut_side=true) {
   difference() {
-    half_basic_helmet(nut_side=nut_side);
+    if (nut_side) {
+      basic_helmet_nut_side();
+    } else {
+      basic_helmet_screw_side();
+    }
     gussets(solid=true, nut_side=nut_side);
   }
   gussets(solid=false, nut_side=nut_side);
 }
+
+module basic_helmet_nut_side() {
+  half_basic_helmet(nut_side=true);
+
+  intersection() {
+    difference() {
+      half_basic_helmet(nut_side=false);
+
+      rotate([0, -90, 0]) {
+        linear_extrude(height=200, convexity=4)
+          thinner_basic_helmet_slice(solid=true);
+      }
+
+      
+    }
+    union() {
+      s = 400;
+      dz = ra_bcbp_ex - helmet_bottom_rib_height;
+      translate([-s/2, 0, s/2 - dz]) cube(size=s, center=true);
+    }
+
+    union() {
+      overhang = 11;
+      s=400;
+      translate([-overhang, -s/2, -s/2])
+        cube(size=s, center=false);
+    }
+  }
+}
+
+module basic_helmet_screw_side() {
+  intersection() {
+    half_basic_helmet(nut_side=false);
+
+    rotate([0, -90, 0]) {
+      linear_extrude(height=200, convexity=4)
+        thinner_basic_helmet_slice(solid=true);
+    }
+  }
+}
+
+module half_basic_helmet(nut_side=true, helmet_ir=dflt_helmet_ir, helmet_or=dflt_helmet_or, dec_port_ir=dflt_dec_port_ir, dec_port_or=dflt_dec_port_or, cws_port_ir=dflt_cws_port_ir, cws_port_or=dflt_cws_port_or) {
+  intersection() {
+    basic_helmet(helmet_ir=helmet_ir, helmet_or=helmet_or, dec_port_ir=dec_port_ir, dec_port_or=dec_port_or, cws_port_ir=cws_port_ir, cws_port_or=cws_port_or);
+    // Cut to be just the upper or lower half (i.e. nut side or screw side).
+    s = 350;
+    translate([(nut_side ? 1 : -1) * s/2, 0, s/4]) {
+      cube(size=s, center=true);
+    }
+  }
+}
+
 
 module gussets(solid=false, nut_side=true) {
   // At the bottom of the cut on the CW shaft side of the helmet.

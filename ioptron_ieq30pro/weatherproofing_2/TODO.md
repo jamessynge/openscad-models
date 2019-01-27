@@ -32,11 +32,6 @@
 
 * Determine real measurements/shape of the lower RA motor/electronics package.
 
-* Trim the rib at the bottom of the helmet to not intersect the DEC rain plate.
-
-* Figure out how to deter water from entering at the cut in the helmet.
-  E.g. an o-ring or a furrow/hump.
-
 # DONE
 
 * Add a rib to the helmet at the bottom. There is some risk of accumulating
@@ -52,4 +47,7 @@
   for water to get into the holes (NOT impossible... consider printing little
   blocks with short handles to go in on top of the screw heads).
 
+* Trim the rib at the bottom of the helmet to not intersect the DEC rain plate.
 
+* Figure out how to deter water from entering at the cut in the helmet.
+  E.g. an o-ring or a furrow/hump.

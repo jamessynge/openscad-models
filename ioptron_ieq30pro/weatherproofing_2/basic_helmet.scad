@@ -51,7 +51,7 @@ if ($preview) {
     };
     union() {
       // Moving side of RA bearing.
-      basic_helmet();
+      color("white") basic_helmet();
       *dec1_hat();
       *helmet_support_at_cws();
     };
@@ -85,29 +85,10 @@ if ($preview) {
     };
   }
 
-  *translate([400, -400, 0]) basic_helmet();
+  translate([400, -400, 0]) basic_helmet();
   *translate([800, -400, 0]) dec_bearing_hoop_profile();
-
-  rotate([90, 0, 0])
-  translate([-400, 0, 0]) {
-    translate([50, 0, 0]) color("orange")
-      half_basic_helmet(nut_side=true);
-    translate([-50, 0, 0]) color("palegreen")
-      half_basic_helmet(nut_side=false);
-  }
 } else {
   basic_helmet();
-}
-
-module half_basic_helmet(nut_side=true, helmet_ir=dflt_helmet_ir, helmet_or=dflt_helmet_or, dec_port_ir=dflt_dec_port_ir, dec_port_or=dflt_dec_port_or, cws_port_ir=dflt_cws_port_ir, cws_port_or=dflt_cws_port_or) {
-  intersection() {
-    basic_helmet(helmet_ir=helmet_ir, helmet_or=helmet_or, dec_port_ir=dec_port_ir, dec_port_or=dec_port_or, cws_port_ir=cws_port_ir, cws_port_or=cws_port_or);
-    // Cut to be just the upper or lower half (i.e. nut side or screw side).
-    s = 350;
-    translate([(nut_side ? 1 : -1) * s/2, 0, s/4]) {
-      cube(size=s, center=true);
-    }
-  }
 }
 
 // A projection (slice) of the cut line of the helmet.
@@ -121,8 +102,8 @@ module thinner_basic_helmet_slice(helmet_ir=dflt_helmet_ir, helmet_or=dflt_helme
   assert(cws_port_t > 4);
 
   new_helmet_or = helmet_ir + helmet_t * 0.5;
-  new_dec_port_or = dec_port_ir + dec_port_t * 0.5;
-  new_cws_port_or = cws_port_ir + cws_port_t * 0.5;
+  new_dec_port_or = dec_port_ir + dec_port_t * 0.6;
+  new_cws_port_or = cws_port_ir + cws_port_t * 0.3;
 
 
   projection(cut=true) {
@@ -140,7 +121,7 @@ module basic_helmet_slice(helmet_ir=dflt_helmet_ir, helmet_or=dflt_helmet_or, de
 }
 
 module basic_helmet(helmet_ir=dflt_helmet_ir, helmet_or=dflt_helmet_or, dec_port_ir=dflt_dec_port_ir, dec_port_or=dflt_dec_port_or, cws_port_ir=dflt_cws_port_ir, cws_port_or=dflt_cws_port_or, solid=false) {
-  color("white") union() {
+  union() {
     difference() {
       ra_and_dec_simple_shell(helmet_ir=helmet_ir, helmet_or=helmet_or, solid=solid);
   
@@ -154,6 +135,15 @@ module basic_helmet(helmet_ir=dflt_helmet_ir, helmet_or=dflt_helmet_or, dec_port
             linear_extrude(height=50, convexity=3)
               circle(r=cws_port_ir);
         }
+      }
+
+      // Remove everything beyond the plane where the DEC port
+      // ends (i.e. where the rain plate attaches).
+
+      translate_to_dec_bearing_plane() {
+        s = 300;
+        translate([0, 0, -s/2 - hoop_disc_z + hoop_disc_wall])
+          cube(size=s, center=true);
       }
     }
   
@@ -275,7 +265,8 @@ module dec_bearing_hoop_attachment_in_place(dec_port_ir=dflt_dec_port_ir, dec_po
 
 // Part between helmet and dec_bearing_rain_plate; a part of/permanently
 // attached to the helmet, with screw holes for attaching the hoop. Planning
-// to use threaded metal inserts that can be glued into the 3D printed plastic.
+// to use nut slots or threaded metal inserts that can be glued into the
+// 3D printed plastic.
 module dec_bearing_hoop_attachment(dec_port_ir=dflt_dec_port_ir, dec_port_or=dflt_dec_port_or, solid=false) {
   translate([0, 0, -ra1_radius])
     linear_extrude(height=hoop_disc_z+ra1_radius-hoop_disc_wall, convexity=10)
