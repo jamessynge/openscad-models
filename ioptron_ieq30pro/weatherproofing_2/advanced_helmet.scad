@@ -61,6 +61,11 @@ if (!$preview) {
     translate([-distance, 0, 0]) color("palegreen")
       half_helmet(nut_side=false);
   }
+
+  rotate([0, -90, 0]) basic_helmet_slice(solid=true);
+
+  translate([3, 0, 0]) rotate([0, -90, 0]) thinner_basic_helmet_slice(solid=true);
+
 } else if (true) {
   scale(1) {
     translate([distance, 0, 0]) color("orange")
@@ -128,17 +133,6 @@ module half_helmet(nut_side=true) {
     gussets(solid=true, nut_side=nut_side);
   }
   gussets(solid=false, nut_side=nut_side);
-}
-
-module half_basic_helmet(nut_side=true) {
-  intersection() {
-    basic_helmet();
-    // Cut to be just the upper or lower half (i.e. nut side or screw side).
-    s = 1000;
-    translate([(nut_side ? 1 : -1) * s/2,0, 0]) {
-      cube(size=s, center=true);
-    }
-  }
 }
 
 module gussets(solid=false, nut_side=true) {

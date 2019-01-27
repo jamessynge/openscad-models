@@ -9,7 +9,9 @@ include <../../utils/metric_dimensions.scad>
 // else the RA bearing roof will collide with the mount base.
 ra_motor_collar_thickness = 5;
 ra_motor_collar_radius = 100.8;
-ra_motor_collar_z0 = ra2_len - ra_motor_collar_thickness / 2;
+// ra_motor_collar_z0 = ra2_len - ra_motor_collar_thickness / 2;
+// ra_motor_collar_z1 = ra_motor_collar_z0 + ra_motor_collar_thickness;
+ra_motor_collar_z0 = ra2_len;
 ra_motor_collar_z1 = ra_motor_collar_z0 + ra_motor_collar_thickness;
 
 
@@ -23,9 +25,10 @@ ra_bcbp_or = ra_bcbp_ir + ra_bcbp_thickness;
 
 ra_bcbp_ex = ra2_len + ra3_len + ra_bearing_gap;
 
+// How far above RA bearing plane before we go from ~cylinder to hemisphere.
+helmet_cyl_above_bearing = ra1_base_to_dec + dec1_radius * 1.75;
 
 ra_to_dec_bearing_plane = ra1_radius + dec2_len;
-
 
 rtp_gusset_diam = m4_washer_diam * 1.5;
 rtp_gusset_height = m4_nut_diam2;
@@ -98,3 +101,13 @@ cw_sleeve_od = dec1_diam + 2 * dec1_hat_outer_offset;
 cw_sleeve_id = dec1_diam + 2 * dec1_hat_inner_offset; // == cw_cap_diam + 0.6;
 assert(cw_sleeve_od > cw_sleeve_id + 2);
 cw_sleeve_length = 30 + dec_len_beyond_ra;
+
+
+
+
+dflt_helmet_ir=ra_bcbp_ir;
+dflt_helmet_or=ra_bcbp_or;
+dflt_dec_port_ir=dec_hoop_interior_radius;
+dflt_dec_port_or=dec_hoop_exterior_radius;
+dflt_cws_port_ir = cws_port_ir;
+dflt_cws_port_or = cws_port_or;

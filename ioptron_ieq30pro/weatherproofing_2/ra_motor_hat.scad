@@ -25,8 +25,7 @@ if ($preview) {
   translate([400, 0, 0])
     ra_motor_hat();
 } else {
-ra_motor_hat();
-
+  ra_motor_hat();
 }
 
 module ra_motor_hat(solid=false) {
