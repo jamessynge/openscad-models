@@ -23,8 +23,8 @@ use <../../utils/misc.scad>
 use <../../utils/strap.scad>
 
 // Global resolution
-$fs = $preview ? 6 : 1;
-$fa = $preview ? 6 : 1;
+$fs = $preview ? 10 : 1;
+$fa = $preview ? 10 : 1;
 
 // Default location is parked.
 lat = mount_latitude;
@@ -32,67 +32,30 @@ ra_angle = 90 + $t * 360;
 dec_angle = 90 + mount_latitude + $t * 360;
 show_arrows=true;
 
-
-
-if ($preview && false)
-translate([200, 200, 0])
-decorated_ioptron_mount(ra_angle=ra_angle,
-  dec_angle=dec_angle, latitude=lat, show_arrows=show_arrows) {
-  union() {
-    color("palegreen") ra_motor_hat();
+if (!$preview) {
+  helmet_support_at_dec_head();
+} else if (true) {
+  ra_and_dec() {
+    union() {
+      helmet_support_at_dec_head();
+      dec1_hat();
+      *cw_chin_strap_helmet_support();
+    };
+    union() {
+      // RA side of DEC bearing.
+      // color("red")dec_bearing_rain_plate();
+    };
+    union() {
+      // DEC head side of DEC bearing.
+      color("DeepSkyBlue") dec_head_bearing_cover();
+    };
+    union() {
+      // Saddle plate
+    };
   };
-  union() {
-    // // Moving side of RA bearing.
-    // difference() {
-    //   color("white")ra_basic_helmet(solid=false);
-    //   // Remove the volume needed for the DEC head and its clutch.
-
-    //   dec_clutch_void();
-
-    // }
-
-    // difference() {
-    //   translate_to_dec_bearing_plane() {
-    //     rotate([0, 180, 0])
-    //       rotate([0, 0, mount_latitude])
-    //         translate([0,0,0])
-    //           color("white")dec_bearing_hoop_attachment();
-    //   }
-    //   ra_basic_helmet(solid=true);
-    // }
-
-    helmet_support_at_dec_head();
-    dec1_hat();
-    cw_chin_strap_helmet_support();
-
-
-
-
-//    cw_chin_strap();
-
-  };
-  union() {
-    // RA side of DEC bearing.
-    // color("red")dec_bearing_rain_plate();
-  };
-  union() {
-    // DEC head side of DEC bearing.
-    color("DeepSkyBlue") dec_head_bearing_cover();
-  };
-  union() {
-    // Saddle plate
-  };
-};
-
-if ($preview) {
-  ra_and_dec();
-  dec1_hat();
-  cw_chin_strap_helmet_support();
+} else {
+  helmet_support_at_dec_head();
 }
-helmet_support_at_dec_head();
-
-
-
 
 module helmet_support_at_dec_head() {
   color("MediumAquamarine") {
@@ -110,7 +73,6 @@ module helmet_support_at_dec_head() {
     dec1_hat_nut_slots(show_gusset=true,gusset_z=30);
   }
 }
-
 
 module dec_chin_core() {
   linear_extrude(height=ra1_base_to_dec_center, convexity=3)

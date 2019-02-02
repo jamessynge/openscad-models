@@ -14,7 +14,8 @@
   it with the helmet. It would not be latitude dependent, and would not need
   to be installed (with very little room to get the screws into place, let
   alone tighten them). This does mean that the DEC clutch would be completely
-  inaccessible once the helmet is in place.
+  inaccessible once the helmet is in place. Removing the rain plate would allow
+  the DEC attachment hoop to have much thinner walls.
 
 * Place holes around the hoop support for glue-in threaded inserts; place around
   six around the whole circumference, but use a function to decide which of them

@@ -82,7 +82,7 @@ ra_and_dec($t * 360) {
   };
 };
 
-module ra_and_dec(dec_angle=0, include_polar_port=true, include_cw_shaft=true) {
+module ra_and_dec(dec_angle=0, include_polar_port=true, include_dec_head=true, include_cw_shaft=true) {
   if ($children > 4) {
     echo("ra_and_dec has", $children, "children, too many.");
     assert($children <= 4);
@@ -93,7 +93,7 @@ module ra_and_dec(dec_angle=0, include_polar_port=true, include_cw_shaft=true) {
 
   translate_to_dec12_plane() {
     // echo("ra_and_dec dec_body at angle", dec_angle);
-    dec_body(dec_angle, include_cw_shaft=include_cw_shaft) {
+    dec_body(dec_angle, include_dec_head=include_dec_head, include_cw_shaft=include_cw_shaft) {
       union() { if ($children > 1) children(1); }
       union() { if ($children > 2) children(2); }
       union() { if ($children > 3) children(3); }
@@ -167,7 +167,7 @@ module ra_to_dec_fillet() {
   }
 }
 
-module dec_body(dec_angle=0, include_cw_shaft=true) {
+module dec_body(dec_angle=0, include_dec_head=true, include_cw_shaft=true) {
   if ($children > 3) {
     echo("dec_body has", $children, "children, too many");
     assert($children <= 3);
@@ -175,7 +175,7 @@ module dec_body(dec_angle=0, include_cw_shaft=true) {
 
   // Render the "stationary" body of the DEC axis.
   rotate([180, 0, 0]) {
-    dec_body_helper(, include_cw_shaft=include_cw_shaft);
+    dec_body_helper(include_cw_shaft=include_cw_shaft);
     if ($children > 0) translate([0, 0, -dec2_len]) children(0);
   }
 
@@ -190,12 +190,16 @@ module dec_body(dec_angle=0, include_cw_shaft=true) {
 
   // Render the moving head of the DEC axis, along
   // with its two children.
-  translate([0, 0, dec2_len+dec_bearing_gap])
-    rotate([0, 0, dec_angle])
-      dec_head() {
-        union() if ($children > 1) children(1);
-        union() if ($children > 2) children(2);
+  if (include_dec_head) {
+    translate([0, 0, dec2_len+dec_bearing_gap]) {
+      rotate([0, 0, dec_angle]) {
+        dec_head() {
+          union() if ($children > 1) children(1);
+          union() if ($children > 2) children(2);
+        };
       };
+    };
+  }
 }
 
 module dec_body_helper(include_cw_shaft=true) {

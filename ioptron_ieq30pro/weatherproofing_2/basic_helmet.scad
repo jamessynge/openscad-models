@@ -43,26 +43,47 @@ show_arrows=false;
 
 if (!$preview) {
   basic_helmet();
-} else if (true) {
+} else if (false) {
   basic_helmet();
-} else {
-  rotate([0, 27, 0])
-  translate([0, -70, 0])
-  decorated_ioptron_mount(ra_angle=ra_angle,
-    dec_angle=dec_angle, latitude=lat, show_arrows=show_arrows) {
-    union() {
-      color("palegreen") ra_motor_hat();
-    };
+} else if (true) {
+  ra_and_dec() {
     union() {
       // Moving side of RA bearing.
-      color("white") basic_helmet();
+      basic_helmet();
       *dec1_hat();
       *helmet_support_at_cws();
     };
     union() {
       // RA side of DEC bearing.
       
-      color("red")dec_bearing_rain_plate();
+      *color("red")dec_bearing_rain_plate();
+    };
+    union() {
+      // DEC head side of DEC bearing.
+      *color("DeepSkyBlue") dec_head_bearing_cover();
+    };
+    union() {
+      // Saddle plate
+    };
+  };
+} else {
+  rotate([0, 27, 0])
+  translate([0, -70, 0])
+  decorated_ioptron_mount(ra_angle=ra_angle,
+    dec_angle=dec_angle, latitude=lat, show_arrows=show_arrows) {
+    union() {
+      *color("palegreen") ra_motor_hat();
+    };
+    union() {
+      // Moving side of RA bearing.
+      #basic_helmet();
+      dec1_hat();
+      *helmet_support_at_cws();
+    };
+    union() {
+      // RA side of DEC bearing.
+      
+      *color("red")dec_bearing_rain_plate();
     };
     union() {
       // DEC head side of DEC bearing.

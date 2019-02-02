@@ -32,6 +32,7 @@ dec1_hatch_offset = 0.3;
 cw_cap_diam = 68.1;  // Slightly larger than dec1_diam.
 cw_cap_height = 10;
 cw_cap_bevel_height = 5;
+cw_cap_total_height = cw_cap_height + cw_cap_bevel_height;
 
 // There is a countersink in the bottom of the DEC body to allow for the
 // counterweight shaft to screw into the body.
