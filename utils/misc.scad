@@ -12,7 +12,7 @@ translate([0,-10,0]) {
   symmetric_z_cylinder(6,20);
 }
 
-module symmetric_z_cylinder(d=undef, l=undef, r=undef, convexity=3) {
+module symmetric_z_cylinder(d=undef, l=undef, r=undef, convexity=2) {
   assert((d>0 && r==undef) || (d==undef && r>0));
   assert(l!=undef && l>0);
   translate([0,0,-l/2])
@@ -20,7 +20,14 @@ module symmetric_z_cylinder(d=undef, l=undef, r=undef, convexity=3) {
       circle(d=d, r=r);
 }
 
-
+module my_cylinder(r=undef, d=undef, r1=undef, r2=undef, h=undef, convexity=undef) {
+  assert(r == undef || r1 == undef);
+  R = r == undef ? r1 : r;
+  assert(R == undef || d == undef);
+  scale = (r1 != undef && r2 != undef) ? r2/r1 : 1;
+  linear_extrude(height=h, convexity=convexity, scale=scale)
+      circle(r=R, d=d);
+}
 
 // Helper for creating the hollow box
 // around a motor cover. Has 3 sides,
@@ -164,14 +171,6 @@ translate([-50, 0, 0]) {
   test_nut_slot_and_screw_gusset(show_gusset=true, below=true);
 }
 
-
-
-
-
-
-
-
-
 module fillet_outline(radius) {
   intersection() {
     square([radius, radius], center=false);
@@ -203,4 +202,33 @@ module annulus(d1=undef, r1=undef, d2=undef, r2=undef, solid=false) {
 module mirrored(v=undef) {
   children();
   mirror(v=v) children();
+}
+
+// From OpenSCAD documentation/examples at:
+//   https://en.wikibooks.org/wiki/OpenSCAD_User_Manual/Tips_and_Tricks#Filleting_objects
+module offset_3d(r=1, size=1e12) {
+  n = $fn==undef ? 12: $fn;
+  if(r==0) {
+    children();
+  }  else {
+    if( r>0 ) {
+      minkowski() {
+        children();
+        sphere(r, $fn=n);
+      }
+    } else {
+      size2 = size*[1,1,1];
+      size1 = size2*0.99;
+      difference() {
+        cube(size2, center=true);
+        minkowski() {
+          difference(){
+            cube(size1, center=true);
+            children();
+          }
+          sphere(-r, $fn=n);
+        }
+      }
+    }
+  }
 }

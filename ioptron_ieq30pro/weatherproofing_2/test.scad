@@ -20,153 +20,163 @@ include <../../utils/metric_dimensions.scad>
 use <../../utils/misc.scad>
 use <../../utils/strap.scad>
 
-local_helmet_avoidance_ir = ra_motor_collar_radius;
+local_helmet_avoidance_ir = dflt_helmet_ir; // ra_motor_collar_radius;
+
+helmet_walls = 10;
 
 // Global resolution
 $fs = $preview ? 10 : 1;
 $fa = $preview ? 10 : 1;
 
-*minkowski() {
-  union() {
-    ra_and_dec(include_dec_head=false, include_cw_shaft=false);
-  };
-  sphere(r=5);
+if (!$preview) {
+  helmet2();
+} else {
+  ioptron_mount(ra_angle=90) {
+    union() {*ra_motor_hat();};
+    union() {
+      // Intersection for showing how thick things are.
+      #intersection() {
+        helmet2();
+        s = 400;
+        translate([s/2, 0, 0]) cube(size=s, center=true);
+      }
+      translate([400, 0, 0]) helmet2_interior();
+    };
+  }
 }
 
-ioptron_mount() {
-  union() {};
-  #helmet_interior3();
+module helmet2() {
+  difference() {
+    helmet2_simple_solid();
+    helmet2_interior();
+
+    union() {
+      // Cut below ra_bcbp_ex.
+      s = local_helmet_avoidance_ir * 3;
+      translate([0, 0, -s/2 - ra_bcbp_ex])
+        cube(size=s, center=true);
 
 
+      translate_to_dec_bearing_plane() {
+        mirror([0, 0, 1]) {
+          // Can't be too thick between the DEC clutch and the DEC saddle
+          // screws; there is only about 1cm of space, so need to trim here.
+          z = hoop_disc_z;
+          translate([0, 0, s/2 + z]) cube(size=s, center=true);
 
+          // Cut a hole for the DEC head.
+          my_cylinder(r=dec2_radius, h=dec_head_total_height);
+        }
+      }
+
+      // Cut the CW shaft port to a reasonable length.
+      *translate_to_dec12_plane() {
+        mirror([0, 0, 1]) {
+          s = 150;
+          translate([-s/2, -s/2, dec1_len+cw_cap_height + 40]) {
+            #cube(size=s, center=false);
+          }
+        }
+      }
+    }
+  }
 }
 
+*translate([200, 200, 200]) minkowski_sphere();
 
-module helmet_interior2() {
+module minkowski_sphere() {
+  sphere(r=helmet_walls, $fn=$fn);
+}
+
+module helmet2_simple_solid() {
+  minkowski() {
+    hull() helmet2_interior_core();
+    minkowski_sphere();
+  }
+
+  cw_shaft_port_exterior();
+}
+
+module helmet2_interior() {
+  hull() helmet2_interior_core();
+
+  // We the extend below_ra_bearing part a bit further so that we
+  // can easily cut it off later without running into math problems.
+  below_ra_bearing(h_multiplier=2);
+
+  cw_shaft_port_interior();
+}
+
+module helmet2_interior_core() {
   // The volume including the RA motor and the RA motor rain plate.
   below_ra_bearing();
 
-  // See if we can sweep a semi-circle by 90 degrees and properly cover
-  // the CW shaft end of the dec body.
-  sweep_semi_circle(radius=local_helmet_avoidance_ir, angle=180);
+  // Mostly cover the ra_and_dec body, with a little poking out near the
+  // CW shaft and the motor.
+  dome_above_ra_bearing();
 
+  // The volume swept out by the DEC clutch.
+  swept_dec_clutch();
 
-  translate_to_dec_bearing_plane() {
-    // The volume swept out by the DEC clutch.
-    swept_dec_clutch();
-
-    // A fake DEC head, up to the point of the DEC rain plate.
-    short_dec_head_core();
-  }
+  // This cone adds a lot of time to the minkowski calculation.
+  // // A little cone so that we get a smooth transition to the CW shaft.
+  // cw_shaft_port_transition(h=20);
 }
 
-module helmet_interior3() {
-  hull() {
-    // The volume including the RA motor and the RA motor rain plate.
-    below_ra_bearing();
-
-    // Mostly cover the ra_and_dec body, with a little poking out near the
-    // CW shaft and the motor.
-    sweep_semi_circle(radius=local_helmet_avoidance_ir, angle=180);
-
-    translate_to_dec_bearing_plane() {
-      // The volume swept out by the DEC clutch.
-      swept_dec_clutch();
-    }
-
-
-    translate_to_dec12_plane() {
-      mirror([0, 0, 1])
-        cylinder(d=dec1_diam, h=dec1_len+cw_cap_total_height);
-    }
-  }
-
-
-  // intersection() {
-  //   union() {
-
-  //   }
-  //   s = 3 * local_helmet_avoidance_ir;
-  //   translate([0, 0, s/2])
-  //     cube(size=s, center=true);
-  // }
+module below_ra_bearing(h_multiplier=1) {
+  // We support extend below the RA bearing plane further than necessary so
+  // that we can easily cut it off later without running into math problems.
+  h = ra_bcbp_ex * h_multiplier;
+  e = 0.01;
+  translate([0, 0, -h])
+    my_cylinder(r=local_helmet_avoidance_ir, h=h+e);
 }
 
-*helmet_interior3();
-
-
-module helmet_interior2_below_axis() {
+module dome_above_ra_bearing() {
+  r=local_helmet_avoidance_ir;
+  r2 = r + 1;
   intersection() {
-    union() {
-      translate([0, 0, -(ra_bcbp_ex - 0.01)])
-        cylinder(r=local_helmet_avoidance_ir, h=ra_bcbp_ex);
-
-      // See if we can sweep a semi-circle by 90 degrees and properly cover
-      // the CW shaft end of the dec body.
-
-
-
-//      sweep_semi_circle(radius=local_helmet_avoidance_ir, angle=180);
-
-      translate_to_dec_bearing_plane() {
-        // The volume swept out by the DEC clutch.
-        swept_dec_clutch();
-      }
-    }
-    s = 3 * local_helmet_avoidance_ir;
-    translate([0, 0, -s/2])
-      cube(size=s, center=true);
-  }
-}
-*hull()helmet_interior2_below_axis();
-
-*helmet_interior2();
-
-module helmet_interior2_above_axis() {
-  intersection() {
-    union() {
-      // See if we can sweep a semi-circle by 90 degrees and properly cover
-      // the CW shaft end of the dec body.
-      sweep_semi_circle(radius=local_helmet_avoidance_ir, angle=180);
-
-    }
-    s = 3 * local_helmet_avoidance_ir;
-    translate([0, 0, s/2])
-      cube(size=s, center=true);
-  }
-      translate_to_dec_bearing_plane() {
-        // The volume swept out by the DEC clutch.
-        swept_dec_clutch();
-      }
-}
-*hull()helmet_interior2_above_axis();
-
-module below_ra_bearing() {
-  translate([0, 0, -(ra_bcbp_ex - 0.01)])
-    cylinder(r=local_helmet_avoidance_ir, h=ra_bcbp_ex);
-}
-
-module sweep_semi_circle(radius=local_helmet_avoidance_ir, angle=90) {
-  scale([1, 1, 1.42])
-  rotate([0, 0, -90])
-  rotate([90, 0, 0])
-  rotate_extrude(angle=angle) {
-    intersection() {
-      circle(r=radius);
-      w = radius + 1;
-      h = 2 * w;
-      translate([0, -w, 0]) {
-        square(size=[w, h], center=false);
-      }
-    }
+    scale([1, 1, 1.42]) sphere(r=r);
+    translate([-r2, -r2, 0]) cube(size=r2*2, center=false);
   }
 }
 
-*translate([300, 0, 0]) sweep_semi_circle();
 
+// Volume swept out by the DEC clutch as it rotates fully, and the DEC head
+// under it, plus some more to allow the hull above to cover the DEC motor.
 module swept_dec_clutch(grow=true) {
   r = dec_clutch_handle_max_height;
   r2 = grow ? r * 1.15 : r;
-  h = clutch_screw_axis_height + clutch_handle_base_diam / 2;
-  translate([0, 0, -(dec_bearing_gap + h)]) cylinder(h=h*1.7, r1=r, r2=r2);
+  h = clutch_screw_axis_height + clutch_handle_base_diam / 2 + 2;
+
+  translate_to_dec_bearing_plane() {
+    // The volume swept out by the DEC clutch.
+    translate([0, 0, -(dec_bearing_gap + h)]) my_cylinder(h=h*1.7, r1=r, r2=r2);
+  }
+}
+
+// Interior of tube surrounding the counterweight shaft as it goes through
+// the side of the helmet. Allows us room for a small disc that keeps
+// most rain from entering the helmet.
+module cw_shaft_port_interior(r=cw_shaft_diam, h=61) {
+  translate_to_dec12_plane() {
+    mirror([0, 0, 1]) {
+      translate([0, 0, dec1_len+cw_cap_height]) {
+        my_cylinder(r=r, h=h);
+      }
+    }
+  }
+}
+
+// Interior of tube surrounding the counterweight shaft as it goes through
+// the side of the helmet. Allows us room for a small disc that keeps
+// most rain from entering the helmet.
+module cw_shaft_port_exterior(r=cw_shaft_diam+helmet_walls, h=40) {
+  translate_to_dec12_plane() {
+    mirror([0, 0, 1]) {
+      translate([0, 0, dec1_len+cw_cap_height]) {
+        my_cylinder(r1=r*1.3, r2=r, h=h);
+      }
+    }
+  }
 }
