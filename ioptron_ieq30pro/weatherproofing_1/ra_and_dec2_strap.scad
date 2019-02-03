@@ -36,16 +36,16 @@ module ra_strap_at_dec2() {
   remove_for_clutch = ra_clutch_angle / 2;
 
   strap(angle=90, radius=ra1_radius, thickness=ra_ring_thickness,
-        width=ra1_base_to_dec, gusset_hole_diam=screw_hole_diam,
-        gusset_thickness=screw_hole_diam*3, gusset_length=30,
-        render_gusset_2=false);
+        width=ra1_base_to_dec, boss_hole_diam=screw_hole_diam,
+        boss_thickness=screw_hole_diam*3, boss_length=30,
+        render_boss_2=false);
 
     rotate([0, 0, 90])
       strap(angle=60, radius=ra1_radius, thickness=ra_ring_thickness,
-            width=ra1_base_to_dec + 10, gusset_hole_diam=screw_hole_diam,
-            gusset_thickness=screw_hole_diam*3, gusset_length=30,
-            render_gusset_1=false,
-            render_gusset_2=false);
+            width=ra1_base_to_dec + 10, boss_hole_diam=screw_hole_diam,
+            boss_thickness=screw_hole_diam*3, boss_length=30,
+            render_boss_1=false,
+            render_boss_2=false);
 }
 
 //module
@@ -56,8 +56,8 @@ module dec2_strap_at_ra() {
   translate_to_dec2() {
     translate([0, 0, -(dec2_len-dec2_strap_width)]) {
       strap(angle=180, radius=dec2_radius, thickness=dec2_strap_thickness,
-            width=dec2_strap_width, gusset_hole_diam=screw_hole_diam,
-            gusset_thickness=screw_hole_diam*3, gusset_length=30);
+            width=dec2_strap_width, boss_hole_diam=screw_hole_diam,
+            boss_thickness=screw_hole_diam*3, boss_length=30);
     }
   }
 }

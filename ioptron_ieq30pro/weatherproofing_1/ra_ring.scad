@@ -31,12 +31,12 @@ module ra_ring_profile() {
       ]);
 }
 
-module dec_motor_cover_strap(expansion_gap=1, gusset_length=strap_gusset_length) {
+module dec_motor_cover_strap(expansion_gap=1, boss_length=strap_boss_length) {
   narrows_to = dec2_radius + 3;
 
   difference() {
     union() {
-      dmcc_strap_gussets(gusset_length=gusset_length);
+      dmcc_strap_bosses(boss_length=boss_length);
       intersection() {
         $fn=100;
         difference() {
@@ -63,20 +63,20 @@ module dec_motor_cover_strap(expansion_gap=1, gusset_length=strap_gusset_length)
   }
 }
 
-module dmcc_strap_gusset(gx=10, gy=10, gusset_length=30) {
+module dmcc_strap_boss(gx=10, gy=10, boss_length=30) {
   gx = shell2_outside_x - dec2_radius;
   gy = shell2_depth;
   gd = bolt_diam;
 
   translate([-shell2_outside_x,0,0])
     rotate([90,0,0]) {
-      screw_gusset(gx, gy, gusset_length, gd);
+      screw_boss(gx, gy, boss_length, gd);
     }
 }
 
-translate([0, 150, 0]) dmcc_strap_gussets();
+translate([0, 150, 0]) dmcc_strap_bosses();
 
-module dmcc_strap_gussets(gusset_length=30) {
-  dmcc_strap_gusset(gusset_length=gusset_length);
-  mirror([1,0,0]) dmcc_strap_gusset(gusset_length=gusset_length);
+module dmcc_strap_bosses(boss_length=30) {
+  dmcc_strap_boss(boss_length=boss_length);
+  mirror([1,0,0]) dmcc_strap_boss(boss_length=boss_length);
 }

@@ -18,7 +18,7 @@ use <../../utils/cut.scad>
 include <../../utils/metric_dimensions.scad>
 use <../../utils/misc.scad>
 use <../../utils/strap.scad>
-use <../../utils/paired_gussets.scad>
+use <../../utils/paired_bosses.scad>
 
 // Global resolution
 $fs = $preview ? 6 : 1;
@@ -38,8 +38,8 @@ dflt_dec_port_ir=dec_hoop_interior_radius;
 dflt_dec_port_or=dec_hoop_exterior_radius;
 dflt_cws_port_d=cw_shaft_diam*2;
 
-rtp_diam = rtp_gusset_diam;
-rtp_height = rtp_gusset_height;
+rtp_diam = rtp_boss_diam;
+rtp_height = rtp_boss_height;
 
 
 distance = 40 * (cos($t*360) + 1);
@@ -146,9 +146,9 @@ module half_helmet(nut_side=true) {
     } else {
       basic_helmet_screw_side();
     }
-    gussets(solid=true, nut_side=nut_side);
+    bosses(solid=true, nut_side=nut_side);
   }
-  gussets(solid=false, nut_side=nut_side);
+  bosses(solid=false, nut_side=nut_side);
 }
 
 module basic_helmet_nut_side() {
@@ -203,31 +203,31 @@ module half_basic_helmet(nut_side=true, helmet_ir=dflt_helmet_ir, helmet_or=dflt
 }
 
 
-module gussets(solid=false, nut_side=true) {
+module bosses(solid=false, nut_side=true) {
   // At the bottom of the cut on the CW shaft side of the helmet.
-  gussets_below_cw_port(solid=solid, nut_side=nut_side);
+  bosses_below_cw_port(solid=solid, nut_side=nut_side);
   // Below and above the counterweight port.
-  gussets_around_cw_port(
+  bosses_around_cw_port(
       solid=solid, nut_side=nut_side, do_intersect=!solid,
       z=ra1_base_to_dec_center-(dflt_cws_port_d+rtp_diam)/2 - 3,
       angle=15);
-  gussets_around_cw_port(
+  bosses_around_cw_port(
       solid=solid, nut_side=nut_side, do_intersect=!solid,
       z=ra1_base_to_dec_center+(dflt_cws_port_d+rtp_diam)/2 + 3,
       angle=15);
   // At the top.
-  gussets_around_hemisphere(
+  bosses_around_hemisphere(
       solid=solid, nut_side=nut_side, do_intersect=!solid, hemi_angle=0, angle=15);
   // Near DEC port, and opposite side.
   mirrored([0, 1, 0])
-    gussets_around_hemisphere(
+    bosses_around_hemisphere(
         solid=solid, nut_side=nut_side, do_intersect=!solid, hemi_angle=-45, angle=15);
 }
 
-// Gusset at the bottom rim, below the CW shaft port.
-module gussets_below_cw_port(solid=false, nut_side=true, do_intersect=false) {
+// Boss at the bottom rim, below the CW shaft port.
+module bosses_below_cw_port(solid=false, nut_side=true, do_intersect=false) {
   nut_slot_angle=90;
-  gusset_height=35;
+  boss_height=35;
   r1=dflt_helmet_ir;
   r2=dflt_helmet_or;
   // 30mm from screw head to center of nut, so a 40mm screw will work.
@@ -239,9 +239,9 @@ module gussets_below_cw_port(solid=false, nut_side=true, do_intersect=false) {
   intersection() {
     translate([0, -(r1+rtp_diam/2), -ra_bcbp_ex+rtp_diam/2]) {
       rotate([0, 90, 0]) {
-        matching_rect_m4_slotted_gussets(
+        matching_rect_m4_slotted_bosses(
             nut_side=nut_side, nut_slot_angle=nut_slot_angle,
-            nut_depth=nut_depth, screw_extension=screw_extension, gusset_height=gusset_height,
+            nut_depth=nut_depth, screw_extension=screw_extension, boss_height=boss_height,
             screw_head_depth=screw_head_depth, screw_head_recess=screw_head_recess,
             solid=solid);
       }
@@ -252,7 +252,7 @@ module gussets_below_cw_port(solid=false, nut_side=true, do_intersect=false) {
   }
 }
 
-module gussets_around_cw_port(solid=false, nut_side=true, do_intersect=false, angle=0, z=undef) {
+module bosses_around_cw_port(solid=false, nut_side=true, do_intersect=false, angle=0, z=undef) {
   r1=dflt_helmet_ir;
   r2=dflt_helmet_or;
   nut_depth=15;
@@ -264,7 +264,7 @@ module gussets_around_cw_port(solid=false, nut_side=true, do_intersect=false, an
   intersection() {
     translate([0, -r1+h*1.25, z]) {
       rotate([0, 90, 0]) {
-       matching_rtp_m4_recessed_gussets(
+       matching_rtp_m4_recessed_bosses(
             d=rtp_diam, h=h,
             nut_side=nut_side, angle=angle,
             nut_depth=nut_depth,
@@ -280,7 +280,7 @@ module gussets_around_cw_port(solid=false, nut_side=true, do_intersect=false, an
 }
 
 
-module gussets_around_hemisphere(solid=false, nut_side=true, do_intersect=false, hemi_angle=undef, angle=0) {
+module bosses_around_hemisphere(solid=false, nut_side=true, do_intersect=false, hemi_angle=undef, angle=0) {
   r1=dflt_helmet_ir;
   r2=dflt_helmet_or;
   nut_depth=15;
@@ -300,7 +300,7 @@ module gussets_around_hemisphere(solid=false, nut_side=true, do_intersect=false,
       translate([0, 0, dflt_helmet_ir-10]) {
         rotate([270, 0, 0]) {
           rotate([0, 90, 0]) {
-            matching_rtp_m4_recessed_gussets(
+            matching_rtp_m4_recessed_bosses(
                 d=rtp_diam, h=h,
                 nut_side=nut_side, angle=angle,
                 nut_depth=nut_depth,
@@ -322,43 +322,43 @@ module gussets_around_hemisphere(solid=false, nut_side=true, do_intersect=false,
 
 
 
-module matching_rtp_m4_recessed_gussets(nut_side=undef, d=rtp_diam, h=rtp_height, nut_depth=undef, angle=0, screw_head_depth=undef, screw_head_recess=undef, solid=false) {
-  matching_m4_recessed_gussets(
-      solid=solid, show_nut_gusset=nut_side, show_screw_gusset=!nut_side,
+module matching_rtp_m4_recessed_bosses(nut_side=undef, d=rtp_diam, h=rtp_height, nut_depth=undef, angle=0, screw_head_depth=undef, screw_head_recess=undef, solid=false) {
+  matching_m4_recessed_bosses(
+      solid=solid, show_nut_boss=nut_side, show_screw_boss=!nut_side,
       nut_depth=nut_depth, screw_head_depth=screw_head_depth,
       screw_head_recess=screw_head_recess) {
     round_top_pyramid(d, h, angle=angle);
   }
 }
 
-module matching_rtp_m4_slotted_gussets(nut_side=undef, h=rtp_height, angle=0, nut_slot_angle=undef, nut_depth=undef, screw_extension=undef, gusset_height=undef, screw_head_depth=undef, screw_head_recess=undef, solid=false) {
-  matching_m4_slotted_gussets(
-      solid=solid, show_nut_gusset=nut_side, show_screw_gusset=!nut_side,
+module matching_rtp_m4_slotted_bosses(nut_side=undef, h=rtp_height, angle=0, nut_slot_angle=undef, nut_depth=undef, screw_extension=undef, boss_height=undef, screw_head_depth=undef, screw_head_recess=undef, solid=false) {
+  matching_m4_slotted_bosses(
+      solid=solid, show_nut_boss=nut_side, show_screw_boss=!nut_side,
       nut_slot_angle=nut_slot_angle, nut_depth=nut_depth,
       screw_extension=screw_extension,
-      gusset_height=gusset_height,
+      boss_height=boss_height,
       screw_head_depth=screw_head_depth, screw_head_recess=screw_head_recess) {
     round_top_pyramid(diam=rtp_diam, height=h, angle=angle);
   }
 }
 
-module matching_circular_m4_slotted_gussets(nut_side=undef, d=rtp_diam, angle=0, nut_slot_angle=undef, nut_depth=undef, screw_extension=undef, gusset_height=undef, screw_head_depth=undef, screw_head_recess=undef, solid=false) {
-  matching_m4_slotted_gussets(
-      solid=solid, show_nut_gusset=nut_side, show_screw_gusset=!nut_side,
+module matching_circular_m4_slotted_bosses(nut_side=undef, d=rtp_diam, angle=0, nut_slot_angle=undef, nut_depth=undef, screw_extension=undef, boss_height=undef, screw_head_depth=undef, screw_head_recess=undef, solid=false) {
+  matching_m4_slotted_bosses(
+      solid=solid, show_nut_boss=nut_side, show_screw_boss=!nut_side,
       nut_slot_angle=nut_slot_angle, nut_depth=nut_depth,
       screw_extension=screw_extension,
-      gusset_height=gusset_height,
+      boss_height=boss_height,
       screw_head_depth=screw_head_depth, screw_head_recess=screw_head_recess) {
     circle(d=d);
   }
 }
 
-module matching_rect_m4_slotted_gussets(nut_side=undef, w=rtp_diam, h=rtp_diam, nut_slot_angle=undef, nut_depth=undef, screw_extension=undef, gusset_height=undef, screw_head_depth=undef, screw_head_recess=undef, solid=false) {
-  matching_m4_slotted_gussets(
-      solid=solid, show_nut_gusset=nut_side, show_screw_gusset=!nut_side,
+module matching_rect_m4_slotted_bosses(nut_side=undef, w=rtp_diam, h=rtp_diam, nut_slot_angle=undef, nut_depth=undef, screw_extension=undef, boss_height=undef, screw_head_depth=undef, screw_head_recess=undef, solid=false) {
+  matching_m4_slotted_bosses(
+      solid=solid, show_nut_boss=nut_side, show_screw_boss=!nut_side,
       nut_slot_angle=nut_slot_angle, nut_depth=nut_depth,
       screw_extension=screw_extension,
-      gusset_height=gusset_height,
+      boss_height=boss_height,
       screw_head_depth=screw_head_depth, screw_head_recess=screw_head_recess) {
     square(size=[w, h], center=true);
   }

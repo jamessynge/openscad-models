@@ -67,10 +67,10 @@ module helmet_support_at_dec_head() {
         helmet_interior(inner_offset=0.1);
       }
       ra_and_dec(include_cw_shaft=false);
-      dec1_hat_nut_slots(show_gusset=false);
-      dec1_hat_nut_slots(show_gusset=true,gusset_z=100);
+      dec1_hat_nut_slots(show_boss=false);
+      dec1_hat_nut_slots(show_boss=true,boss_z=100);
     }
-    dec1_hat_nut_slots(show_gusset=true,gusset_z=30);
+    dec1_hat_nut_slots(show_boss=true,boss_z=30);
   }
 }
 

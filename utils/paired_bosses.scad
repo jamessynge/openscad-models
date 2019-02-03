@@ -14,10 +14,10 @@
 //    Width across the flat faces of a hex nut.
 // nut_height
 //    Height / thickness of the nut.
-// nut_gusset_diam
+// nut_boss_diam
 //    Diameter of the body that holds the nut.
 // nut_recess
-//    How far below the surface of the gusset the nut is recessed. Typically
+//    How far below the surface of the boss the nut is recessed. Typically
 //    zero to a few millimeters.
 // nut_depth
 //    Distance from parting plane (z=0 in this model) to the start of the nut.
@@ -27,7 +27,7 @@
 // screw_head_depth
 //    Distance from parting plane (z=0 in this model) to the start of the head.
 // screw_head_recess
-//    How far below the surface of the gusset the head is recessed.
+//    How far below the surface of the boss the head is recessed.
 //    Must be >= 0.
 
 include <metric_dimensions.scad>
@@ -39,7 +39,7 @@ $fa = $preview ? 5 : 1;
 
 ////////////////////////////////////////////////////////////////////////////////
 
-module gusset_alignment_cone(solid=false, screw_hole_diam=undef, cone_height=undef, cone_diam1=undef, cone_diam2=undef, cone_fn=undef) {
+module boss_alignment_cone(solid=false, screw_hole_diam=undef, cone_height=undef, cone_diam1=undef, cone_diam2=undef, cone_fn=undef) {
   assert(cone_height > 0);
   assert(cone_diam1 > 0);
   assert(cone_diam2 > 0);
@@ -56,14 +56,14 @@ module gusset_alignment_cone(solid=false, screw_hole_diam=undef, cone_height=und
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-// Creates a screw gusset, but this module only has the code for the inside of
-// the gusset, the outside 2D profile must be passed in as the first and only
+// Creates a screw boss, but this module only has the code for the inside of
+// the boss, the outside 2D profile must be passed in as the first and only
 // child.
 // We assume here that the outer profile is large enough to support the screw
 // head or washer, and to enclose the hole for the screw head/washer, if
 // screw_head_recess>0.
 
-module generic_screw_gusset(
+module generic_screw_boss(
     solid=false, screw_hole_diam=undef, screw_head_diam=0, washer_diam=0,
     screw_head_recess=0, screw_head_depth=undef, screw_head_scale_factor=1.02,
     cone_height=0, cone_diam1=undef, cone_diam2=undef, cone_fn=undef) {
@@ -106,30 +106,30 @@ module generic_screw_gusset(
       // solid.
       if (cone_height < 0 && !solid) {
         translate([0, 0, -0.001])
-          gusset_alignment_cone(
+          boss_alignment_cone(
               solid=true, cone_height=-cone_height, cone_diam1=cone_diam1,
               cone_diam2=cone_diam2, cone_fn=cone_fn);
       }
     }
   }
   if (cone_height > 0) {
-    gusset_alignment_cone(
+    boss_alignment_cone(
         solid=solid, screw_hole_diam=screw_hole_diam,
         cone_height=cone_height, cone_diam1=cone_diam1,
         cone_diam2=cone_diam2, cone_fn=cone_fn);
   }
 }
 
-module example_generic_screw_gusset(solid=false) {
+module example_generic_screw_boss(solid=false) {
   // Without recess or alignment cone.
-  generic_screw_gusset(
+  generic_screw_boss(
     solid=solid, screw_hole_diam=m4_hole_diam, washer_diam=m4_washer_diam,
     screw_head_depth=10) {
     circle(d=m4_washer_diam);
   }
   // With alignment cone.
   translate([0, -30, 0])
-  generic_screw_gusset(
+  generic_screw_boss(
     solid=solid, screw_hole_diam=m4_hole_diam, washer_diam=m4_washer_diam,
     screw_head_depth=15,
     cone_height=5, cone_diam1=m4_hole_diam*2.25,
@@ -138,7 +138,7 @@ module example_generic_screw_gusset(solid=false) {
   }
   // With recess and alignment cone.
   translate([0, -60, 0])
-  generic_screw_gusset(
+  generic_screw_boss(
     solid=solid, screw_hole_diam=m4_hole_diam, washer_diam=m4_washer_diam,
     screw_head_depth=15, screw_head_recess=5,
     cone_height=-5, cone_diam1=m4_hole_diam*2.25,
@@ -150,19 +150,19 @@ module example_generic_screw_gusset(solid=false) {
 // Example:
 translate([0, -30, 0])
   color("red")
-    example_generic_screw_gusset(solid=false);
+    example_generic_screw_boss(solid=false);
 
 translate([30, -30, 0])
   color("red")
-    example_generic_screw_gusset(solid=true);
+    example_generic_screw_boss(solid=true);
 
 ////////////////////////////////////////////////////////////////////////////////
-// Creates a nut gusset for holding a nut in a recessed hole), but
+// Creates a nut boss for holding a nut in a recessed hole), but
 // the outside 2D profile must be passed in as the first and only child.
 // We assume here that the outer profile is large enough to enclose the nut with
 // enough material so that the rotary forces on the nut don't break through the
 // walls.
-module generic_recessed_nut_gusset(
+module generic_recessed_nut_boss(
     solid=false, screw_hole_diam=undef, nut_hex_diam=undef, nut_height=undef,
     nut_recess=0, nut_depth=0, nut_hole_scale_factor=1.02,
     cone_height=0, cone_diam1=undef, cone_diam2=undef, cone_fn=undef) {
@@ -192,7 +192,7 @@ module generic_recessed_nut_gusset(
       // solid.
       if (cone_height < 0 && !solid) {
         translate([0, 0, -0.001])
-          gusset_alignment_cone(
+          boss_alignment_cone(
               solid=true, cone_height=-cone_height, cone_diam1=cone_diam1,
               cone_diam2=cone_diam2, cone_fn=cone_fn);
       }
@@ -208,7 +208,7 @@ module generic_recessed_nut_gusset(
   }
   if (cone_height > 0) {
     mirror([0, 0, 1]) {
-      gusset_alignment_cone(
+      boss_alignment_cone(
           solid=solid, screw_hole_diam=screw_hole_diam,
           cone_height=cone_height, cone_diam1=cone_diam1,
           cone_diam2=cone_diam2, cone_fn=cone_fn);
@@ -216,9 +216,9 @@ module generic_recessed_nut_gusset(
   }
 }
 
-module example_generic_recessed_nut_gusset(solid=false) {
+module example_generic_recessed_nut_boss(solid=false) {
   // Without extra recess or alignment cone.
-  generic_recessed_nut_gusset(
+  generic_recessed_nut_boss(
     solid=solid, screw_hole_diam=m4_hole_diam, nut_hex_diam=m4_nut_diam1,
     nut_height=m4_nut_height, nut_depth=12) {
     square(size=m4_nut_diam2*1.5, center=true);
@@ -226,7 +226,7 @@ module example_generic_recessed_nut_gusset(solid=false) {
 
   // With alignment cone.
   translate([0, 30, 0])
-  generic_recessed_nut_gusset(
+  generic_recessed_nut_boss(
     solid=solid, screw_hole_diam=m4_hole_diam, nut_hex_diam=m4_nut_diam1,
     nut_height=m4_nut_height, nut_depth=12,
     cone_height=5, cone_diam1=m4_hole_diam*2.25,
@@ -235,7 +235,7 @@ module example_generic_recessed_nut_gusset(solid=false) {
   }
   // With extra recess and alignment hole.
   translate([0, 60, 0])
-  generic_recessed_nut_gusset(
+  generic_recessed_nut_boss(
     solid=solid, screw_hole_diam=m4_hole_diam, nut_hex_diam=m4_nut_diam1,
     nut_height=m4_nut_height, nut_recess=m4_nut_height*0.1, nut_depth=12,
     cone_height=-5, cone_diam1=m4_hole_diam*2.25,
@@ -247,22 +247,22 @@ module example_generic_recessed_nut_gusset(solid=false) {
 // Example:
 translate([0, 30, 0])
   color("skyblue")
-    example_generic_recessed_nut_gusset(solid=false);
+    example_generic_recessed_nut_boss(solid=false);
 
 translate([30, 30, 0])
   color("skyblue")
-    example_generic_recessed_nut_gusset(solid=true);
+    example_generic_recessed_nut_boss(solid=true);
 
 
 ////////////////////////////////////////////////////////////////////////////////
-// Creates a nut gusset for holding a nut in a slotted hole), but
+// Creates a nut boss for holding a nut in a slotted hole), but
 // the outside 2D profile must be passed in as the first and only child.
 // We assume here that the outer profile is large enough to enclose the nut with
 // enough material so that the rotary forces on the nut don't break through the
 // walls.
 
-module generic_slotted_nut_gusset(
-    solid=false, screw_hole_diam=undef, gusset_height=undef, nut_depth=0, screw_extension=0,
+module generic_slotted_nut_boss(
+    solid=false, screw_hole_diam=undef, boss_height=undef, nut_depth=0, screw_extension=0,
     nut_hex_diam=undef, nut_height=undef, nut_hole_scale_factor=1.02,
     slot_depth=undef, nut_diam_to_slot_depth_multiplier=3, nut_slot_angle=0,
     cone_height=0, cone_diam1=undef, cone_diam2=undef, cone_fn=undef) {
@@ -286,13 +286,13 @@ module generic_slotted_nut_gusset(
   total_height = nut_depth + nut_height + screw_extension;
   nut_height_extra = nut_height_final - nut_height;
 
-  assert(gusset_height >= nut_depth + nut_height_final);
+  assert(boss_height >= nut_depth + nut_height_final);
   slot_depth_final =
     slot_depth>0 ? slot_depth :
       nut_rnd_diam*nut_diam_to_slot_depth_multiplier;
 
   difference() {
-    linear_extrude(height=gusset_height, convexity=3) {
+    linear_extrude(height=boss_height, convexity=3) {
       children(0);
     }
     if (!solid) {
@@ -313,7 +313,7 @@ module generic_slotted_nut_gusset(
       // Make alignment hole if cone_height < 0.
       if (cone_height < 0) {
         translate([0, 0, -0.001])
-          gusset_alignment_cone(
+          boss_alignment_cone(
               solid=true, cone_height=-cone_height, cone_diam1=cone_diam1,
               cone_diam2=cone_diam2, cone_fn=cone_fn);
       }
@@ -321,7 +321,7 @@ module generic_slotted_nut_gusset(
   }
   if (cone_height > 0) {
     mirror([0, 0, 1]) {
-      gusset_alignment_cone(
+      boss_alignment_cone(
           solid=solid, screw_hole_diam=screw_hole_diam,
           cone_height=cone_height, cone_diam1=cone_diam1,
           cone_diam2=cone_diam2, cone_fn=cone_fn);
@@ -329,7 +329,7 @@ module generic_slotted_nut_gusset(
   }
   if (solid) {
     // Include the nut slot so that it will be removed from the body from which
-    // this whole gusset is being removed.
+    // this whole boss is being removed.
     translate([0, 0, nut_depth - nut_height_extra / 2]) {
       the_nut_slot(
           nut_height=nut_height_final, nut_slot_angle=nut_slot_angle,
@@ -348,7 +348,7 @@ module the_nut_slot(nut_height=undef, nut_slot_angle=undef, nut_hex_diam=undef, 
   }
 }
 
-module example_generic_slotted_nut_gusset(solid=false) {
+module example_generic_slotted_nut_boss(solid=false) {
 
     // solid=false, screw_hole_diam=undef, nut_depth=0, screw_extension=0,
     // nut_hex_diam=undef, nut_height=undef, nut_hole_scale_factor=1.02,
@@ -356,16 +356,16 @@ module example_generic_slotted_nut_gusset(solid=false) {
     // cone_height=0, cone_diam1=undef, cone_diam2=undef, cone_fn=undef) {
 
   // Without recess or alignment cone.
-  generic_slotted_nut_gusset(
-    solid=solid, screw_hole_diam=m4_hole_diam, gusset_height=20, nut_depth=12,
+  generic_slotted_nut_boss(
+    solid=solid, screw_hole_diam=m4_hole_diam, boss_height=20, nut_depth=12,
     screw_extension=10, nut_hex_diam=m4_nut_diam1, nut_height=m4_nut_height) {
     square(size=m4_nut_diam2*1.5, center=true);
   }
 
   // With alignment cone.
   translate([0, 30, 0])
-    generic_slotted_nut_gusset(
-      solid=solid, screw_hole_diam=m4_hole_diam, gusset_height=20, nut_depth=12,
+    generic_slotted_nut_boss(
+      solid=solid, screw_hole_diam=m4_hole_diam, boss_height=20, nut_depth=12,
       screw_extension=10, nut_hex_diam=m4_nut_diam1, nut_height=m4_nut_height,
       nut_slot_angle=45,
       cone_height=5, cone_diam1=m4_hole_diam*2.25, cone_diam2=m4_hole_diam*1.75) {
@@ -374,8 +374,8 @@ module example_generic_slotted_nut_gusset(solid=false) {
 
   // With alignment hole.
   translate([0, 60, 0])
-    generic_slotted_nut_gusset(
-      solid=solid, screw_hole_diam=m4_hole_diam, gusset_height=20, nut_depth=12,
+    generic_slotted_nut_boss(
+      solid=solid, screw_hole_diam=m4_hole_diam, boss_height=20, nut_depth=12,
       screw_extension=10, nut_hex_diam=m4_nut_diam1, nut_height=m4_nut_height,
       nut_slot_angle=270,
       cone_height=-5, cone_diam1=m4_hole_diam*2.25, cone_diam2=m4_hole_diam*1.75) {
@@ -386,25 +386,25 @@ module example_generic_slotted_nut_gusset(solid=false) {
 // Example:
 translate([60, -90, 0])
   color("palegreen")
-    example_generic_slotted_nut_gusset(solid=false);
+    example_generic_slotted_nut_boss(solid=false);
 
 translate([90, -90, 0])
   color("palegreen")
-    example_generic_slotted_nut_gusset(solid=true);
+    example_generic_slotted_nut_boss(solid=true);
 
 ////////////////////////////////////////////////////////////////////////////////
-// matching_m4_recessed_gussets creates a pair of a recessed nut gusset and a screw
-// gusset for a screw on the z-axis (i.e. x=0, y=0), with the nut on the
+// matching_m4_recessed_bosses creates a pair of a recessed nut boss and a screw
+// boss for a screw on the z-axis (i.e. x=0, y=0), with the nut on the
 // z>0 side. A single child must be provided with a 2D profile that can be
-// extruded to be the outer surface of the gussets.
+// extruded to be the outer surface of the bosses.
 
-module matching_m4_recessed_gussets(show_nut_gusset=true, show_screw_gusset=true, nut_depth=6, screw_head_depth=15, screw_head_recess=45, solid=false) {
+module matching_m4_recessed_bosses(show_nut_boss=true, show_screw_boss=true, nut_depth=6, screw_head_depth=15, screw_head_recess=45, solid=false) {
   assert($children == 1);
   cone_height = 5;
   cone_diam1 = m4_hole_diam*2.25;
   cone_diam2 = m4_hole_diam*1.75;
-  if (show_nut_gusset) {
-    generic_recessed_nut_gusset(
+  if (show_nut_boss) {
+    generic_recessed_nut_boss(
         solid=solid, screw_hole_diam=m4_hole_diam, nut_hex_diam=m4_nut_diam1,
         nut_height=m4_nut_height, nut_depth=nut_depth+max(0, -cone_height),
         cone_height=-(cone_height+.1), cone_diam1=cone_diam1+.1,
@@ -412,8 +412,8 @@ module matching_m4_recessed_gussets(show_nut_gusset=true, show_screw_gusset=true
       children(0);
     }
   }
-  if (show_screw_gusset) {
-    generic_screw_gusset(
+  if (show_screw_boss) {
+    generic_screw_boss(
         solid=solid, screw_hole_diam=m4_hole_diam, washer_diam=m4_washer_diam,
         screw_head_depth=screw_head_depth, screw_head_recess=screw_head_recess,
         cone_height=cone_height-.1, cone_diam1=cone_diam1-.1, cone_diam2=cone_diam2-.1) {
@@ -423,19 +423,19 @@ module matching_m4_recessed_gussets(show_nut_gusset=true, show_screw_gusset=true
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-// matching_m4_slotted_gussets creates a pair of a slotted nut gusset and a screw gusset for a screw
+// matching_m4_slotted_bosses creates a pair of a slotted nut boss and a screw boss for a screw
 // on the z-axis (i.e. x=0, y=0), with the nut on the z>0 side.
 // A single child must be provided with a 2D profile that can be extruded to
-// be the outer surface of the gussets.
-module matching_m4_slotted_gussets(show_nut_gusset=true, show_screw_gusset=true, nut_slot_angle=0, nut_depth=6, screw_extension=10, gusset_height=20, screw_head_depth=15, screw_head_recess=45, solid=false) {
+// be the outer surface of the bosses.
+module matching_m4_slotted_bosses(show_nut_boss=true, show_screw_boss=true, nut_slot_angle=0, nut_depth=6, screw_extension=10, boss_height=20, screw_head_depth=15, screw_head_recess=45, solid=false) {
   assert($children == 1);
   assert(nut_depth > -cone_height);  // If have a hole, must not go too deep.
   cone_height = 5;
   cone_diam1 = m4_hole_diam*2.25;
   cone_diam2 = m4_hole_diam*1.75;
-  if (show_nut_gusset) {
-    generic_slotted_nut_gusset(
-        solid=solid, screw_hole_diam=m4_hole_diam, gusset_height=gusset_height, nut_depth=nut_depth,
+  if (show_nut_boss) {
+    generic_slotted_nut_boss(
+        solid=solid, screw_hole_diam=m4_hole_diam, boss_height=boss_height, nut_depth=nut_depth,
         screw_extension=screw_extension, nut_hex_diam=m4_nut_diam1, nut_height=m4_nut_height,
         nut_slot_angle=nut_slot_angle,
         cone_height=-(cone_height+.1), cone_diam1=cone_diam1+.1,
@@ -443,8 +443,8 @@ module matching_m4_slotted_gussets(show_nut_gusset=true, show_screw_gusset=true,
       children(0);
     }
   }
-  if (show_screw_gusset) {
-    generic_screw_gusset(
+  if (show_screw_boss) {
+    generic_screw_boss(
         solid=solid, screw_hole_diam=m4_hole_diam, washer_diam=m4_washer_diam,
         screw_head_depth=screw_head_depth, screw_head_recess=screw_head_recess,
         cone_height=cone_height-.1, cone_diam1=cone_diam1-.1, cone_diam2=cone_diam2-.1) {
@@ -510,20 +510,20 @@ module round_top_pyramid(diam=undef, height=undef, angle=20) {
 
 
 
-// module round_nut_gusset(solid=false, nut_gusset_diam=undef, screw_hole_diam=undef, nut_hex_diam=undef, nut_height=undef, nut_recess=0, nut_depth=undef) {
-//   generic_recessed_nut_gusset(solid=solid, screw_hole_diam=screw_hole_diam, nut_hex_diam=nut_hex_diam, nut_height=nut_height, nut_recess=nut_recess, nut_depth=nut_depth) {
-//     circle(d=nut_gusset_diam);
+// module round_nut_boss(solid=false, nut_boss_diam=undef, screw_hole_diam=undef, nut_hex_diam=undef, nut_height=undef, nut_recess=0, nut_depth=undef) {
+//   generic_recessed_nut_boss(solid=solid, screw_hole_diam=screw_hole_diam, nut_hex_diam=nut_hex_diam, nut_height=nut_height, nut_recess=nut_recess, nut_depth=nut_depth) {
+//     circle(d=nut_boss_diam);
 //   }
 // }
 // // Example:
 // color("red") {
-//   round_nut_gusset(
-//     solid=false, nut_gusset_diam=2*m4_nut_diam1, screw_hole_diam=m4_hole_diam,
+//   round_nut_boss(
+//     solid=false, nut_boss_diam=2*m4_nut_diam1, screw_hole_diam=m4_hole_diam,
 //     nut_hex_diam=m4_nut_diam1, nut_height=m4_nut_height, nut_recess=1,
 //     nut_depth=10);
 //   translate([0, 20, 0])
-//     round_nut_gusset(
-//       solid=true, nut_gusset_diam=2*m4_nut_diam1, screw_hole_diam=m4_hole_diam, nut_hex_diam=m4_nut_diam1,
+//     round_nut_boss(
+//       solid=true, nut_boss_diam=2*m4_nut_diam1, screw_hole_diam=m4_hole_diam, nut_hex_diam=m4_nut_diam1,
 //       nut_height=m4_nut_height, nut_recess=1,
 //       nut_depth=10);
 // }
@@ -533,26 +533,26 @@ module round_top_pyramid(diam=undef, height=undef, angle=20) {
 //         nut_height=m4_nut_height);
 
 
-// module round_top_nut_gusset(
-//   solid=false, nut_gusset_diam=undef, nut_gusset_height=undef, screw_hole_diam=undef, nut_hex_diam=undef, nut_height=undef, nut_recess=0, nut_depth=undef) {
-//   generic_recessed_nut_gusset(solid=solid, screw_hole_diam=screw_hole_diam, nut_hex_diam=nut_hex_diam, nut_height=nut_height, nut_recess=nut_recess, nut_depth=nut_depth) {
+// module round_top_nut_boss(
+//   solid=false, nut_boss_diam=undef, nut_boss_height=undef, screw_hole_diam=undef, nut_hex_diam=undef, nut_height=undef, nut_recess=0, nut_depth=undef) {
+//   generic_recessed_nut_boss(solid=solid, screw_hole_diam=screw_hole_diam, nut_hex_diam=nut_hex_diam, nut_height=nut_height, nut_recess=nut_recess, nut_depth=nut_depth) {
 //     union() {
-//       circle(d=nut_gusset_diam);
-//       translate([-nut_gusset_diam/2, -nut_gusset_height, 0])
-//         square(size=[nut_gusset_diam, nut_gusset_height]);
+//       circle(d=nut_boss_diam);
+//       translate([-nut_boss_diam/2, -nut_boss_height, 0])
+//         square(size=[nut_boss_diam, nut_boss_height]);
 //     }
 //   }
 // }
 // // Example:
 // translate([30, 0, 0]) color("green") {
-//   round_top_nut_gusset(
-//     solid=false, nut_gusset_diam=12, nut_gusset_height=12,
+//   round_top_nut_boss(
+//     solid=false, nut_boss_diam=12, nut_boss_height=12,
 //     screw_hole_diam=m4_hole_diam, nut_hex_diam=m4_nut_diam1,
 //     nut_height=m4_nut_height, nut_recess=-.1, nut_depth=12);
 
 //   translate([0, 30, 0])
-//     round_top_nut_gusset(
-//       solid=true, nut_gusset_diam=12, nut_gusset_height=12,
+//     round_top_nut_boss(
+//       solid=true, nut_boss_diam=12, nut_boss_height=12,
 //       screw_hole_diam=m4_hole_diam, nut_hex_diam=m4_nut_diam1,
 //       nut_height=m4_nut_height, nut_recess=1, nut_depth=12);
 // }
@@ -563,8 +563,8 @@ module round_top_pyramid(diam=undef, height=undef, angle=20) {
 
 // ////////////////////////////////////////////////////////////////////////////////
 
-// module nut_gusset_alignment_hole(cone_height=undef, cone_diam1=undef, cone_diam2=undef, cone_fn=undef) {
-//   gusset_alignment_cone(
+// module nut_boss_alignment_hole(cone_height=undef, cone_diam1=undef, cone_diam2=undef, cone_fn=undef) {
+//   boss_alignment_cone(
 //     solid=true, cone_height=cone_height,
 //     cone_diam1=cone_diam1, cone_diam2=cone_diam2, cone_fn=cone_fn);
 // }
@@ -572,23 +572,23 @@ module round_top_pyramid(diam=undef, height=undef, angle=20) {
 // // Example:
 // translate([60, 0, 0]) color("orange") {
 //   difference() {
-//     round_nut_gusset(
-//       solid=false, nut_gusset_diam=4*m4_nut_diam1, screw_hole_diam=m4_hole_diam,
+//     round_nut_boss(
+//       solid=false, nut_boss_diam=4*m4_nut_diam1, screw_hole_diam=m4_hole_diam,
 //       nut_hex_diam=m4_nut_diam1, nut_height=m4_nut_height, nut_recess=0.5,
 //       nut_depth=10);
 //     translate([0,0,-0.001])
-//     nut_gusset_alignment_hole(
+//     nut_boss_alignment_hole(
 //       cone_height=5, cone_diam1=3*m4_hole_diam, cone_diam2=2*m4_hole_diam, cone_fn=undef);
 //   }
 
 //   translate([0, 30, 0])
 //   difference() {
-//     round_top_nut_gusset(
-//       solid=true, nut_gusset_diam=12, nut_gusset_height=12,
+//     round_top_nut_boss(
+//       solid=true, nut_boss_diam=12, nut_boss_height=12,
 //       screw_hole_diam=m4_hole_diam, nut_hex_diam=m4_nut_diam1,
 //       nut_height=m4_nut_height, nut_recess=1, nut_depth=12);
 //     translate([0,0,-0.001])
-//       nut_gusset_alignment_hole(
+//       nut_boss_alignment_hole(
 //         cone_height=5, cone_diam1=2*m4_hole_diam, cone_diam2=1.75*m4_hole_diam, cone_fn=undef);
 //   }
 // }
@@ -600,10 +600,10 @@ module round_top_pyramid(diam=undef, height=undef, angle=20) {
 
 // ////////////////////////////////////////////////////////////////////////////////
 
-// module nut_gusset_alignment_cone(solid=false, screw_hole_diam=undef, cone_height=undef, cone_diam1=undef, cone_diam2=undef, cone_fn=undef) {
+// module nut_boss_alignment_cone(solid=false, screw_hole_diam=undef, cone_height=undef, cone_diam1=undef, cone_diam2=undef, cone_fn=undef) {
 //   // $fs = min($fs, 2);
 //   mirror([0, 0, 1]) {
-//     gusset_alignment_cone(
+//     boss_alignment_cone(
 //       solid=solid, screw_hole_diam=screw_hole_diam, cone_height=cone_height,
 //       cone_diam1=cone_diam1, cone_diam2=cone_diam2, cone_fn=cone_fn);
 //   }
@@ -611,22 +611,22 @@ module round_top_pyramid(diam=undef, height=undef, angle=20) {
 
 // // Example:
 // translate([90, 0, 0]) color("blue") {
-//   round_top_nut_gusset(
+//   round_top_nut_boss(
 //     solid=false,
-//     nut_gusset_diam=3*m4_hole_diam, nut_gusset_height=3*m4_hole_diam,
+//     nut_boss_diam=3*m4_hole_diam, nut_boss_height=3*m4_hole_diam,
 //     screw_hole_diam=m4_hole_diam, nut_hex_diam=m4_nut_diam1,
 //     nut_height=m4_nut_height, nut_depth=12);
-//   nut_gusset_alignment_cone(
+//   nut_boss_alignment_cone(
 //     solid=false, screw_hole_diam=m4_hole_diam, cone_height=5,
 //     cone_diam1=3*m4_hole_diam, cone_diam2=2*m4_hole_diam, cone_fn=4);
 
 //   translate([0, 30, 0]){
-//     round_top_nut_gusset(
+//     round_top_nut_boss(
 //       solid=true,
-//       nut_gusset_diam=3*m4_hole_diam, nut_gusset_height=3*m4_hole_diam,
+//       nut_boss_diam=3*m4_hole_diam, nut_boss_height=3*m4_hole_diam,
 //       screw_hole_diam=m4_hole_diam, nut_hex_diam=m4_nut_diam1,
 //       nut_height=m4_nut_height, nut_recess=1, nut_depth=12);
-//     nut_gusset_alignment_cone(
+//     nut_boss_alignment_cone(
 //       solid=true, screw_hole_diam=m4_hole_diam, cone_height=5,
 //       cone_diam1=2.5*m4_hole_diam, cone_diam2=1.5*m4_hole_diam, cone_fn=undef);
 //   }
@@ -637,7 +637,7 @@ module round_top_pyramid(diam=undef, height=undef, angle=20) {
 //         nut_height=m4_nut_height);
 
 // ////////////////////////////////////////////////////////////////////////////////
-// // Defines the inside of the gusset for holding a nut in a slot, but the
+// // Defines the inside of the boss for holding a nut in a slot, but the
 // // outside 2D profile must be passed in as the first and only child.
 // module generic_nut_slot(screw_hole_diam=undef, nut_hex_diam=undef, nut_height=undef,
 //   nut_depth=undef, screw_extension=undef,
@@ -686,7 +686,7 @@ module round_top_pyramid(diam=undef, height=undef, angle=20) {
 //     nut(nut_hex_diam=m4_nut_diam1, screw_diam=m4_screw_diam,
 //         nut_height=m4_nut_height);
 
-// // module generic_screw_gusset(
+// // module generic_screw_boss(
 // //     solid=false, screw_hole_diam=undef, screw_head_diam=undef, washer_diam=undef,
 // //     screw_head_recess=undef, screw_head_depth=undef, screw_head_scale_factor=1.02,
 // //     cone_height=undef, cone_diam1=undef, cone_diam2=undef, cone_fn=undef
@@ -724,7 +724,7 @@ module round_top_pyramid(diam=undef, height=undef, angle=20) {
 // //       }
 // //       // Make alignment hole if cone_height < 0.
 // //       if (cone_height < 0) {
-// //         gusset_alignment_cone(
+// //         boss_alignment_cone(
 // //             solid=solid, screw_hole_diam=screw_hole_diam,
 // //             cone_height=-cone_height, cone_diam1=cone_diam1,
 // //             cone_diam2=cone_diam2, cone_fn=cone_fn);
@@ -732,7 +732,7 @@ module round_top_pyramid(diam=undef, height=undef, angle=20) {
 // //     }
 // //   }
 // //   if (cone_height > 0) {
-// //     gusset_alignment_cone(
+// //     boss_alignment_cone(
 // //         solid=solid, screw_hole_diam=screw_hole_diam,
 // //         cone_height=cone_height, cone_diam1=cone_diam1,
 // //         cone_diam2=cone_diam2, cone_fn=cone_fn);
@@ -740,9 +740,9 @@ module round_top_pyramid(diam=undef, height=undef, angle=20) {
 // // }
 
 
-// // module example_generic_screw_gusset(solid=false) {
+// // module example_generic_screw_boss(solid=false) {
 // //   // Without recess or alignment cone.
-// //   generic_screw_gusset(
+// //   generic_screw_boss(
 // //     solid=solid, screw_hole_diam=m4_hole_diam, washer_diam=m4_washer_diam,
 // //     screw_head_depth=10) {
 // //     circle(d=m4_washer_diam);
@@ -750,7 +750,7 @@ module round_top_pyramid(diam=undef, height=undef, angle=20) {
 
 // //   // With alignment cone.
 // //   translate([0, -30, 0])
-// //   generic_screw_gusset(
+// //   generic_screw_boss(
 // //     solid=solid, screw_hole_diam=m4_hole_diam, washer_diam=m4_washer_diam,
 // //     screw_head_depth=15,
 // //     cone_height=5, cone_diam1=m4_hole_diam*2.25,
@@ -760,7 +760,7 @@ module round_top_pyramid(diam=undef, height=undef, angle=20) {
 
 // //   // With recess and alignment cone.
 // //   translate([0, -60, 0])
-// //   generic_screw_gusset(
+// //   generic_screw_boss(
 // //     solid=solid, screw_hole_diam=m4_hole_diam, washer_diam=m4_washer_diam,
 // //     screw_head_depth=15, screw_head_recess=5,
 // //     cone_height=5, cone_diam1=m4_hole_diam*2.25,
@@ -773,11 +773,11 @@ module round_top_pyramid(diam=undef, height=undef, angle=20) {
 // // // Example:
 // // translate([0, -30, 0])
 // //   color("red")
-// //     example_generic_screw_gusset(solid=false);
+// //     example_generic_screw_boss(solid=false);
 
 // // translate([30, -30, 0])
 // //   color("red")
-// //     example_generic_screw_gusset(solid=true);
+// //     example_generic_screw_boss(solid=true);
 
 
 
@@ -787,10 +787,10 @@ module round_top_pyramid(diam=undef, height=undef, angle=20) {
 // //    Width across the flat faces of a hex nut.
 // // nut_height
 // //    Height / thickness of the nut.
-// // nut_gusset_diam
+// // nut_boss_diam
 // //    Diameter of the body that holds the nut.
 // // nut_recess
-// //    How far below the surface of the gusset the nut is recessed. Typically
+// //    How far below the surface of the boss the nut is recessed. Typically
 // //    zero to a few millimeters.
 // // nut_depth
 // //    Distance from parting plane (z=0 in this model) to the start of the nut.
@@ -800,7 +800,7 @@ module round_top_pyramid(diam=undef, height=undef, angle=20) {
 // // screw_head_depth
 // //    Distance from parting plane (z=0 in this model) to the start of the head.
 // // screw_head_recess
-// //    How far below the surface of the gusset the head is recessed.
+// //    How far below the surface of the boss the head is recessed.
 // //    Must be >= 0.
 // ////////////////////////////////////////////////////////////////////////////////
 

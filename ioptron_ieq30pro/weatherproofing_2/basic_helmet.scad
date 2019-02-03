@@ -216,7 +216,7 @@ module ra_and_dec_simple_shell(helmet_ir=dflt_helmet_ir, helmet_or=dflt_helmet_o
             shell=shell, inner_offset=inner_offset, show_cut_rib=false);
       }
       if (shell) {
-        // Rib to reinforce bottom of the shell, and allow room for gussets.
+        // Rib to reinforce bottom of the shell, and allow room for bosses.
         linear_extrude(height=helmet_bottom_rib_height, convexity=10) {
           ra_and_dec_hoop_profile(
               helmet_ir=helmet_ir, helmet_or=helmet_ir+helmet_bottom_rib_thickness,

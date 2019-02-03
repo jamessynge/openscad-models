@@ -118,7 +118,7 @@ module nut(nut_hex_diam=undef, screw_diam=undef, nut_height=undef) {
   }
 }
 
-module screw_gusset(x, y, z, d, center=false, fn=undef) {
+module screw_boss(x, y, z, d, center=false, fn=undef) {
   xlate = center ? [0, 0, -z/2] : [x/2, y/2, 0];
   translate(xlate) {
     linear_extrude(height=z, convexity=10) {
@@ -129,8 +129,8 @@ module screw_gusset(x, y, z, d, center=false, fn=undef) {
     }
   }
 }
-translate([0,0,0]) screw_gusset(15,15,10,5, center=true);
-translate([0,0,20]) screw_gusset(15,15,10,5);
+translate([0,0,0]) screw_boss(15,15,10,5, center=true);
+translate([0,0,20]) screw_boss(15,15,10,5);
 
 module demo_screw(shaft_diam, shaft_length, head_diam, head_height) {
   color("silver") {
@@ -140,17 +140,17 @@ module demo_screw(shaft_diam, shaft_length, head_diam, head_height) {
   }
 }
 
-// Space to be occupied by a nut (show_gusset=false) or a screw gusset (show_gusset=true)
+// Space to be occupied by a nut (show_boss=false) or a screw boss (show_boss=true)
 // for the corresponding bolt.
-module nut_slot_and_screw_gusset(show_gusset=true, nut_diam=0, nut_height=0, depth=0, bolt_diam=0, bolt_up=0, bolt_down=0, gusset_w=0, gusset_h=0, gusset_z=0, gusset_dist=0, fn=undef) {
+module nut_slot_and_screw_boss(show_boss=true, nut_diam=0, nut_height=0, depth=0, bolt_diam=0, bolt_up=0, bolt_down=0, boss_w=0, boss_h=0, boss_z=0, boss_dist=0, fn=undef) {
   // x_offset = (shell2_outside_x + dec2_radius) / 2;
   // y_offset = nut_height+nut_slot_margin;
 
-  if (show_gusset) {
-    z_dist = gusset_dist == 0 ? 0 : (nut_height + gusset_z) / 2 + abs(gusset_dist);
-    z_offset = gusset_dist > 0 ? z_dist : -z_dist;
+  if (show_boss) {
+    z_dist = boss_dist == 0 ? 0 : (nut_height + boss_z) / 2 + abs(boss_dist);
+    z_offset = boss_dist > 0 ? z_dist : -z_dist;
     translate([0, 0, z_offset])
-      screw_gusset(gusset_w, gusset_h, gusset_z, bolt_diam, center=true, fn=fn);
+      screw_boss(boss_w, boss_h, boss_z, bolt_diam, center=true, fn=fn);
   } else {
     nut_slot(nut_diam=nut_diam, nut_height=nut_height,
                    depth=depth,
@@ -160,15 +160,15 @@ module nut_slot_and_screw_gusset(show_gusset=true, nut_diam=0, nut_height=0, dep
   }
 }
 
-module test_nut_slot_and_screw_gusset(show_gusset=true, below=false) {
-  gusset_dist = below ? -5 : 10;
-  nut_slot_and_screw_gusset(show_gusset=show_gusset, nut_diam=10, nut_height=5, depth=15, bolt_diam=5, bolt_up=30, bolt_down=20, gusset_w=20, gusset_h=12, gusset_z=10, gusset_dist=gusset_dist, fn=20);
+module test_nut_slot_and_screw_boss(show_boss=true, below=false) {
+  boss_dist = below ? -5 : 10;
+  nut_slot_and_screw_boss(show_boss=show_boss, nut_diam=10, nut_height=5, depth=15, bolt_diam=5, bolt_up=30, bolt_down=20, boss_w=20, boss_h=12, boss_z=10, boss_dist=boss_dist, fn=20);
 }
 
 translate([-50, 0, 0]) {
-  test_nut_slot_and_screw_gusset(show_gusset=true, below=false);
-  test_nut_slot_and_screw_gusset(show_gusset=false, below=false);
-  test_nut_slot_and_screw_gusset(show_gusset=true, below=true);
+  test_nut_slot_and_screw_boss(show_boss=true, below=false);
+  test_nut_slot_and_screw_boss(show_boss=false, below=false);
+  test_nut_slot_and_screw_boss(show_boss=true, below=true);
 }
 
 module fillet_outline(radius) {

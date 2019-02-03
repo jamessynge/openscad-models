@@ -45,7 +45,7 @@ nut_slot_margin = 15; //
 bolt_len=50;  // Not a real size, just used for
               // difference().
 
-strap_gusset_length=30;
+strap_boss_length=30;
 
 // Trying to get better protection
 // for bottom of motor cover, which
@@ -122,12 +122,12 @@ module dec_motor_cover_cover() {
   }
 }
 
-module dec_motor_cover_strap(expansion_gap=1, gusset_length=strap_gusset_length) {
+module dec_motor_cover_strap(expansion_gap=1, boss_length=strap_boss_length) {
   narrows_to = dec2_radius + 3;
 
   difference() {
     union() {
-      dmcc_strap_gussets(gusset_length=gusset_length);
+      dmcc_strap_bosses(boss_length=boss_length);
       intersection() {
         $fn=100;
         difference() {
@@ -329,7 +329,7 @@ module dec_bearing_latitude_rain_void() {
 // Simpler version of the strap to be used as
 // a void.
 module dec_motor_cover_strap_void() {
-  gl = strap_gusset_length + 2;
+  gl = strap_boss_length + 2;
   union() {
     cylinder(r=shell2_outside_x, h=shell2_depth);
     translate([-shell2_outside_x, -gl, 0])
@@ -408,20 +408,20 @@ module dmcc_fillet1() {
         fillet_extrusion(shell_diff, 50, scale=0.01);
 }
 
-module dmcc_strap_gusset(gusset_length=30) {
+module dmcc_strap_boss(boss_length=30) {
   gx = shell2_outside_x - dec2_radius;
   gy = shell2_depth;
   gd = bolt_diam;
 
   translate([-shell2_outside_x,0,0])
     rotate([90,0,0]) {
-      screw_gusset(gx, gy, gusset_length, gd);
+      screw_boss(gx, gy, boss_length, gd);
     }
 }
 
-module dmcc_strap_gussets(gusset_length=30) {
-  dmcc_strap_gusset(gusset_length=gusset_length);
-  mirror([1,0,0]) dmcc_strap_gusset(gusset_length=gusset_length);
+module dmcc_strap_bosses(boss_length=30) {
+  dmcc_strap_boss(boss_length=boss_length);
+  mirror([1,0,0]) dmcc_strap_boss(boss_length=boss_length);
 }
 
 module dec_bearing_roof_screw_hole1() {

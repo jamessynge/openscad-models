@@ -1,6 +1,6 @@
 use <misc.scad>
 include <metric_dimensions.scad>
-use <paired_gussets.scad>
+use <paired_bosses.scad>
 
 //echo("cos($t)", cos($t));
 distance = 5 * (cos($t*360) + 1);
@@ -19,18 +19,18 @@ translate([0, -distance, 0]) color("green")
 module example(nut_side=true) {
   r1 = 100;
   r2 = 105;
-  angle = 0;
+  angle = 20;
   difference() {
     example_body(nut_side=nut_side, r1=r1, r2=r2);
-    // Remove from the ring the gussets, which really means removing the holes
+    // Remove from the ring the bosses, which really means removing the holes
     // for the screws.
     mirrored(v=[1,0,0]) {
-      matching_rtp_m4_gussets_in_body(nut_side=nut_side, r1=r1, r2=r2, angle=angle, solid=true);
+      matching_rtp_m4_bosses_in_body(nut_side=nut_side, r1=r1, r2=r2, angle=angle, solid=true);
     }
   }
-  // The actual gussets.
+  // The actual bosses.
   mirrored(v=[1,0,0]) {
-    matching_rtp_m4_gussets_in_body(nut_side=nut_side, r1=r1, r2=r2, angle=angle, solid=false, do_intersect=true);
+    matching_rtp_m4_bosses_in_body(nut_side=nut_side, r1=r1, r2=r2, angle=angle, solid=false, do_intersect=true);
   }
 }
 
@@ -58,29 +58,29 @@ module example_body(nut_side=undef, r1=undef, r2=undef, solid=false) {
   }
 }
 
-module matching_rtp_m4_gussets_in_body(nut_side=undef, r1=undef, r2=undef, angle=0, solid=false, do_intersect=false) {
+module matching_rtp_m4_bosses_in_body(nut_side=undef, r1=undef, r2=undef, angle=0, solid=false, do_intersect=false) {
   intersection() {
-    matching_rtp_m4_gussets_in_place(nut_side=nut_side, r1=r1, r2=r2, angle=angle, solid=solid);
+    matching_rtp_m4_bosses_in_place(nut_side=nut_side, r1=r1, r2=r2, angle=angle, solid=solid);
     if (do_intersect) {
       example_body(nut_side=nut_side, r1=r1, r2=r2, solid=true);
     }
   }
 }
 
-module matching_rtp_m4_gussets_in_place(nut_side=undef, r1=undef, r2=undef, angle=0, solid=false) {
+module matching_rtp_m4_bosses_in_place(nut_side=undef, r1=undef, r2=undef, angle=0, solid=false) {
   translate([r1-7, 0, 0]) {
     rotate([-90, 0, 0]) {
       rotate([0, 0, 90]) {
-        matching_rtp_m4_gussets(nut_side=nut_side, angle=angle, solid=solid);
+        matching_rtp_m4_bosses(nut_side=nut_side, angle=angle, solid=solid);
       }
     }
   }
 }
 
-module matching_rtp_m4_gussets(nut_side=undef, angle=0, solid=false) {
+module matching_rtp_m4_bosses(nut_side=undef, angle=0, solid=false) {
   rtp_diam = m4_nut_diam2*1.5;
   rtp_height = m4_nut_diam2;
-  matching_m4_recessed_gussets(solid=solid, show_nut_gusset=nut_side, show_screw_gusset=!nut_side, angle=angle) {
+  matching_m4_recessed_bosses(solid=solid, show_nut_boss=nut_side, show_screw_boss=!nut_side) {
     round_top_pyramid(rtp_diam, rtp_height, angle=angle);
   }
 }

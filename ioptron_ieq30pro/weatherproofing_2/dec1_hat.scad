@@ -44,7 +44,7 @@ module dec1_hat(over_port=true, remainder=true, sleeve=true) {
       dec1_hat_draft_angle_body();
     }
     ra_and_dec(include_cw_shaft=false);
-    dec1_hat_nut_slots(show_gusset=false);
+    dec1_hat_nut_slots(show_boss=false);
   }
 }
 
@@ -90,13 +90,13 @@ module dec1_hat_extrusion(over_port=true, remainder=true, sleeve=true) {
   }
 }
 
-module dec1_hat_nut_slots(show_gusset=false, gusset_z=25) {
-  dec1_hat_nut_slot_near_clutch(show_gusset=show_gusset, gusset_z=gusset_z);
-  mirror([1,0,0]) dec1_hat_nut_slot_near_clutch(show_gusset=show_gusset, gusset_z=gusset_z);
+module dec1_hat_nut_slots(show_boss=false, boss_z=25) {
+  dec1_hat_nut_slot_near_clutch(show_boss=show_boss, boss_z=boss_z);
+  mirror([1,0,0]) dec1_hat_nut_slot_near_clutch(show_boss=show_boss, boss_z=boss_z);
 }
 
 // Space to be occupied by a nut, to receive a bolt from the helmet_support_at_dec_head.
-module dec1_hat_nut_slot_near_clutch(show_gusset=false, gusset_z=25) {
+module dec1_hat_nut_slot_near_clutch(show_boss=false, boss_z=25) {
   inset_from_radii = 2*m4_nut_diam1;
   nut_slot_depth = m4_nut_diam2 + 5;
   offset_towards_dec_bearing = 25;
@@ -106,18 +106,18 @@ module dec1_hat_nut_slot_near_clutch(show_gusset=false, gusset_z=25) {
              ra1_base_to_dec_center-nut_slot_depth])
     rotate([0, 0, 30])
       rotate([90,0,0])
-        nut_slot_and_screw_gusset(
-          show_gusset=show_gusset,
+        nut_slot_and_screw_boss(
+          show_boss=show_boss,
           nut_diam=m4_nut_diam1,
           nut_height=m4_nut_height,
           depth=nut_slot_depth+1,
           bolt_diam=m4_hole_diam,
           bolt_up=10,
           bolt_down=100,
-          gusset_w=20,
-          gusset_h=nut_slot_depth*2,
-          gusset_z=gusset_z,
-          gusset_dist=-13,
+          boss_w=20,
+          boss_h=nut_slot_depth*2,
+          boss_z=boss_z,
+          boss_dist=-13,
           fn=$fn);
 }
 

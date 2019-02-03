@@ -30,17 +30,17 @@ helmet_cyl_above_bearing = ra1_base_to_dec + dec1_radius * 1.75;
 
 ra_to_dec_bearing_plane = ra1_radius + dec2_len;
 
-rtp_gusset_diam = m4_washer_diam * 1.5;
-rtp_gusset_height = m4_nut_diam2;
+rtp_boss_diam = m4_washer_diam * 1.5;
+rtp_boss_height = m4_nut_diam2;
 
 // Dimensions for rib at bottom. Goal is to provide enough room for a slotted
-// gusset for an M4 screw. Will require that the DEC bearing rain plate be
+// boss for an M4 screw. Will require that the DEC bearing rain plate be
 // notched to allow room for the rib.
 // Note that the rib can't be on the inside because it would very nearly collide
 // with the plate of the RA motor hat.
 
-helmet_bottom_rib_thickness = rtp_gusset_diam;
-helmet_bottom_rib_height = rtp_gusset_diam;
+helmet_bottom_rib_thickness = rtp_boss_diam;
+helmet_bottom_rib_height = rtp_boss_diam;
 
 
 cws_port_ir = cw_shaft_diam;

@@ -29,9 +29,9 @@ module ra_at_sleeve_strap() {
  // mirror([0,1,0])
  rotate([0,0,270])
   strap(angle=90, radius=ra1_radius, thickness=ra_ring_thickness,
-        width=ra1_base_to_dec, gusset_hole_diam=screw_hole_diam,
-        gusset_thickness=screw_hole_diam*3, gusset_length=30,
-        render_gusset_1=false);
+        width=ra1_base_to_dec, boss_hole_diam=screw_hole_diam,
+        boss_thickness=screw_hole_diam*3, boss_length=30,
+        render_boss_1=false);
 
 }
 
