@@ -22,7 +22,9 @@ use <../../utils/strap.scad>
 
 local_helmet_avoidance_ir = dflt_helmet_ir; // ra_motor_collar_radius;
 
-basic_helmet2_walls = 10;
+basic_helmet2_walls = 5;
+lower_rib_thickness = 10;
+
 
 distance = 40;//40 * (cos($t*360) + 1);
 
@@ -57,7 +59,7 @@ if (!$preview) {
 
 } else if (true) {
   ra_and_dec(include_dec_head=false) {
-    basic_helmet2_interior();
+    basic_helmet2();
   }
 
 
@@ -106,7 +108,7 @@ module basic_helmet2_half(nut_side) {
   }
 }
 
-module basic_helmet2() {
+module basic_helmet2_old() {
   difference() {
     basic_helmet2_simple_solid();
     basic_helmet2_interior();
@@ -307,6 +309,168 @@ module basic_helmet2_interior_tight_core(boost_size=false) {
 }
 
 
+module basic_helmet2() {
+  difference() {
+    basic_helmet2_exterior();
+
+    basic_helmet2_cut_from_exterior();
+
+    // Cut below the z=-ra_bcbp_ex plane.
+    s = 300;
+    translate([-s/2, -s/2, -(s + ra_bcbp_ex)]) cube(size=s);
+
+    translate_to_dec_bearing_plane() {
+      mirror([0, 0, 1]) {
+        // Can't be too thick between the DEC clutch and the DEC saddle
+        // screws; there is only about 1cm of space, so need to trim here.
+        z = hoop_disc_z;
+        translate([0, 0, s/2 + z]) cube(size=s, center=true);
+      }
+    }
+  }
+}
+
+module basic_helmet2_exterior() {
+  motor_cylinder_x = dec_motor_w/2 - 5;
+  motor_cylinder_y = dec_motor_z_offset + dec_motor_core_z - 5;
+  dec1_total_len = dec1_len + cw_cap_total_height;
+
+  minkowski() {
+    hull() {
+      translate_to_dec_bearing_plane() {
+        translate([0, motor_cylinder_y, 0]) {
+          // Four spheres to mark the top corners of the DEC motor in the hull,
+          mirrored([1, 0, 0]) {
+            translate([motor_cylinder_x, 0, 0]) {
+              sphere(r=10, $fn=20);
+              translate([0, 0, dec_motor_core_top_h])
+                sphere(r=10, $fn=20);
+            }
+          }
+
+          // And a couple larger spheres in the middle so we get more
+          // thickness in the helmet where it gets cut in half.
+          translate([0, -22, 20]) {
+            sphere(r=40, $fn=20);
+            translate([0, 0, dec_motor_core_top_h])
+              sphere(r=40, $fn=20);
+          }
+
+        }
+      }
+
+      // The dec1 body.
+      translate_to_dec12_plane() {
+        mirror([0,0,1])
+          my_cylinder(r=dec1_radius, h=dec1_total_len);
+      }
+
+      // The volume swept out by the DEC clutch.
+      extra_h = hoop_disc_z - basic_helmet2_walls;
+      swept_dec_clutch(grow=false, extra_h=extra_h);
+
+      rib_boost = lower_rib_thickness-basic_helmet2_walls;
+
+      // The volume including the RA motor and the RA motor rain plate.
+      below_ra_bearing(r=local_helmet_avoidance_ir+rib_boost);
+      bump_below_cw_shaft(s_offset=rib_boost);
+    }
+    minkowski_sphere();
+  }
+
+  below_ra_bearing(r=local_helmet_avoidance_ir+lower_rib_thickness);
+
+  // Exterior of tube surrounding the counterweight shaft as it goes through
+  // the side of the helmet. Allows us room for a small disc that keeps
+  // most rain from entering the helmet.
+  translate_to_dec12_plane() {
+    mirror([0, 0, 1]) {
+      translate([0, 0, dec1_len+cw_cap_total_height]) {
+        r=cw_shaft_diam+lower_rib_thickness;
+        h = 50;
+
+        my_cylinder(r=r, h=h);
+
+
+        *hull() {
+          my_cylinder(r=dec1_radius+basic_helmet2_walls, h=0.001);
+          translate([0,11,h-0.001])
+            my_cylinder(r=cw_shaft_diam+basic_helmet2_walls, h=0.001);
+        }
+        // scale([1, 1.2, 1])
+        // my_cylinder(r1=dec1_radius, r2=cw_shaft_diam, h=h);
+      }
+    }
+  }
+}
+
+translate([600, 0, 0]) color("red")
+  basic_helmet2_exterior();
+
+translate([300, 0, 0]) color("green")
+  basic_helmet2_cut_from_exterior();
+
+// The parts to cut out of basic_helmet2_exterior().
+// One goal is to try to leave a rim at the bottom (around the RA core/motor)
+// which makes some room for fasteners.
+module basic_helmet2_cut_from_exterior() {
+  motor_cylinder_x = dec_motor_w/2 - 5;
+  motor_cylinder_y = dec_motor_z_offset + dec_motor_core_z - 5;
+  dec1_total_len = dec1_len + cw_cap_total_height;
+
+  hull() {
+    // Four spheres to mark the top corners of the DEC motor in the hull.
+    translate_to_dec_bearing_plane() {
+      translate([0, motor_cylinder_y, 0]) {
+        mirrored([1, 0, 0]) {
+          translate([motor_cylinder_x, 0, 0]) {
+            sphere(r=10, $fn=20);
+            translate([0, 0, dec_motor_core_top_h])
+              sphere(r=10, $fn=20);
+          }
+        }
+      }
+    }
+
+    // The dec1 body.
+    translate_to_dec12_plane() {
+      mirror([0,0,1])
+        my_cylinder(r=dec1_radius, h=dec1_total_len);
+    }
+
+    // The volume swept out by the DEC clutch.
+    swept_dec_clutch(grow=false, extra_h=0);
+
+    // The volume including the RA motor and the RA motor rain plate.
+    below_ra_bearing(h_offset=-lower_rib_thickness);
+
+    bump_below_cw_shaft(h_offset=-lower_rib_thickness);
+  }
+
+  hull() {
+    // The volume including the RA motor and the RA motor rain plate, extended
+    // lower for cutting an opening in the bottom of basic_helmet2_exterior.
+    below_ra_bearing(h_offset=20);
+    // Along with a bump for improving 3D print-ability.
+    bump_below_cw_shaft(h_offset=20);
+  }
+
+  translate_to_dec_bearing_plane() {
+    mirror([0, 0, 1]) {
+      // Space for the DEC head.
+      my_cylinder(r=dec2_radius, h=dec_head_total_height);
+    }
+  }
+
+  // Room for the counterweight shaft.
+  translate_to_dec12_plane() {
+    mirror([0, 0, 1]) {
+      translate([0, 0, dec1_len+cw_cap_total_height]) {
+        my_cylinder(r=cw_shaft_diam, h=100);
+      }
+    }
+  }
+}
 
 
 
@@ -314,13 +478,24 @@ module basic_helmet2_interior_tight_core(boost_size=false) {
 
 
 
-module below_ra_bearing(h_multiplier=1, h_offset=0) {
+module below_ra_bearing(r=local_helmet_avoidance_ir, h_multiplier=1, h_offset=0) {
   // We support extend below the RA bearing plane further than necessary so
   // that we can easily cut it off later without running into math problems.
   h = ra_bcbp_ex * h_multiplier + h_offset;
   e = 0.01;
   translate([0, 0, -h])
-    my_cylinder(r=local_helmet_avoidance_ir, h=h+e);
+    my_cylinder(r=r, h=h+e);
+}
+
+// ONLY for the sake of being able to 3D print this part (with the DEC head end
+// being flat on the printer bed, and the CW shaft port at the top), we put
+// an angled bump out below the CW shaft.
+module bump_below_cw_shaft(s_offset=0, h_offset=0) {
+  s = 30 + s_offset;
+  translate([0, -local_helmet_avoidance_ir + s/3, 0])
+  rotate([0, 0, 45])
+    translate([-s/2,-s/2, -(ra_bcbp_ex+h_offset)])
+      cube(size=[s, s, ra_bcbp_ex+ra1_base_to_dec_center+h_offset], center=false);
 }
 
 module dome_above_ra_bearing() {
@@ -330,17 +505,6 @@ module dome_above_ra_bearing() {
     scale([1, 1, 1.42]) sphere(r=r);
     translate([-r2, -r2, 0]) cube(size=r2*2, center=false);
   }
-}
-
-// ONLY for the sake of being able to 3D print this part (with the DEC head end
-// being flat on the printer bed, and the CW shaft port at the top), we put
-// an angled bump out below the CW shaft.
-module bump_below_cw_shaft(h_offset=0) {
-  s = 30;
-  translate([0, -local_helmet_avoidance_ir + s/3, 0])
-  rotate([0, 0, 45])
-    translate([-s/2,-s/2, -(ra_bcbp_ex+h_offset)])
-      cube(size=[s, s, ra_bcbp_ex+ra1_base_to_dec_center+h_offset], center=false);
 }
 
 
@@ -367,23 +531,32 @@ module swept_dec_clutch(grow=true, extra_h=0) {
 // Interior of tube surrounding the counterweight shaft as it goes through
 // the side of the helmet. Allows us room for a small disc that keeps
 // most rain from entering the helmet.
-module cw_shaft_port_interior(r1=cw_shaft_diam, h=45) {
+module cw_shaft_port_interior(r1=cw_shaft_diam, h=100) {
   translate_to_dec12_plane() {
     mirror([0, 0, 1]) {
-      translate([0, 0, dec1_len+cw_cap_height]) {
-        my_cylinder(r1=dec1_radius, r2=cw_shaft_diam, h=h);
+      translate([0, 0, dec1_len+cw_cap_total_height]) {
+        my_cylinder(r=cw_shaft_diam, h=h);
+
+
+        *hull() {
+          my_cylinder(r=dec1_radius, h=0.001);
+          translate([0,11,h-0.001])
+            my_cylinder(r=cw_shaft_diam, h=0.001);
+        }
+        // scale([1, 1.2, 1])
+        // my_cylinder(r1=dec1_radius, r2=cw_shaft_diam, h=h);
       }
     }
   }
 }
 
-// Interior of tube surrounding the counterweight shaft as it goes through
+// Exterior of tube surrounding the counterweight shaft as it goes through
 // the side of the helmet. Allows us room for a small disc that keeps
 // most rain from entering the helmet.
 module cw_shaft_port_exterior(r=cw_shaft_diam+basic_helmet2_walls, h=40) {
   translate_to_dec12_plane() {
     mirror([0, 0, 1]) {
-      translate([0, 0, dec1_len+cw_cap_height]) {
+      translate([0, 0, dec1_len+cw_cap_total_height]) {
         my_cylinder(r1=r*1.3, r2=r, h=h);
       }
     }
