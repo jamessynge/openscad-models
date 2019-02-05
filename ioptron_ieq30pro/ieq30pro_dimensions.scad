@@ -347,6 +347,10 @@ dec_gap_to_saddle_knob = 31;
 dec_clutch_handle_min_height = dec2_radius + 18.6; 
 dec_clutch_handle_max_height = dec2_radius + 26.6; 
 
+// The same for the RA axis.
+ra_clutch_handle_min_height = ra1_radius + 18.6; 
+ra_clutch_handle_max_height = ra1_radius + 26.6; 
+
 ////////////////////////////////////////////////////////////////////////////////
 // Computed values for the DEC bearing.
 

@@ -20,13 +20,13 @@ module symmetric_z_cylinder(d=undef, l=undef, r=undef, convexity=2) {
       circle(d=d, r=r);
 }
 
-module my_cylinder(r=undef, d=undef, r1=undef, r2=undef, h=undef, convexity=undef) {
+module my_cylinder(r=undef, d=undef, r1=undef, r2=undef, h=undef, convexity=undef, fn=undef) {
   assert(r == undef || r1 == undef);
   R = r == undef ? r1 : r;
   assert(R == undef || d == undef);
   scale = (r1 != undef && r2 != undef) ? r2/r1 : 1;
   linear_extrude(height=h, convexity=convexity, scale=scale)
-      circle(r=R, d=d);
+      circle(r=R, d=d, $fn=fn);
 }
 
 // Helper for creating the hollow box
