@@ -89,7 +89,7 @@ if (!$preview) {
     union() {
       // Moving side of RA bearing.
       color("white") half_helmet(nut_side=true);
-      *color("white") half_helmet(nut_side=false);
+      color("white") half_helmet(nut_side=false);
       *dec1_hat();
       *helmet_support_at_cws();
     };
@@ -194,7 +194,7 @@ module bosses(solid=false, nut_side=true) {
 module bosses_below_cw_port(solid=false, nut_side=true) {
   nut_slot_angle=90;
   boss_height=35;
-  r1=dflt_helmet_ir+6.5;
+  r1=dflt_helmet_ir+10;
   // 30mm from screw head to center of nut, so a 40mm screw will work.
   nut_depth=15;
   screw_head_depth=15;
@@ -205,13 +205,14 @@ module bosses_below_cw_port(solid=false, nut_side=true) {
   difference() {
     translate([0, -(r1+rtp_radius), -ra_bcbp_ex+rtp_radius]) {
       rotate([0, 90, 0]) {
-        matching_rect_m4_slotted_bosses2(
+       matching_rect_m4_slotted_bosses2(
             nut_side=nut_side, nut_slot_angle=nut_slot_angle,
             nut_depth=nut_depth, screw_extension=screw_extension,
+            slot_depth=200,
             boss_height=boss_height,
             screw_head_depth=screw_head_depth,
             screw_head_recess=screw_head_recess,
-            solid=solid, cone_height=3,
+            solid=solid,
             w=rtp_diam, h=rtp_diam*2, y=-rtp_diam/2);
       }
     }
@@ -249,7 +250,7 @@ module bosses_below_dec_port(solid=false, nut_side=true, do_intersect=false, ang
 
 
 module bosses_near_top(solid=false, nut_side=true) {
-  nut_slot_angle=90;
+  nut_slot_angle=165;
   boss_height=45;
   r1=dflt_helmet_ir+6.5;
   // 30mm from screw head to center of nut, so a 40mm screw will work.
@@ -260,16 +261,16 @@ module bosses_near_top(solid=false, nut_side=true) {
   rtp_radius = rtp_diam / 2;
 
   intersection() {
-    translate([0, -10, 142]) {
+    translate([0, -25, 110]) {
       rotate([0, 90, 0]) {
-        rotate([0, 0, -84]) {
+        rotate([0, 0, -66]) {
           matching_rtp_m4_slotted_bosses(
               nut_side=nut_side, nut_slot_angle=nut_slot_angle,
               nut_depth=nut_depth, screw_extension=screw_extension,
               boss_height=boss_height,
               screw_head_depth=screw_head_depth,
               screw_head_recess=screw_head_recess,
-              solid=solid, angle=40, h=rtp_radius*0.7);
+              solid=solid, angle=44, h=rtp_radius*1);
         }
       }
     }
@@ -382,21 +383,23 @@ module matching_circular_m4_slotted_bosses(nut_side=undef, d=rtp_diam, angle=0, 
   }
 }
 
-module matching_rect_m4_slotted_bosses(nut_side=undef, w=rtp_diam, h=rtp_diam, nut_slot_angle=undef, nut_depth=undef, screw_extension=undef, boss_height=undef, screw_head_depth=undef, screw_head_recess=undef, solid=false) {
+module matching_rect_m4_slotted_bosses(nut_side=undef, w=rtp_diam, h=rtp_diam, nut_slot_angle=undef, nut_depth=undef, screw_extension=undef, boss_height=undef, screw_head_depth=undef, screw_head_recess=undef, solid=false, slot_depth=undef) {
   matching_m4_slotted_bosses(
       solid=solid, show_nut_boss=nut_side, show_screw_boss=!nut_side,
       nut_slot_angle=nut_slot_angle, nut_depth=nut_depth,
       screw_extension=screw_extension,
+      slot_depth=slot_depth,
       boss_height=boss_height,
       screw_head_depth=screw_head_depth, screw_head_recess=screw_head_recess) {
     square(size=[w, h], center=true);
   }
 }
 
-module matching_rect_m4_slotted_bosses2(nut_side=undef, w=rtp_diam, h=rtp_diam, x=undef, y=undef, nut_slot_angle=undef, nut_depth=undef, screw_extension=undef, boss_height=undef, screw_head_depth=undef, screw_head_recess=undef, solid=false, cone_height=5) {
+module matching_rect_m4_slotted_bosses2(nut_side=undef, w=rtp_diam, h=rtp_diam, x=undef, y=undef, nut_slot_angle=undef, nut_depth=undef, screw_extension=undef, boss_height=undef, screw_head_depth=undef, screw_head_recess=undef, solid=false, cone_height=5, slot_depth=undef) {
   matching_m4_slotted_bosses(
       solid=solid, show_nut_boss=nut_side, show_screw_boss=!nut_side,
       nut_slot_angle=nut_slot_angle, nut_depth=nut_depth,
+      slot_depth=slot_depth,
       screw_extension=screw_extension,
       boss_height=boss_height,
       screw_head_depth=screw_head_depth,

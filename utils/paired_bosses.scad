@@ -428,7 +428,7 @@ module matching_m4_recessed_bosses(show_nut_boss=true, show_screw_boss=true, nut
 // on the z>0 side.
 // A single child must be provided with a 2D profile that can be extruded to
 // be the outer surface of the bosses.
-module matching_m4_slotted_bosses(show_nut_boss=true, show_screw_boss=true, nut_slot_angle=0, nut_depth=6, screw_extension=10, boss_height=20, screw_head_depth=15, screw_head_recess=45, solid=false, cone_height = 5) {
+module matching_m4_slotted_bosses(show_nut_boss=true, show_screw_boss=true, nut_slot_angle=0, nut_depth=6, screw_extension=10, boss_height=20, screw_head_depth=15, screw_head_recess=45, solid=false, cone_height=5, slot_depth=undef) {
   assert($children == 1);
   assert(cone_height >= 0);
   assert(nut_depth > -cone_height);  // If have a hole, must not go too deep.
@@ -439,9 +439,10 @@ module matching_m4_slotted_bosses(show_nut_boss=true, show_screw_boss=true, nut_
 
   if (show_nut_boss) {
     generic_slotted_nut_boss(
-        solid=solid, screw_hole_diam=m4_hole_diam, boss_height=boss_height, nut_depth=nut_depth,
-        screw_extension=screw_extension, nut_hex_diam=m4_nut_diam1, nut_height=m4_nut_height,
-        nut_slot_angle=nut_slot_angle,
+        solid=solid, screw_hole_diam=m4_hole_diam, boss_height=boss_height,
+        nut_depth=nut_depth, screw_extension=screw_extension,
+        nut_hex_diam=m4_nut_diam1, nut_height=m4_nut_height,
+        nut_slot_angle=nut_slot_angle, slot_depth=slot_depth,
         cone_height=nut_boss_cone_height, cone_diam1=cone_diam1+.1,
         cone_diam2=cone_diam2+.1) {
       children(0);
@@ -451,7 +452,8 @@ module matching_m4_slotted_bosses(show_nut_boss=true, show_screw_boss=true, nut_
     generic_screw_boss(
         solid=solid, screw_hole_diam=m4_hole_diam, washer_diam=m4_washer_diam,
         screw_head_depth=screw_head_depth, screw_head_recess=screw_head_recess,
-        cone_height=screw_boss_cone_height, cone_diam1=cone_diam1-.1, cone_diam2=cone_diam2-.1) {
+        cone_height=screw_boss_cone_height, cone_diam1=cone_diam1-.1,
+        cone_diam2=cone_diam2-.1) {
       children(0);
     }
   }
