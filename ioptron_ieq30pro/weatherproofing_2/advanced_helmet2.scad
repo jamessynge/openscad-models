@@ -143,7 +143,6 @@ module half_helmet(nut_side=true) {
       } else {
         basic_helmet2_screw_side();
       }
-      helmet_clip_parts(nut_side=nut_side);
     }
     bosses(solid=true, nut_side=true);
     bosses(solid=true, nut_side=false);
@@ -405,61 +404,6 @@ module bosses_around_hemisphere(solid=false, nut_side=true, do_intersect=false, 
     }
     if (do_intersect) {
      basic_helmet2_simple_solid();
-    }
-  }
-}
-
-////////////////////////////////////////////////////////////////////////////////
-// Modules for a clip that helps to secure the helmet halves to the supports
-// that are secured to the ra_and_dec body. For printability, the clip runs
-// the full length of the dec body.
-// 
-
-*union() {
-  translate([200, 0, 0]) helmet_clip_parts();
-  translate([200, 0, 20]) helmet_clip_parts(clip=false, intersect=false);
-  translate([200, 0, 40]) {
-    difference() {
-      helmet_clip_parts(clip=false, intersect=false);
-      helmet_clip_parts(intersect=false);
-    }
-  }
-}
-module helmet_clip_parts(nut_side=true, clip=true, intersect=true) {
-  diam = 7 * (clip ? 0.95 : 1.05);
-  shaft_width = 4 * (clip ? 0.95 : 1.05);
-  shaft_length = 30;
-  separator_length = 15;
-  clip_ex_length = hoop_disc_z + dec1_len + dec1_len + cw_cap_total_height;
-  x_offset = dec_clutch_handle_max_height + diam;
-
-  intersection() {
-    translate_to_dec_bearing_plane() {
-      mirror([nut_side ? 0 : 1, 0, 0]) {
-        translate([x_offset, 0, -hoop_disc_z]) {
-          rotate([0, -10, 0])
-          linear_extrude(height=clip_ex_length, convexity=10) {
-            sw2 = shaft_width / 2;
-            sw3 = shaft_width / 3;
-            difference() {
-              union() {
-                circle(d=diam, $fn=20);
-                translate([0, -sw2, 0])
-                  square([shaft_length, shaft_width]);
-              }
-              if (clip) {
-                polygon([[-diam, sw3], [separator_length, 0], [-diam, -sw3]]);
-                // translate([-diam, -sw3/2, 0])
-                //   square([shaft_length + diam, sw3]);
-              }
-            }
-    
-          }
-        }
-      }
-    }
-    if (intersect) {
-      basic_helmet2_interior();
     }
   }
 }

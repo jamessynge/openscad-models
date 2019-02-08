@@ -14,7 +14,7 @@ include <wp2_dimensions.scad>
 use <../weatherproofing_1/dec_head_bearing_cover.scad>
 use <ra_motor_hat.scad>
 use <dec1_hat.scad>
-use <basic_helmet.scad>
+use <basic_helmet2.scad>
 use <wp_utils.scad>
 
 use <../../utils/cut.scad>
@@ -38,7 +38,7 @@ if (!$preview) {
   ra_and_dec() {
     union() {
       helmet_support_at_dec_head();
-      dec1_hat();
+      *dec1_hat();
       *cw_chin_strap_helmet_support();
     };
     union() {
@@ -47,7 +47,7 @@ if (!$preview) {
     };
     union() {
       // DEC head side of DEC bearing.
-      color("DeepSkyBlue") dec_head_bearing_cover();
+      *color("DeepSkyBlue") dec_head_bearing_cover();
     };
     union() {
       // Saddle plate
@@ -64,7 +64,7 @@ module helmet_support_at_dec_head() {
         union() {
           dec_chin_core();
         }
-        helmet_interior(inner_offset=0.1);
+        basic_helmet2_interior();
       }
       ra_and_dec(include_cw_shaft=false);
       dec1_hat_nut_slots(show_boss=false);

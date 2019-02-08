@@ -5,30 +5,6 @@
 
 ## TO DOs for the helmet
 
-* Come up with a way to put a draft angle on the overhang of the nut-side of
-  the helmet, where it goes over the screw-side. Ideally we'd make the screw-
-  side slightly smaller (e.g. 0.2mm) so that they don't bind up and prevent the
-  two sides mating properly.
-
-* Consider removing the rain plate as a separate part, and instead integrate
-  it with the helmet. It would not be latitude dependent, and would not need
-  to be installed (with very little room to get the screws into place, let
-  alone tighten them). This does mean that the DEC clutch would be completely
-  inaccessible once the helmet is in place. Removing the rain plate would allow
-  the DEC attachment hoop to have much thinner walls.
-
-* Place holes around the hoop support for glue-in threaded inserts; place around
-  six around the whole circumference, but use a function to decide which of them
-  to include based on latitude. Insert corresponding holes into the DEC bearing
-  rain shield (dec_bearing_rain_plate). Consider using countersink style
-  connections (ala the alignment cones) to guide the rain shield into the
-  correct location.
-
-* Add a rib inside the helmet just above the interior supports
-  (i.e. cw_chin_strap_helmet_support and helmet_support_at_dec_head),
-  which should be help stiffen the helmet and help guide the placement of the
-  helmet when installing.
-
 ## TO DOs for the helmet supports
 
 * Fix the rectangular hole in the cw_chin_strap_helmet_support.
@@ -69,3 +45,29 @@
 
 * Figure out how to deter water from entering at the cut in the helmet.
   E.g. an o-ring or a furrow/hump.
+
+* Come up with a way to put a draft angle on the overhang of the nut-side of
+  the helmet, where it goes over the screw-side. Ideally we'd make the screw-
+  side slightly smaller (e.g. 0.2mm) so that they don't bind up and prevent the
+  two sides mating properly.
+
+* Consider removing the rain plate as a separate part, and instead integrate
+  it with the helmet. It would not be latitude dependent, and would not need
+  to be installed (with very little room to get the screws into place, let
+  alone tighten them). This does mean that the DEC clutch would be completely
+  inaccessible once the helmet is in place. Removing the rain plate would allow
+  the DEC attachment hoop to have much thinner walls.
+
+# OBSOLETE
+
+* Place holes around the hoop support for glue-in threaded inserts; place around
+  six around the whole circumference, but use a function to decide which of them
+  to include based on latitude. Insert corresponding holes into the DEC bearing
+  rain shield (dec_bearing_rain_plate). Consider using countersink style
+  connections (ala the alignment cones) to guide the rain shield into the
+  correct location.
+
+* Add a rib inside the helmet just above the interior supports
+  (i.e. cw_chin_strap_helmet_support and helmet_support_at_dec_head),
+  which should be help stiffen the helmet and help guide the placement of the
+  helmet when installing.

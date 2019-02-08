@@ -553,57 +553,62 @@ module basic_helmet2_cut_from_exterior(core_only=false) {
   motor_cylinder_y = dec_motor_z_offset + dec_motor_core_z - 2;
   dec1_total_len = dec1_len + cw_cap_total_height;
 
-  hull() {
-    // Four spheres to mark the top corners of the DEC motor in the hull.
-    translate_to_dec_bearing_plane() {
-      translate([0, motor_cylinder_y, 0]) {
-        mirrored([1, 0, 0]) {
-          translate([motor_cylinder_x, 0, 0]) {
-            sphere(r=10, $fn=20);
-            translate([0, 0, dec_motor_core_top_h])
-              sphere(r=10, $fn=20);
+  difference() {
+    union() {
+      hull() {
+        // Four spheres to mark the top corners of the DEC motor in the hull.
+        translate_to_dec_bearing_plane() {
+          translate([0, motor_cylinder_y, 0]) {
+            mirrored([1, 0, 0]) {
+              translate([motor_cylinder_x, 0, 0]) {
+                sphere(r=10, $fn=20);
+                translate([0, 0, dec_motor_core_top_h])
+                  sphere(r=10, $fn=20);
+              }
+            }
           }
         }
-      }
-    }
 
-    // The dec1 body, but with a sphere at the CW end to provide a little
-    // space.
-    translate_to_dec12_plane() {
-        mirror([0,0,1]) {
-          my_cylinder(r=dec1_radius, h=dec1_total_len);
-          translate([0, 0, dec1_len])
-            sphere(r=dec1_radius);
+        // The dec1 body, but with a sphere at the CW end to provide a little
+        // space.
+        translate_to_dec12_plane() {
+            mirror([0,0,1]) {
+              my_cylinder(r=dec1_radius, h=dec1_total_len);
+              translate([0, 0, dec1_len])
+                sphere(r=dec1_radius);
+            }
         }
-    }
 
-    // The volume swept out by the DEC clutch.
-    swept_dec_clutch(grow=false, extra_h=0);
+        // The volume swept out by the DEC clutch.
+        swept_dec_clutch(grow=false, extra_h=0);
 
-    // The volume including the RA motor and the RA motor rain plate.
-    below_ra_bearing(descend_offset=-lower_rib_thickness);
+        // The volume including the RA motor and the RA motor rain plate.
+        below_ra_bearing(descend_offset=-lower_rib_thickness);
 
-    bump_below_cw_shaft(descend_offset=-lower_rib_thickness);
-  }
+        bump_below_cw_shaft(descend_offset=-lower_rib_thickness);
+      }
 
-    hull() {
-      // The volume including the RA motor and the RA motor rain plate, extended
-      // lower for cutting an opening in the bottom of basic_helmet2_exterior.
-      below_ra_bearing(descend_offset=20);
-      // Along with a bump for improving 3D print-ability.
-      bump_below_cw_shaft(descend_offset=20);
-    }
+      hull() {
+        // The volume including the RA motor and the RA motor rain plate, extended
+        // lower for cutting an opening in the bottom of basic_helmet2_exterior.
+        below_ra_bearing(descend_offset=20);
+        // Along with a bump for improving 3D print-ability.
+        bump_below_cw_shaft(descend_offset=20);
+      }
 
-    translate_to_dec_bearing_plane() {
-      mirror([0, 0, 1]) {
-        // Space for the DEC head.
-        my_cylinder(r=dec2_radius, h=dec_head_total_height);
+      translate_to_dec_bearing_plane() {
+        mirror([0, 0, 1]) {
+          // Space for the DEC head.
+          my_cylinder(r=dec2_radius, h=dec_head_total_height);
+        }
+      }
+
+      if (!core_only) {
+        // Room for the counterweight shaft.
+        cw_shaft_port_interior();
       }
     }
-
-  if (!core_only) {
-    // Room for the counterweight shaft.
-    cw_shaft_port_interior();
+    helmet_clip_parts(nut_side=true, screw_side=true);
   }
 }
 
@@ -687,6 +692,74 @@ module cw_shaft_port_exterior() {
         h = 50;
 
         my_cylinder(r=r, h=h);
+      }
+    }
+  }
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// Modules for a clip that helps to secure the helmet halves to the supports
+// that are secured to the ra_and_dec body. For printability, the clip runs
+// the full length of the dec body.
+// 
+
+union() {
+  translate([200, 0, 0]) helmet_clip_parts();
+  translate([200, 0, 20]) helmet_clip_parts(clip=false, intersect=false);
+  translate([200, 0, 40]) {
+    difference() {
+      helmet_clip_parts(clip=false, intersect=false);
+      helmet_clip_parts(intersect=false);
+    }
+  }
+}
+
+module helmet_clip_parts(nut_side=true, screw_side=true, clip=true, intersect=true) {
+  // At least one must be defined.
+  assert(screw_side || nut_side);
+
+  diam = 7 * (clip ? 0.95 : 1.05);
+  shaft_width = 4 * (clip ? 0.95 : 1.05);
+  shaft_length = 30;
+  separator_length = 15;
+  clip_ex_length = hoop_disc_z + dec1_len + dec1_len + cw_cap_total_height;
+  x_offset = dec_clutch_handle_max_height + diam;
+
+  module the_screw_side() {
+    translate([x_offset, 0, -hoop_disc_z]) {
+      rotate([0, -10, 0])
+      linear_extrude(height=clip_ex_length, convexity=10) {
+        sw2 = shaft_width / 2;
+        sw3 = shaft_width / 3;
+        difference() {
+          union() {
+            circle(d=diam, $fn=20);
+            translate([0, -sw2, 0])
+              square([shaft_length, shaft_width]);
+          }
+          if (clip) {
+            polygon([[-diam, sw3], [separator_length, 0], [-diam, -sw3]]);
+            // translate([-diam, -sw3/2, 0])
+            //   square([shaft_length + diam, sw3]);
+          }
+        }
+      }
+    }
+  }
+
+  intersection() {
+    translate_to_dec_bearing_plane() {
+      union() {
+        if (screw_side) {
+          the_screw_side();
+        }
+        if (nut_side) {
+          mirror([1, 0, 0])
+            the_screw_side();
+        }
+      }
+      if (intersect) {
+        basic_helmet2_interior();
       }
     }
   }
