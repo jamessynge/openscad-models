@@ -253,6 +253,20 @@ ra_motor_setback = 1.8;
 
 ra_motor_z_offset = ra2_radius + ra_cover_height - ra_motor_z + 2;
 
+// Min distance across RA bearing cover and RA motor (perpendicular to RA axis
+// at the ra2/ra3 plane) to center of flat cover above bearing.
+ra_diam_plus_motor_min_at_ra2ra3 = 144;
+
+// Max distance across RA bearing cover and RA motor (perpendicular to RA axis
+// at the ra2/ra3 plane) to corner farthest from opposite side of RA axis.
+ra_diam_plus_motor_max_at_ra2ra3 = 150;
+
+// Max distance across RA bearing cover and RA motor (perpendicular to RA axis)
+// to corner farthest from opposite side of RA axis (this is a bit of a guess
+// because the tallest point on the motor w.r.t. the RA axis is beyond the
+// ra2/ra3 plane, away from the RA bearing plane.
+ra_diam_plus_motor_max = 155;
+
 ////////////////////////////////////////////////////////////////////////////////
 // Dimensions for the DEC and RA clutches. They are
 // mostly identical, except that the DEC clutch

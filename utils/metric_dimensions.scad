@@ -9,11 +9,13 @@
 
 m4_screw_diam = 4;
 m4_hole_diam = 4.5;
+
 m4_nut_diam1 = 7;  // Width across the flats
 m4_nut_diam2 = 7.66;  // Width across the corners
 m4_nut_height = 3.2;
-m4_washer_hole_diam = 4.3;
+
 m4_washer_diam = 9;
+m4_washer_hole_diam = 4.3;
 m4_washer_thickness = 0.8;
 
 m5_screw_diam = 5;
