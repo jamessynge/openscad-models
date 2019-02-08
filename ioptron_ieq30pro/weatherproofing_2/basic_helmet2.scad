@@ -58,7 +58,8 @@ if (!$preview) {
 //   }
 
 } else if (true) {
-  ra_and_dec(include_dec_head=false) {
+  ra_clutch_angle=90;
+  ra_and_dec(include_dec_head=false, ra_clutch_angle=ra_clutch_angle) {
     s = 300;
     intersection() {
       basic_helmet2();
@@ -68,7 +69,7 @@ if (!$preview) {
   }
 
   translate([-200, 300, 0])
-  ra_and_dec(include_dec_head=false) {
+  ra_and_dec(include_dec_head=false, ra_clutch_angle=ra_clutch_angle) {
     s = 300;
     intersection() {
       basic_helmet2();
@@ -78,7 +79,7 @@ if (!$preview) {
   }
 
   translate([-400, 600, 0])
-  ra_and_dec(include_dec_head=false) {
+  ra_and_dec(include_dec_head=false, ra_clutch_angle=ra_clutch_angle) {
     s = 300;
     intersection() {
       basic_helmet2();
@@ -338,24 +339,6 @@ basic_helmet2_interior_core_slice();
 
 translate([200, 300, 100])
 basic_helmet2_exterior_slice();
-
-
-translate([200, 600, 0]) {
-  hull() {
-    po1 = 5;
-    translate([0, 0, -po1])
-      linear_extrude(height=1, convexity=3)
-        basic_helmet2_interior_core_slice(projection_offset=po1);
-    translate([0, 0, po1])
-      linear_extrude(height=local_helmet_avoidance_ir+30, convexity=3)
-        basic_helmet2_exterior_slice();
-
-
-
-
-  }
-}
-
 
 module basic_helmet2_half_draft_body(nut_side=false) {
   rotate([0, -90, 0]) {

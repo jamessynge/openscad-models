@@ -470,7 +470,7 @@ module round_top_rectangle(diam=undef, height=undef) {
 // angle: angle of the pyramid sides, where zero is vertical
 //        (i.e. not a pyramid).
 module round_top_pyramid(diam=undef, height=undef, angle=20) {
-  assert(angle <= 45);
+  assert(angle < 90);
   circle(d=diam);
   r = diam / 2;
   // Lazy approach. Should just use some trigonometry to compute polygon.

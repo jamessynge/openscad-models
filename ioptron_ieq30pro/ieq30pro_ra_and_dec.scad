@@ -82,18 +82,18 @@ ra_and_dec($t * 360) {
   };
 };
 
-module ra_and_dec(dec_angle=0, include_polar_port=true, include_dec_head=true, include_cw_shaft=true) {
+module ra_and_dec(dec_angle=0, include_polar_port=true, include_dec_head=true, include_cw_shaft=true, ra_clutch_angle=5, dec_clutch_angle=0) {
   if ($children > 4) {
     echo("ra_and_dec has", $children, "children, too many.");
     assert($children <= 4);
   }
 
   raise_dec = ra1_base_to_dec_center;
-  ra_to_dec(include_polar_port=include_polar_port);
+  ra_to_dec(include_polar_port=include_polar_port, ra_clutch_angle=ra_clutch_angle);
 
   translate_to_dec12_plane() {
     // echo("ra_and_dec dec_body at angle", dec_angle);
-    dec_body(dec_angle, include_dec_head=include_dec_head, include_cw_shaft=include_cw_shaft) {
+    dec_body(dec_angle, include_dec_head=include_dec_head, include_cw_shaft=include_cw_shaft, dec_clutch_angle=dec_clutch_angle) {
       union() { if ($children > 1) children(1); }
       union() { if ($children > 2) children(2); }
       union() { if ($children > 3) children(3); }
@@ -130,7 +130,7 @@ module translate_to_dec_bearing_plane() {
   }
 }
 
-module ra_to_dec(include_polar_port=true) {
+module ra_to_dec(include_polar_port=true, ra_clutch_angle=90) {
   h1 = ra1_base_to_dec;
   h2 = 45 - h1;
 
@@ -145,7 +145,7 @@ module ra_to_dec(include_polar_port=true) {
   };
   translate([-(ra1_radius-5), 0, 0])
     rotate([90,0,270])
-    clutch(handle_angle=5);
+      clutch(handle_angle=ra_clutch_angle);
 
   // Polar scope port.
   if (include_polar_port) {
@@ -167,7 +167,7 @@ module ra_to_dec_fillet() {
   }
 }
 
-module dec_body(dec_angle=0, include_dec_head=true, include_cw_shaft=true) {
+module dec_body(dec_angle=0, include_dec_head=true, include_cw_shaft=true, dec_clutch_angle=5) {
   if ($children > 3) {
     echo("dec_body has", $children, "children, too many");
     assert($children <= 3);
@@ -193,7 +193,7 @@ module dec_body(dec_angle=0, include_dec_head=true, include_cw_shaft=true) {
   if (include_dec_head) {
     translate([0, 0, dec2_len+dec_bearing_gap]) {
       rotate([0, 0, dec_angle]) {
-        dec_head() {
+        dec_head(dec_clutch_angle=dec_clutch_angle) {
           union() if ($children > 1) children(1);
           union() if ($children > 2) children(2);
         };

@@ -88,8 +88,8 @@ if (!$preview) {
     };
     union() {
       // Moving side of RA bearing.
-      color("white") half_helmet(nut_side=true);
-      color("white") half_helmet(nut_side=false);
+      *color("white") half_helmet(nut_side=true);
+      #color("white") half_helmet(nut_side=false);
       *dec1_hat();
       *helmet_support_at_cws();
     };
@@ -137,10 +137,13 @@ module half_helmet_screw_side() {
 
 module half_helmet(nut_side=true) {
   difference() {
-    if (nut_side) {
-      basic_helmet2_nut_side();
-    } else {
-      basic_helmet2_screw_side();
+    union() {
+      if (nut_side) {
+        basic_helmet2_nut_side();
+      } else {
+        basic_helmet2_screw_side();
+      }
+      helmet_clip_parts(nut_side=nut_side);
     }
     bosses(solid=true, nut_side=true);
     bosses(solid=true, nut_side=false);
@@ -156,7 +159,8 @@ module bosses(solid=false, nut_side=true) {
     union() {
       // At the bottom of the cut on the CW shaft side of the helmet.
       bosses_below_cw_port(solid=solid, nut_side=nut_side);
-  bosses_below_dec_port(solid=solid, nut_side=nut_side);
+      bosses_below_dec_port(solid=solid, nut_side=nut_side);
+      //bosses_above_dec_port(solid=solid, nut_side=nut_side);
     }
 
     if (!solid) {
@@ -170,6 +174,8 @@ module bosses(solid=false, nut_side=true) {
 
 
   bosses_near_top(solid=solid, nut_side=nut_side);
+
+  bosses_near_dec_bearing(solid=solid, nut_side=nut_side);
 
 
   // Below and above the counterweight port.
@@ -248,6 +254,33 @@ module bosses_below_dec_port(solid=false, nut_side=true, do_intersect=false, ang
   }
 }
 
+// Boss at the bottom rim, below the DEC port.
+module bosses_above_dec_port(solid=false, nut_side=true, do_intersect=false, angle=0, z=0) {
+  nut_slot_angle=-90;
+  boss_height=60;
+  r1=dflt_helmet_ir;
+  // 30mm from screw head to center of nut, so a 40mm screw will work.
+  nut_depth=35;
+  screw_head_depth=40;
+  screw_extension=15;
+  screw_head_recess=20;
+  rtp_radius = rtp_diam / 2;
+
+  difference() {
+    translate([0, r1+2.65, ra1_base_to_dec_center + dec_clutch_handle_max_height]) {
+      rotate([0, 90, 0]) {
+        matching_rect_m4_slotted_bosses2(
+            nut_side=nut_side, nut_slot_angle=nut_slot_angle,
+            nut_depth=nut_depth, screw_extension=screw_extension,
+            boss_height=boss_height,
+            screw_head_depth=screw_head_depth,
+            screw_head_recess=screw_head_recess,
+            solid=solid, cone_height=0, w=rtp_diam, h=rtp_diam*2, y=-rtp_diam*3/2);
+      }
+    }
+    *basic_helmet2_interior();
+  }
+}
 
 module bosses_near_top(solid=false, nut_side=true) {
   nut_slot_angle=165;
@@ -270,7 +303,7 @@ module bosses_near_top(solid=false, nut_side=true) {
               boss_height=boss_height,
               screw_head_depth=screw_head_depth,
               screw_head_recess=screw_head_recess,
-              solid=solid, angle=44, h=rtp_radius*1);
+              solid=solid, angle=60, h=rtp_radius*1);
         }
       }
     }
@@ -280,7 +313,36 @@ module bosses_near_top(solid=false, nut_side=true) {
   }
 }
 
+module bosses_near_dec_bearing(solid=false, nut_side=true) {
+  nut_slot_angle=20;
+  boss_height=45;
+  r1=dflt_helmet_ir+6.5;
+  // 30mm from screw head to center of nut, so a 40mm screw will work.
+  nut_depth=15;
+  screw_head_depth=15;
+  screw_extension=10;
+  screw_head_recess=40;
+  rtp_radius = rtp_diam / 2;
 
+  intersection() {
+    translate([0, dec1_len/2 + dec2_len*0.7, 129]) {
+      rotate([0, 90, 0]) {
+        rotate([0, 0, 265]) {
+          matching_rtp_m4_slotted_bosses(
+              nut_side=nut_side, nut_slot_angle=nut_slot_angle,
+              nut_depth=nut_depth, screw_extension=screw_extension,
+              boss_height=boss_height,
+              screw_head_depth=screw_head_depth,
+              screw_head_recess=screw_head_recess,
+              solid=solid, angle=40, h=rtp_radius*0.85);
+        }
+      }
+    }
+    if (!solid) {
+      basic_helmet2_simple_solid();
+    }
+  }
+}
 
 module bosses_around_cw_port(solid=false, nut_side=true, do_intersect=false, angle=0, z=undef) {
   r1=dflt_helmet_ir;
@@ -347,8 +409,65 @@ module bosses_around_hemisphere(solid=false, nut_side=true, do_intersect=false, 
   }
 }
 
+////////////////////////////////////////////////////////////////////////////////
+// Modules for a clip that helps to secure the helmet halves to the supports
+// that are secured to the ra_and_dec body. For printability, the clip runs
+// the full length of the dec body.
+// 
+
+*union() {
+  translate([200, 0, 0]) helmet_clip_parts();
+  translate([200, 0, 20]) helmet_clip_parts(clip=false, intersect=false);
+  translate([200, 0, 40]) {
+    difference() {
+      helmet_clip_parts(clip=false, intersect=false);
+      helmet_clip_parts(intersect=false);
+    }
+  }
+}
+module helmet_clip_parts(nut_side=true, clip=true, intersect=true) {
+  diam = 7 * (clip ? 0.95 : 1.05);
+  shaft_width = 4 * (clip ? 0.95 : 1.05);
+  shaft_length = 30;
+  separator_length = 15;
+  clip_ex_length = hoop_disc_z + dec1_len + dec1_len + cw_cap_total_height;
+  x_offset = dec_clutch_handle_max_height + diam;
+
+  intersection() {
+    translate_to_dec_bearing_plane() {
+      mirror([nut_side ? 0 : 1, 0, 0]) {
+        translate([x_offset, 0, -hoop_disc_z]) {
+          rotate([0, -10, 0])
+          linear_extrude(height=clip_ex_length, convexity=10) {
+            sw2 = shaft_width / 2;
+            sw3 = shaft_width / 3;
+            difference() {
+              union() {
+                circle(d=diam, $fn=20);
+                translate([0, -sw2, 0])
+                  square([shaft_length, shaft_width]);
+              }
+              if (clip) {
+                polygon([[-diam, sw3], [separator_length, 0], [-diam, -sw3]]);
+                // translate([-diam, -sw3/2, 0])
+                //   square([shaft_length + diam, sw3]);
+              }
+            }
+    
+          }
+        }
+      }
+    }
+    if (intersect) {
+      basic_helmet2_interior();
+    }
+  }
+}
 
 
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 
 
 
@@ -361,7 +480,7 @@ module matching_rtp_m4_recessed_bosses(nut_side=undef, d=rtp_diam, h=rtp_height,
   }
 }
 
-module matching_rtp_m4_slotted_bosses(nut_side=undef, h=rtp_height, angle=0, nut_slot_angle=undef, nut_depth=undef, screw_extension=undef, boss_height=undef, screw_head_depth=undef, screw_head_recess=undef, solid=false) {
+module matching_rtp_m4_slotted_bosses(nut_side=undef, rtp_diam=rtp_diam, h=rtp_height, angle=0, nut_slot_angle=undef, nut_depth=undef, screw_extension=undef, boss_height=undef, screw_head_depth=undef, screw_head_recess=undef, solid=false) {
   matching_m4_slotted_bosses(
       solid=solid, show_nut_boss=nut_side, show_screw_boss=!nut_side,
       nut_slot_angle=nut_slot_angle, nut_depth=nut_depth,

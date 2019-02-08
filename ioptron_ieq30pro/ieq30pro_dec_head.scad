@@ -29,7 +29,7 @@ show_axis_arrows = true;
 
 dec_head(show_axis_arrows=show_axis_arrows);
 
-module dec_head(show_axis_arrows=false) {
+module dec_head(show_axis_arrows=false, dec_clutch_angle=5) {
   // echo("dec_head has", $children, "children");
   base_r = dec_head_base_diam / 2;
   inner_r = dec_head_diam1 / 2;
@@ -52,7 +52,7 @@ module dec_head(show_axis_arrows=false) {
 
   translate([inner_r-2,0,0])
     rotate([90,0,90])
-      clutch();
+      clutch(handle_angle=dec_clutch_angle);
 
   dec_head_clamp_screws();
 
