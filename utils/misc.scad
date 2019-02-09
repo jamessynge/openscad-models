@@ -1,5 +1,6 @@
 include <metric_dimensions.scad>
 
+function in_to_mm(v) = v * 25.4;
 
 translate([100,0,0]) motor_cover_shell(50, 40, 30, shell_wall=1,
 bracing0=10, bracing1=20
