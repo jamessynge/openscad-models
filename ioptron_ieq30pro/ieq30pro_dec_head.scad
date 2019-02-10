@@ -41,7 +41,8 @@ module dec_head(show_axis_arrows=false, dec_clutch_angle=5) {
         translate([0,0,dec_head_base_height])
           linear_extrude(
               height=dec_head_height,
-              scale=dec_head_scale)
+              scale=dec_head_scale,
+              convexity=10)
             dec_head_extrusion_profile();
       };
       dec_saddle_inverse();

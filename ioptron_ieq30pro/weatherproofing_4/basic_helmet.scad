@@ -1,4 +1,4 @@
-// Test of building interior of helmet using union(), hull(), etc.
+// Helmet around ra_and_dec.
 
 // Author: James Synge
 
@@ -8,15 +8,17 @@ use <../ieq30pro_dec_head.scad>
 use <../ieq30pro_ra_and_dec.scad>
 use <../ieq30pro_ra_core.scad>
 
-include <wp2_dimensions.scad>
-use <../weatherproofing_1/dec_head_bearing_cover.scad>
-use <ra_motor_hat.scad>
-use <dec1_hat.scad>
-use <basic_helmet.scad>
-use <wp_utils.scad>
+include <../ieq30pro_wp_dimensions.scad>
+include <wp4_dimensions.scad>
+include <fragments.scad>
+//use <../weatherproofing_1/dec_head_bearing_cover.scad>
+//use <ra_motor_hat.scad>
+//use <dec1_hat.scad>
+//use <basic_helmet.scad>
+//use <wp_utils.scad>
 
-use <../../utils/cut.scad>
 include <../../utils/metric_dimensions.scad>
+use <../../utils/cut.scad>
 use <../../utils/misc.scad>
 use <../../utils/strap.scad>
 
@@ -34,7 +36,7 @@ $fa = $preview ? 10 : 1;
 
 if (!$preview) {
   basic_helmet2();
-} else if (false) {
+} else if (true) {
   color("orange") translate([distance, 0, 0]) basic_helmet2_nut_side();
   color("limegreen") translate([-distance, 0, 0]) basic_helmet2_screw_side();
 
@@ -180,10 +182,6 @@ module basic_helmet2_old() {
 //         basic_helmet2_simple_solid();
 //   }
 // }
-
-module minkowski_sphere() {
-  sphere(r=basic_helmet2_walls, $fn=$fn);
-}
 
 module basic_helmet2_simple_solid() {
   basic_helmet2_exterior();
@@ -559,13 +557,13 @@ module basic_helmet2_cut_from_exterior(core_only=false) {
         // Four spheres to mark the top corners of the DEC motor in the hull.
         translate_to_dec_bearing_plane() {
           translate([0, motor_cylinder_y, 0]) {
-            mirrored([1, 0, 0]) {
+            //mirrored([1, 0, 0]) {
               translate([motor_cylinder_x, 0, 0]) {
                 sphere(r=10, $fn=20);
                 translate([0, 0, dec_motor_core_top_h])
                   sphere(r=10, $fn=20);
               }
-            }
+            //}
           }
         }
 
@@ -612,17 +610,6 @@ module basic_helmet2_cut_from_exterior(core_only=false) {
   }
 }
 
-module below_ra_bearing(r=local_helmet_avoidance_ir, r_offset=0, descend_offset=0, ascend=0*ra1_base_to_dec_center) {
-  // We support extend below the RA bearing plane further than necessary so
-  // that we can easily cut it off later without running into math problems.
-  descend = ra_bcbp_ex + descend_offset;
-  h = descend + ascend;
-
-  translate([0, 0, -descend]) {
-    my_cylinder(r=r+r_offset, h=h);
-  }
-}
-
 // ONLY for the sake of being able to 3D print this part (with the DEC head end
 // being flat on the printer bed, and the CW shaft port at the top), we put
 // an angled bump out below the CW shaft.
@@ -647,26 +634,6 @@ module dome_above_ra_bearing() {
   }
 }
 
-
-
-// Volume swept out by the DEC clutch as it rotates fully, and the DEC head
-// under it, plus some more to allow the hull above to cover the DEC motor.
-module swept_dec_clutch(grow=true, extra_h=0) {
-  r = dec_clutch_handle_max_height;
-  r2 = grow ? r * 1.15 : r;
-  h = clutch_screw_axis_height + clutch_handle_base_diam / 2 + 2;
-
-  translate_to_dec_bearing_plane() {
-    // The volume swept out by the DEC clutch.
-    translate([0, 0, -(dec_bearing_gap + h)]) {
-      my_cylinder(h=h*1.7, r1=r, r2=r2);
-      if (extra_h > 0) {
-        translate([0, 0, -extra_h + 0.001])
-          my_cylinder(r=r, h=extra_h);
-      }
-    }
-  }
-}
 
 // Interior of tube surrounding the counterweight shaft as it goes through
 // the side of the helmet. Allows us room for a small disc that keeps

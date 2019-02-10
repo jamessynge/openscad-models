@@ -107,10 +107,53 @@ module ra_and_dec(dec_angle=0, include_polar_port=true, include_dec_head=true, i
 module translate_to_dec12_plane(z_towards_dec_head=true) {
   raise_dec = ra1_base_to_dec_center;
   translate([0, ra1_radius, raise_dec]) {
-    rotate([z_towards_dec_head ? -90 : 90,0,0]) {
+    rotate([z_towards_dec_head ? -90 : 90, 0, 0]) {
       children();
     }
   }
+}
+*translate_to_dec12_plane(z_towards_dec_head=true) {
+  cube(size=[80, 10, 40]);
+}
+*translate_to_dec12_plane(z_towards_dec_head=false) {
+  color("blue") cube(size=[80, 10, 40]);
+}
+
+
+module translate_to_dec_bearing_plane(z_towards_dec_head=true) {
+  raise_dec = ra1_base_to_dec_center;
+  translate([0, ra1_radius+dec2_len, raise_dec]) {
+    rotate([z_towards_dec_head ? -90 : 90, 0, 0]) {
+      rotate([0, 0, z_towards_dec_head ? 0 : 180]) {
+        children();
+      }
+    }
+  }
+}
+*translate_to_dec_bearing_plane(z_towards_dec_head=true) {
+  color("skyblue") cube(size=[10, 80, 30]);
+}
+
+*translate_to_dec_bearing_plane(z_towards_dec_head=false) {
+  translate([0, 0, 0])
+  color("limegreen") cube(size=[10, 80, 30]);
+}
+
+module translate_to_dec_head_base(z_towards_dec_head=true) {
+  raise_dec = ra1_base_to_dec_center;
+  translate([0, ra1_radius + dec2_len + dec_bearing_gap, raise_dec]) {
+    rotate([z_towards_dec_head ? -90 : 90, 0, 0]) {
+      children();
+    }
+  }
+}
+*translate_to_dec_head_base(z_towards_dec_head=true) {
+  color("green") cube(size=[10, 80, 90]);
+}
+
+*translate_to_dec_head_base(z_towards_dec_head=false) {
+  translate([0, 0, 0])
+  color("pink") cube(size=[10, 80, 200]);
 }
 
 module translate_to_dec2() {
@@ -122,13 +165,6 @@ module translate_to_dec2() {
   }
 }
 
-module translate_to_dec_bearing_plane() {
-  translate_to_dec12_plane() {
-    rotate([180, 0, 0]) {
-      translate([0, 0, -dec2_len]) children();
-    }
-  }
-}
 
 module ra_to_dec(include_polar_port=true, ra_clutch_angle=90) {
   h1 = ra1_base_to_dec;
@@ -203,9 +239,7 @@ module dec_body(dec_angle=0, include_dec_head=true, include_cw_shaft=true, dec_c
 }
 
 module dec_body_helper(include_cw_shaft=true) {
-  total_dec_len =
-    dec1_len + dec2_len + cw_cap_height +
-    cw_cap_bevel_height;
+  total_dec_len = dec1_len + dec2_len + cw_cap_total_height;
   difference() {
     union() {
       color(cast_iron_color) {

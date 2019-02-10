@@ -136,6 +136,7 @@ ps5_len = (ps5_od - ps5_id) / 2;
 polar_port_diam = 28.4;
 //polar_port_offset = 60;  // To center of port.
 polar_port_height = 2.15;  // Above surface of dec1 body.
+polar_port_height_max = 5; // After dec1 slopes away.
 polar_port_cap_diam = 31.9;
 polar_port_cap_height = 8;
 
@@ -226,6 +227,9 @@ dec_motor_z_offset =
 dec_motor_x_offset = 1.76;
 
 
+
+dec_center_to_dec_motor_top = dec1_radius + dec_motor_z2;
+ra1_base_to_dec_motor_top = ra1_base_to_dec_center + dec_center_to_dec_motor_top;
 
 ////////////////////////////////////////////////////////////////////////////////
 // RA core (the non-moving portion "below" RA bearing plane) dimensions.
@@ -381,7 +385,7 @@ dec_cover_max_diam = dec_cover_max_radius * 2;
 dec_motor_cover_angle = 2 * asin(dec_motor_w/dec2_diam);
 
 dec1_body_len_beyond_ra = dec1_len - ra1_diam;
-dec_len_beyond_ra = dec1_body_len_beyond_ra + cw_cap_height + cw_cap_bevel_height;
+dec_len_beyond_ra = dec1_body_len_beyond_ra + cw_cap_total_height;
 
 ////////////////////////////////////////////////////////////////////////////////
 // Four star knob dimensions.

@@ -12,11 +12,10 @@ module four_star_knob(include_screw=true, zero_is_top=false) {
   total_knob_height = fsk_height + fsk_shoulder_height;
   drop_by = zero_is_top ? 0 : total_knob_height;
 
-
   translate([0, 0, -drop_by]) {
     color(plastic_color) {
       union() {
-        linear_extrude(height=fsk_height) {
+        linear_extrude(height=fsk_height, convexity=4) {
           four_star_knob_profile(fsk_inner_diam, fsk_notch_diam, fsk_outer_diam);
         };
         translate([0, 0, fsk_height])
@@ -37,6 +36,7 @@ module four_star_knob_profile(inner_diam, notch_diam, outer_diam) {
   inner_radius = inner_diam / 2;
   delta = (inner_diam + notch_diam) / 2;
 
+  rotate([0, 0, 45])
   difference() {
     circle(d=outer_diam);
     // Remove the four notches.
