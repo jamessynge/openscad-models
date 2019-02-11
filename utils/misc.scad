@@ -233,3 +233,22 @@ module offset_3d(r=1, size=1e12) {
     }
   }
 }
+
+module minkowski_sphere(d=undef, r=undef, fn=$fn) {
+  // One of of d and r must be provided, but not both.
+  assert((d == undef) != (r == undef));
+  sphere(d=d, r=r, $fn=fn);
+}
+
+module maybe_minkowski_each(minkowski_sphere_r=0, fn=$fn) {
+  for (i = [0:$children-1]) {
+    if (minkowski_sphere_r > 0) {
+      minkowski() {
+        children(i);
+        minkowski_sphere(r=minkowski_sphere_r, fn=fn);
+      }
+    } else {
+      children(i);
+    }
+  }
+}

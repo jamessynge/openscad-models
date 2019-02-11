@@ -139,6 +139,7 @@ polar_port_height = 2.15;  // Above surface of dec1 body.
 polar_port_height_max = 5; // After dec1 slopes away.
 polar_port_cap_diam = 31.9;
 polar_port_cap_height = 8;
+polar_port_interior_height = 6; // Measurement from my mount, inside the port.
 
 ////////////////////////////////////////////////////////////////////////////////
 // Declination motor cover size.
@@ -407,4 +408,4 @@ fsk_screw_len = 24.4;
 mount_latitude = 43;
 
 assert(mount_latitude >= 0);
-assert(mount_latitude < 90);
+assert(mount_latitude <= 90);

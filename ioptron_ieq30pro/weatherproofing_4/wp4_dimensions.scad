@@ -33,6 +33,8 @@ ra_to_dec_bearing_plane = ra1_radius + dec2_len;
 rtp_boss_diam = m4_washer_diam * 1.5;
 rtp_boss_height = m4_nut_diam2;
 
+rtp_boss_radius = rtp_boss_diam/2;
+
 // Dimensions for rib at bottom. Goal is to provide enough room for a slotted
 // boss for an M4 screw. Will require that the DEC bearing rain plate be
 // notched to allow room for the rib.
