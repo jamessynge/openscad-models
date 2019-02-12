@@ -40,7 +40,7 @@ mount_latitude=90;
 ra_angle = 152 + $t * 360;
 dec_angle = 180 + 238 + $t * 360;
 
-ioptron_mount(latitude=mount_latitude,ra_angle=ra_angle, dec_angle=dec_angle) {
+*ioptron_mount(latitude=mount_latitude,ra_angle=ra_angle, dec_angle=dec_angle) {
   union() {}
   union() {
     demo();
@@ -98,7 +98,7 @@ ra_and_dec(include_dec_head=true, ra_clutch_angle=ra_clutch_angle) {
   }
 }
 
-translate([500, 0, 0]) {
+*translate([500, 0, 0]) {
   cut_along_x() {
     difference() {
       simple_exterior(solid=true, include_polar_port=false);
@@ -109,17 +109,23 @@ translate([500, 0, 0]) {
   }
 }
 
-module cut_along_x(x=0) {
-  difference() {
-    union() { children(); }
-    s = 300;
-    translate([x, -s/2, -s/3])
-      cube(size=s, center=false);
+module cut_along_x(x=0, reverse=false) {
+  if (reverse) {
+    intersection() {
+      union() { children(); }
+      s = 300;
+      translate([x, -s/2, -s/3])
+        cube(size=s, center=false);
+    }
+  } else {
+    difference() {
+      union() { children(); }
+      s = 300;
+      translate([x, -s/2, -s/3])
+        cube(size=s, center=false);
+    }
   }
 }
-
-
-
 module demo() {
   // hull() {
   //   trim_below_ra_bearing() {
@@ -146,7 +152,11 @@ module demo() {
 
   //   swept_dec_clutch_and_dec1_hull();
   // }
-  difference() {
+
+  cut_along_x() {
+    simple_exterior(solid=false, include_polar_port=true);
+  }
+*  difference() {
     simple_exterior(solid=false, include_polar_port=true);
     s = 300;
     translate([0, -s/2, -s/3])
@@ -154,6 +164,92 @@ module demo() {
 
   }
 }
+
+
+translate([50, 0, 0])
+difference() {
+  simple_exterior();
+  difference() {
+    rotate([0, -90, 0]) {
+      linear_extrude(height=200, convexity=4)
+        overhang_cut_profile(overhang=overhang+0.1);
+    }
+    cylinder(d=polar_port_cap_diam*1.5, h=150);
+  }
+}
+
+  intersection() {
+    difference() {
+      simple_exterior();
+      cylinder(d=polar_port_cap_diam*1.5, h=150);
+    }
+    rotate([0, -90, 0]) {
+      linear_extrude(height=200, convexity=4)
+        overhang_cut_profile(overhang=overhang-0.1);
+    }
+  }
+
+translate([300, 0, 0])
+overhang_cut_profile();
+
+
+
+translate([0, 500, 0])
+  overhang_cut_body();
+
+
+module overhang_cut_body(overhang=overhang) {
+  difference() {
+    rotate([0, -90, 0]) {
+      linear_extrude(height=200, convexity=4)
+        overhang_cut_profile(overhang=overhang);
+    }
+    s = polar_port_cap_diam*1.5;
+    rotate([0, 0, 45])
+      translate([-s/2, -s/2, -100])
+        cube([s, s, 300], center=false);
+//    cylinder(d=polar_port_cap_diam*1.5, h=150);
+  }
+
+}
+
+
+module overhang_cut_profile(overhang=overhang, solid=true, include_polar_port=false) {
+  module extensions() {
+    // Extend the profile below the bottom and beyond the DEC head so that
+    // so that we don't have funny slivers of material there.
+    union() {
+      union() {
+        x = 50;
+        y = 400;
+        translate([-x/2 - ra_bcbp_ex + overhang, 0, 0])
+          square(size=[x, y], center=true);
+      }
+      union() {
+        x = dec_clutch_handle_max_height*2;
+        y = 50;
+        translate([ra1_base_to_dec_center+2, y/2 + ra1_radius+dec2_len+dec_bearing_gap+clutch_flange_height, 0]) {
+          square(size=[x, y], center=true);
+          translate([-x/2, 0, 0])
+            square(size=[x, y], center=true);
+        }
+      }
+    }    
+  }
+  module base() {
+    simple_exterior_profile(solid=solid, include_polar_port=include_polar_port);
+  }
+  offset(r=-overhang) base();
+  extensions();
+}
+
+module simple_exterior_profile(solid=true, include_polar_port=false) {
+  projection(cut=true) {
+    rotate([0, 90, 0]) 
+      simple_exterior(solid=solid, include_polar_port=include_polar_port);
+  }
+}
+
 
 module simple_exterior(solid=false, include_polar_port=true) {
 
