@@ -363,12 +363,21 @@ dec_gap_to_saddle_knob = 31;
 // handle is straight, so becomes farther and farther away from the DEC bearing
 // gap as it is tangent to the circle.
 
-dec_clutch_handle_min_height = dec2_radius + 18.6; 
-dec_clutch_handle_max_height = dec2_radius + 26.6; 
+dec_clutch_handle_min_height = dec2_radius + 22.75; 
+dec_clutch_handle_max_height = dec2_radius + 27.5; 
 
 // The same for the RA axis.
-ra_clutch_handle_min_height = ra1_radius + 18.6; 
-ra_clutch_handle_max_height = ra1_radius + 26.6; 
+// The base of the RA clutch sits more flush against the the ra_to_dec body
+// than the base of the DEC clutch does to the DEC head, hence the difference
+// in height.
+ra_clutch_handle_min_height = ra1_radius + 16.5; 
+ra_clutch_handle_max_height = ra1_radius + 23.0; 
+
+// Distance from the RA or DEC base to the top of the handle's base, assuming
+// the clutch handle is in the locked position, i.e. down near the bearing.
+
+dec_base_to_clutch_handle_diam_top = 21.75;
+ra_base_to_clutch_handle_diam_top = 22.4;
 
 ////////////////////////////////////////////////////////////////////////////////
 // Computed values for the DEC bearing.

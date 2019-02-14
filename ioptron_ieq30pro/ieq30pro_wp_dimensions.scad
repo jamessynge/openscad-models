@@ -24,9 +24,17 @@ ra_motor_clearance_radius_min = ra2_radius + 25;
 // ra_motor_clearance_radius_max applies.
 ra_motor_max_clearance_z = ra2_len + ra3_len / 2;
 
-// Distance from the RA or DEC base to the top of the handle's base, assuming
-// the clutch handle is in the locked position, i.e. down near the bearing.
-base_to_clutch_handle_diam_top = clutch_screw_axis_height + clutch_handle_base_diam / 2;
+
+// Minimum distance from RA bearing plane (not including the gap) to the
+// latitude adjusting base. A skirt (hoop around the RA core and motor) any
+// larger longer than this will collide with the base.
+ra_motor_skirt_max_z = 50;
+
+
+// OBSOLETE, use one of the two values.
+// // Distance from the RA or DEC base to the top of the handle's base, assuming
+// // the clutch handle is in the locked position, i.e. down near the bearing.
+base_to_clutch_handle_diam_top = max(dec_base_to_clutch_handle_diam_top, ra_base_to_clutch_handle_diam_top);
 
 // Distance from the DEC head base to the mid point between the DEC clutch
 // and the knobs of the DEC saddle plate; this can be used as the middle of
