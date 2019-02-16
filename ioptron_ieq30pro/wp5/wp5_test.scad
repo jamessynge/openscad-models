@@ -35,12 +35,18 @@ if ($preview) {
     union() {}
     //cut_along_y(reverse=true)
     union() {
-      color("palegreen") simple_helmet_core();
+      #color("palegreen") simple_helmet_core();
       color("skyblue") simple_lid();
+
+
+//translate([0,200, 0])
+      color("green") simple_cw_port(nut_side=true);
+      color("red") simple_cw_port(nut_side=false);
+
     }
   }
 } else {
-  simple_helmet_core();
+  *simple_helmet_core();
 
   translate([400, 0, 0]) simple_lid();
 }
@@ -50,7 +56,8 @@ helmet_ir = ra_motor_clearance_radius_max + extra_ra_motor_clearance;
 helmet_or = helmet_ir + ra_motor_skirt_thickness;
 rim_or = helmet_ir + ra_motor_skirt_rim;
 
-
+// Size of the notch in the helmet for an alignment tab in the lid.
+lid_tab_slot_degrees = 4; // degrees
 
 
 
@@ -181,6 +188,169 @@ module simple_dec_head_skirt() {
   // }
 }
 
+
+// Goals:
+// * Printable, which means that there can't be horizontal overhangs.
+// * Add a raised lip at the outside edge so that water will tend to flow
+//   back towards the helmet and then down rather than into the opening.
+// * Eventually add a collar to be clipped onto the CW shaft that surrounds
+//   the port, so that most water doesn't even make it to the port.
+module simple_cw_port(nut_side=true) {
+  length = 30;  // Just for the extrusion, will probably be cut down.
+  thickness = dec_head_thickness;
+  inside = 30;
+  outside = inside + thickness * 2;
+
+  module profile() {
+    
+    difference() {
+      square(size=outside, center=true);
+      square(size=inside, center=true);
+    }
+  }
+
+  module screw_side_match() {
+    translate([-thickness, -thickness, 0])
+      square(size=outside, center=true);
+    rotate([0, 0, -135])
+      square(size=outside, center=false);
+  }
+
+  module nut_side_profile() {
+    difference() {
+      profile();
+      screw_side_match();
+    }
+  }
+
+  module screw_side_profile() {
+    intersection() {
+      profile();
+      screw_side_match();
+    }
+  }
+
+  module gusset() {
+    half = outside/2;
+    halfsq = half*half;
+    dx = nut_side ? -thickness : 0;
+     rotate([0, 0, -135])
+       translate([0, sqrt(halfsq + halfsq) - 0*thickness/2, 0])
+        union() {
+          linear_extrude(height=length, scale=[1, 0], convexity=4) {
+            translate([dx, 0, 0])
+              square([thickness, length]);
+          }
+          linear_extrude(height=length, convexity=4) {
+            translate([dx, -thickness, 0])
+              square(size=thickness);
+          }
+        }
+    }
+
+  translate_to_dec12_plane() {
+
+  translate([0, 0, -ra1_radius - helmet_ir]) {
+      rotate([0, 0, 0]) {
+        gusset();
+        linear_extrude(height=length, convexity=4) {
+          if (nut_side) {
+            nut_side_profile();
+          } else {
+            screw_side_profile();
+          }
+        }
+      }
+    }
+  }
+}
+// Goals:
+// * Printable, which means that there can't be horizontal overhangs.
+// * Add a raised lip at the outside edge so that water will tend to flow
+//   back towards the helmet and then down rather than into the opening.
+// * Eventually add a collar to be clipped onto the CW shaft that surrounds
+//   the port, so that most water doesn't even make it to the port.
+module simple_cw_port_old() {
+  length = 50;  // Just for the extrusion, will probably be cut down.
+  exterior_scale = 1.25;
+  exterior_radius = 15;
+  rim_size = 3;
+  interior_radius = 10;
+  interior_scale = 1.25;
+
+  // Profile for the hollow inside of the port, which will have a tear drop
+  // shape, i.e. the top will be above the basic circle's cumference to
+  // allow the top to be printed (i.e. not a serious overhang).
+  module teardrop_profile(r=undef, top_slope=30) {
+    assert(r != undef);
+    assert(top_slope > 10);
+    assert(top_slope < 60);
+
+    hull() {
+      circle(r=r);
+      hypotenuse = r / sin(90 - top_slope);
+      translate([0, hypotenuse - 0.001, 0])
+        circle(r=0.001);
+    }
+  }
+
+  module rim() {
+    far_d = (exterior_radius * 2) * exterior_scale;
+    d = far_d + rim_size;
+
+
+    cz = length-rim_size;
+    cy = d/2 - exterior_radius;//d - exterior_radius * 2;
+
+
+//     = rim_size + exterior_radius * (exterior_scale - 1);
+
+    
+    translate([0, cy, cz])
+      cylinder(d=d, h=max(rim_size, 1));
+  }
+
+
+  module exterior() {
+    translate([0, -exterior_radius, 0])
+      hull() {
+        linear_extrude(height=length, convexity=4, scale=exterior_scale)
+          translate([0, exterior_radius, 0])
+            circle(r=exterior_radius);
+        linear_extrude(height=length, convexity=4)
+          translate([0, exterior_radius, 0])
+            teardrop_profile(r=exterior_radius);
+        translate([0, -length/2, 0])
+          sphere(r=exterior_radius/20);
+        // Rim at outer edge
+
+      };
+    rim();
+  }
+
+  module interior() {
+    r=interior_radius;
+    translate([0, r+2, -1])
+      linear_extrude(height=length+2, convexity=8, scale=interior_scale)
+        translate([0, -r, 0])
+        teardrop_profile(r=r);
+  }
+
+  difference() {
+    exterior();
+    interior();
+  }
+}
+
+
+
+
+
+
+
+*if ($preview) translate([300, 0, 0]) color("lime") simple_lid();
+
+
 module simple_lid(extra_ir=extra_ra_motor_clearance, helmet_thickness=ra_motor_skirt_thickness, lid_thickness=lid_thickness, grip_height=lid_grip_height) {
 
   ir = ra_motor_clearance_radius_max + extra_ir;
@@ -202,27 +372,44 @@ module simple_lid(extra_ir=extra_ra_motor_clearance, helmet_thickness=ra_motor_s
       [x0, y1],
     ]);
   }
-
-  // The outer is optional so that we can slide the screw side (not glued to
-  // to the lid) into place without needing to move down and then up.
-  module profile(include_outer=true) {
-    square([lid_or, lid_thickness]);
-    if (include_outer) {
-      translate([lid_or - lid_thickness, 0, 0]) grip_profile();
-    }
+  module outer_grip() {
+    translate([lid_or - lid_thickness, 0, 0]) grip_profile();
+  }
+  module inner_grip() {
     translate([lid_or - lid_thickness - helmet_thickness, 0, 0])
       mirror([1, 0, 0])
         grip_profile();
   }
 
-  module solid_body() {
-    rotate_extrude(angle=180, convexity=4) profile(include_outer=true);
-    alignment_gap = 4; // degrees
-    rotate([0, 0, 90 + alignment_gap / 2])
-    rotate_extrude(angle=360 - alignment_gap, convexity=4)
-      profile(include_outer=false);
+  // The outer is optional so that we can slide the screw side (not glued to
+  // to the lid) into place without needing to move down and then up.
+  module profile(include_outer=true, include_inner=true, include_tab=false) {
+    square([lid_or, lid_thickness]);
+    if (include_tab) {
+      hull() {
+        outer_grip();
+        inner_grip();
+      }
+    } else {
+      if (include_outer) {
+        outer_grip();
+      }
+      if (include_inner) {
+        inner_grip();
+      }      
+    }
+  }
 
-    rotate_extrude(convexity=4) profile(include_outer=false);
+  module solid_body() {
+    rotate_extrude(convexity=4) profile(include_outer=false, include_inner=true);
+    rotate_extrude(angle=180, convexity=4) profile(include_outer=true, include_inner=false);
+
+    tab_size = lid_tab_slot_degrees * 0.95; // degrees
+    rotate([0, 0, 90 - tab_size / 2])
+      rotate_extrude(angle=tab_size, convexity=4)
+        profile(include_tab=true);
+
+*    rotate_extrude(convexity=4) profile(include_outer=false);
     *difference() {
       union() {
         rotate_extrude(angle=180, convexity=4) profile(include_outer=true);
