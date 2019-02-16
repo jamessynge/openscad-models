@@ -119,7 +119,9 @@ module polar_port_cap_orig(print_threads_down=true, see_through=false) {
   }
 
   module solid_body() {
-    metric_thread (diameter=24.7, pitch=1.5, length=6, leadin=2, leadfac=1);
+    // Testing the effect of making the thread diameter slightly smaller (it is
+    // a very tight fit otherwise).
+    metric_thread (diameter=24.7 - 0.2, pitch=1.5, length=6, leadin=2, leadfac=1);
     cylinder(d=shaft_od, h=total_h);
     translate([0, 0, total_h - h1]) {
       port_lip();
@@ -305,7 +307,7 @@ module demo_cut_along_x(x=0, reverse=false) {
 // adding a conical taper and/or extending the height a little so that there is
 // a mm or two of bare shaft before the threads.
 
-//if ($preview)
+if ($preview)
   polar_port_cap(print_threads_down=true, see_through=true);
 
 translate([polar_port_cap_diam, 0, 0]) {
@@ -313,4 +315,5 @@ translate([polar_port_cap_diam, 0, 0]) {
   polar_port_cap(print_threads_down=false, see_through=true);
 }
 
-translate([-polar_port_cap_diam, 0, 0]) polar_port_cap(print_threads_down=false);
+if ($preview)
+  translate([-polar_port_cap_diam, 0, 0]) polar_port_cap(print_threads_down=false);
