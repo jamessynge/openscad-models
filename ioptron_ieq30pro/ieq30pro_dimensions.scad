@@ -141,6 +141,12 @@ polar_port_cap_diam = 31.9;
 polar_port_cap_height = 8;
 polar_port_interior_height = 6; // Measurement from my mount, inside the port.
 
+
+polar_port_cap_thread_od = 24.75;
+polar_port_cap_thread_id = 22.8;
+
+
+
 ////////////////////////////////////////////////////////////////////////////////
 // Declination motor cover size.
 dec_motor_w = 85.4;  // left-right on face with logo.  OBSOLETE
