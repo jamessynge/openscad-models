@@ -24,39 +24,42 @@ M = [ [ 1  , 0  , 0  , 0   ],
       [ 0  , 1  , 0  , 0   ],  // The "0.7" is the skew value; pushed along the y axis
       [ 0.2  , 0.2  , 1  , 0   ],
       [ 0  , 0  , 0  , 1   ] ] ;
-translate([0, 0, 2*GetDepth(test_dims)])
+translate([-100, -100, 0])
   multmatrix(M) 
     shaft_port(test_dims, fs=undef);
 
 translate([0, 0, -2*GetHeight(test_dims)])
   shaft_port_solid(test_dims);
 
-translate([2*GetOuterDiam(test_dims), 0, 0]) {
+translate([100, 100, 0]) {
   difference() {
     shaft_port(test_dims);
-    shaft_port_solid(SetDepth(GetDepth(test_dims)+10, test_dims));
+    extra_deep = SetDepth(GetDepth(test_dims)+10, test_dims);
+    shaft_port_solid(extra_deep);
   }
 }
 
-// This is used for cutting out the hole in the body into which the port
-// is inserted. thickness_frac controls whether the hole is just the inside
-// of the port, the outside, or somewhere in between.
-module shaft_port_solid(dims, thickness_frac=0.5) {
-  SP_ValidateDims(dims);
-  hull() shaft_port(dims, thickness_frac=thickness_frac);
-}
-
-// This is used for cutting out the hole in the body into which the port
-// is inserted. thickness_frac controls whether the hole is just the inside
-// of the port, the outside, or somewhere in between.
-module shaft_port(dims, thickness_frac=1, fs=undef) {
-  SP_ValidateDims(dims);
-  $fs = fs == undef ? GetThickness(dims) / 20 : fs;
-  rotate_extrude(convexity=10) shaft_port_profile(dims, thickness_frac=thickness_frac);
-}
-
-
 shaft_port_profile(test_dims);
+mirror([1, 0, 0])
+shaft_port_profile(test_dims, miter=true);
+
+
+// This is used for cutting out the hole in the body into which the port
+// is inserted. thickness_frac controls whether the hole is just the inside
+// of the port, the outside, or somewhere in between.
+module shaft_port_solid(dims, miter=true, thickness_frac=0.5, fs=undef) {
+  SP_ValidateDims(dims);
+  hull() shaft_port(dims, miter=miter, thickness_frac=thickness_frac, fs=fs);
+}
+
+// This is used for cutting out the hole in the body into which the port
+// is inserted. thickness_frac controls whether the hole is just the inside
+// of the port, the outside, or somewhere in between.
+module shaft_port(dims, miter=false, thickness_frac=1, fs=undef) {
+  SP_ValidateDims(dims);
+  rotate_extrude(convexity=10)
+    shaft_port_profile(dims, miter=miter, thickness_frac=thickness_frac, fs=fs);
+}
 
 
 
@@ -66,7 +69,7 @@ shaft_port_profile(test_dims);
 // with the opening.
 // Depth is the amount the profile sticks down below the x axis.
 // Diameters measure interior diameters of the port at thickness_frac == 1.
-module shaft_port_profile(dims, thickness_frac=1) {
+module shaft_port_profile(dims, miter=false, thickness_frac=1, fs=undef) {
   SP_ValidateDims(dims);
   thickness = GetThickness(dims);
   t2 = thickness / 2;
@@ -76,19 +79,18 @@ module shaft_port_profile(dims, thickness_frac=1) {
   h = GetHeight(dims);
   d = GetDepth(dims);
 
-  tf = thickness * GetThickness(dims);
   e = 0.01;
   delta = or - mr;
 
-  // Centerline of the profile, to be offset by thickness.
-  p0 = [ir, h];
-  p1 = [mr, h];
-  p2 = [or /*p1.x + delta*/, p1.y - delta];
-  p3 = [or, -d];
+  module profile() {
+    // Centerline of the profile, to be offset by thickness.
+    p0 = [ir, h];
+    p1 = [mr, h];
+    p2 = [or /*p1.x + delta*/, p1.y - delta];
+    p3 = [or, -d];
 
-  assert(p2.y > p3.y);
+    assert(p2.y > p3.y);
 
-  offset(r=thickness * thickness_frac / 2)
     polygon([
       [p0[0], p0[1]+e],
       [p1[0]+e, p1[1]+e],
@@ -99,6 +101,43 @@ module shaft_port_profile(dims, thickness_frac=1) {
       [p1[0]-e, p1[1]-e],
       [p0[0], p0[1]-e],
     ]);
+  }
+
+  tf2 = thickness_frac * t2;
+
+  $fs = fs == undef ? max(0.1, min(thickness / 20, $fs)) : fs;
+  if (miter) {
+    offset(delta=tf2)
+      profile();
+  } else {
+    offset(r=-3)
+      offset(delta=+3)
+        offset(r=tf2)
+          profile();
+  }
+
+
+
+
+  // // Centerline of the profile, to be offset by thickness.
+  // p0 = [ir, h];
+  // p1 = [mr, h];
+  // p2 = [or /*p1.x + delta*/, p1.y - delta];
+  // p3 = [or, -d];
+
+  // assert(p2.y > p3.y);
+
+  // offset(r=thickness * thickness_frac / 2)
+  //   polygon([
+  //     [p0[0], p0[1]+e],
+  //     [p1[0]+e, p1[1]+e],
+  //     [p2[0]+e, p2[1]+e],
+  //     [p3[0]+e, p3[1]],
+  //     [p3[0]-e, p3[1]],
+  //     [p2[0]-e, p2[1]-e],
+  //     [p1[0]-e, p1[1]-e],
+  //     [p0[0], p0[1]-e],
+  //   ]);
 }
 
 module SP_ValidateDims(dims) {

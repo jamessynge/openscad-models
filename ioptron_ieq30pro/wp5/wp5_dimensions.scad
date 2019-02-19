@@ -38,12 +38,12 @@ total_can_height = ra_motor_skirt_max_z + ra_bearing_gap + helmet_min_height_abo
 
 
 cw_shaft_port_dims =
-  SetHeight(10,
+  SetHeight(20,
     SetDepth(10,
       SetThickness(5,
         SetInnerDiam(30,
-          SetMidDiam(40,
-            SetOuterDiam(55))))));
+          SetMidDiam(31,
+            SetOuterDiam(60))))));
 
 dec_head_port_or = dec_clutch_handle_max_height + extra_dec_clutch_clearance*3 + dec_head_thickness;
 

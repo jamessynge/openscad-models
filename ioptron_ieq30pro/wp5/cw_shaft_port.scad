@@ -24,15 +24,15 @@ module cw_shaft_port_solid(thickness_frac=0.5) {
       shaft_port_solid(cw_shaft_port_dims, thickness_frac=thickness_frac);
 }
 
-module cw_shaft_port(thickness_frac=1) {
+module cw_shaft_port(miter=false, thickness_frac=1) {
   translate_to_dec12_plane(z_towards_dec_head=false)
     translate([0, 0, ra1_radius + helmet_ir])
-      shaft_port(cw_shaft_port_dims, thickness_frac=thickness_frac);
+      shaft_port(cw_shaft_port_dims, miter=miter, thickness_frac=thickness_frac);
 }
 
-module cw_shaft_port_interior() {
+module cw_shaft_port_interior(thickness_frac=0.999) {
   difference() {
-    hull() cw_shaft_port();
-    cw_shaft_port(thickness_frac=1.005);
+    hull() cw_shaft_port(miter=true, thickness_frac=thickness_frac);
+    cw_shaft_port(miter=true);
   }
 }
