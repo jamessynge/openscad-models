@@ -36,11 +36,29 @@ module cut_along_y(y=0, keep_above=false) {
   }
 }
 
+module cut_along_z(z=0, keep_above=false) {
+  if (keep_above) {
+    intersection() {
+      union() { children(); }
+      s = 300;
+      translate([-s/2, -s/2, z])
+        cube(size=s, center=false);
+    }
+  } else {
+    difference() {
+      union() { children(); }
+      s = 300;
+      translate([-s/2, -s/2, z])
+        cube(size=s, center=false);
+    }
+  }
+}
+
 td_ratio_dflt = 1.15;
 
 module tear_drop_profile(r=undef, td_ratio=td_ratio_dflt) {
   small_r = min(r/50, 0.1);
-  echo(td_ratio);
+  //echo(td_ratio);
   dx = r * td_ratio - small_r;
   hull() {
     circle(r=r);

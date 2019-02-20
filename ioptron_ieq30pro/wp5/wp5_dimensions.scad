@@ -33,17 +33,15 @@ lid_thickness = 5;
 lid_grip_height = 5;
 helmet_extra_height_above_dec_skirt = lid_thickness + lid_grip_height + 4;
 
-
-total_can_height = ra_motor_skirt_max_z + ra_bearing_gap + helmet_min_height_above_ra_bearing + helmet_extra_height_above_dec_skirt;
+can_height_above_ra1_base = helmet_min_height_above_ra_bearing + helmet_extra_height_above_dec_skirt;
+total_can_height = ra_motor_skirt_max_z + ra_bearing_gap + can_height_above_ra1_base;
 
 
 cw_shaft_port_dims =
   SetHeight(20,
     SetDepth(10,
-      SetThickness(5,
-        SetInnerDiam(30,
-          SetMidDiam(31,
-            SetOuterDiam(60))))));
+      SetInnerDiam(30,
+        SetOuterDiam(30 + dec_head_thickness*2))));
 
 dec_head_port_or = dec_clutch_handle_max_height + extra_dec_clutch_clearance*3 + dec_head_thickness;
 
@@ -62,3 +60,9 @@ rim_or = helmet_ir + ra_motor_skirt_rim;
 
 // Size of the notch in the helmet for an alignment tab in the lid.
 lid_tab_slot_degrees = 4; // degrees
+
+// Alignment cone dimensions.
+cone_support_diam = 10;
+cone_base_diam = 9;
+cone_height = 4.5;
+cone_hole_depth = 5; // The hole is a little deeper, with steeper sides, than the cone.
