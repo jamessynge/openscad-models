@@ -18,14 +18,36 @@ use <tear_drop_shaft_port.scad>
 // generate an arc. $fn is usually 0. When this variable has a value greater
 // than zero, the other two variables are ignored and full circle is rendered
 // using this number of fragments. The default value of $fn is 0.
-$fs = $preview ? 2 : 1;  // Minimum size for a fragment.
-$fa = $preview ? 6 : 1;  // Minimum angle for a fragment.
+$fs = $preview ? 3 : 1;  // Minimum size for a fragment.
+$fa = $preview ? 8 : 1;  // Minimum angle for a fragment.
 
-//ra_and_dec() 
-  basic_helmet_nut_side_top();
+rotate([0, 0, 180 * $t])
+ra_and_dec() { separated_helmet(); }
 
 *translate([0, 0, 0.1])
-simple_lid();
+#simple_lid();
+
+
+module separated_helmet() {
+  max_distance = 100;
+  distance = max(0, max_distance - $t * max_distance);
+  dx = distance;
+  dz = distance;
+  translate([dx, 0, dz])
+    basic_helmet_nut_side_top();
+  translate([dx, 0, -dz])
+    basic_helmet_nut_side_bottom();
+  translate([-dx, 0, dz])
+   basic_helmet_screw_side_top();
+  translate([-dx, 0, -dz])
+   basic_helmet_screw_side_bottom();
+
+  translate([0, 0, 2*dz])
+    simple_lid();
+
+}
+
+
 
 module basic_helmet_nut_side_top() {
   cut_along_x(keep_above=true) {
@@ -53,7 +75,41 @@ module basic_helmet_screw_side_bottom() {
 
 module basic_helmet(top=true, bottom=true) {
   assert(top || bottom);
-  cut_along_z(z=ra1_base_to_dec_center, keep_above=true)
+
+  module solid() {
+    can_solid();
+    dec_head_port();
+  }
+
+  module cutouts() {
+    can_interior();
+    dec_head_port_interior();
+    if (bottom) {
+      cw_shaft_port_interior();
+    } else {
+      cw_shaft_port_solid();
+    }
+  }
+
+  module diff() {
+    difference() {
+      solid();
+      cutouts();
+    }
+  }
+
+
+
+  if (top != bottom) {
+    cut_along_z(z=ra1_base_to_dec_center, keep_above=top) {
+      diff();
+    }
+  } else {
+    diff();
+  }
+
+
+*  cut_along_z(z=ra1_base_to_dec_center, keep_above=true)
   difference() {
     union() {
       can_solid();
@@ -71,6 +127,7 @@ module basic_helmet(top=true, bottom=true) {
       cw_shaft_port_solid();
     }
   }
+
   if (top) {
     lid_alignment_tab();
   }
@@ -78,6 +135,11 @@ module basic_helmet(top=true, bottom=true) {
   if (bottom) {
     mirrored([1, 0, 0])
     can_gluing_shelf(a1=-80, a2=20);
+
+    difference() {
+      cw_shaft_port_solid();
+      cw_shaft_port_interior();
+    }
   }
 }
 
