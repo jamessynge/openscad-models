@@ -508,7 +508,39 @@ module round_top_pyramid(diam=undef, height=undef, angle=20) {
 *translate([0, 0, 40])
   round_top_pyramid(diam=20, height=40, angle=45);
 
+// round_top_right_trapezoid produces a profile that is like a Right
+// Trapezoid, but where the top is circular instead of flat. This supports
+// printing with an overhang; i.e. make the angle 45 (the default) so that
+// the printer can handle the overhang.
+// height is the amount MORE than the radius of the circle.
+module round_top_right_trapezoid(diam=undef, height=0, angle=45) {
+  assert(angle > 0);
+  assert(angle < 90);
+  assert(diam > 0);
+  assert(height >= 0);
+  circle(d=diam);
+  r = diam / 2;
+  h = r + height;
 
+  // Where does the sloped side hit the circle?
+  y0 = r * sin(angle);
+  x0 = r * cos(angle);
+
+  // Given that angle, where will it intercept y==-h (the bottom of the
+  // trapezoid)?
+  x1 = (y0 + h) * tan(angle) + x0;
+  y1 = -h;
+
+  polygon([
+    [-r, 0],
+    [x0, y0],
+    [x1, y1],
+    [-r, y1],
+    ]);
+}
+
+*translate([0, 0, 40])
+  round_top_right_trapezoid(diam=10, height=5, angle=60);
 
 
 

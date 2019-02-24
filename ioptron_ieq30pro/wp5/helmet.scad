@@ -13,24 +13,51 @@ use <helpers.scad>
 use <lid.scad>
 use <dec_head_port.scad>
 use <tear_drop_shaft_port.scad>
+use <bosses.scad>
+
+assert($preview);  // This file isn't for generating STL files.
 
 // The $fa, $fs and $fn special variables control the number of facets used to
 // generate an arc. $fn is usually 0. When this variable has a value greater
 // than zero, the other two variables are ignored and full circle is rendered
 // using this number of fragments. The default value of $fn is 0.
-$fs = $preview ? 3 : 1;  // Minimum size for a fragment.
+$fs = $preview ? 5 : 1;  // Minimum size for a fragment.
 $fa = $preview ? 8 : 1;  // Minimum angle for a fragment.
 
-rotate([0, 0, 180 * $t])
-ra_and_dec() { separated_helmet(); }
+mount_latitude=90;
+// ra_angle = 152 + $t * 360;  // For testing boss below CW port.
+ra_angle = 30 + $t * 360;  // DEC clutch handle very near RA motor.
+dec_angle = 180 + 58 + $t * 360; // DEC clutch handle "down" at closest to RA motor.
 
-*translate([0, 0, 0.1])
-#simple_lid();
+if (false) {
+  rotate([0, 0, 180 * $t])
+    ra_and_dec(dec_angle=dec_angle)
+      animated_separated_helmet();
+} else if (true) {
+  ra_and_dec(dec_angle=dec_angle)
+    basic_helmet(screw_side=false);
+} else if (false) {
+  animated_separated_helmet();
+} else if (false) {
+  difference() {
+    basic_helmet();
+    separated_helmet();
+  }
+} else {
+    basic_helmet();
+    *simple_lid();
+
+}
 
 
-module separated_helmet() {
+module animated_separated_helmet() {
   max_distance = 100;
   distance = max(0, max_distance - $t * max_distance);
+  separated_helmet(distance);
+}
+
+
+module separated_helmet(distance=0) {
   dx = distance;
   dz = distance;
   translate([dx, 0, dz])
@@ -42,43 +69,79 @@ module separated_helmet() {
   translate([-dx, 0, -dz])
    basic_helmet_screw_side_bottom();
 
-  translate([0, 0, 2*dz])
+  *translate([0, 0, 2*dz])
     simple_lid();
 
 }
 
+// Apparently applying render after intersection or difference can help if
+// we're running into "Normalized Tree is growing past X elements" (for X
+// equals some very large number). I haven't found it terribly effective,
+// but worth keeping track of. Enable this by changing the false to true.
+// http://forum.openscad.org/Normalized-tree-is-growing-past-elements-tc13509.html#a13561
+module maybe_render() {
+  if (false) {
+    render() children();
+  } else {
+    children();
+  }
+}
 
 
 module basic_helmet_nut_side_top() {
-  cut_along_x(keep_above=true) {
-    basic_helmet(top=true, bottom=false);
-  }
+  maybe_render()
+    basic_helmet(nut_side=true, screw_side=false, top=true, bottom=false);
 }
 
 module basic_helmet_nut_side_bottom() {
-  cut_along_x(keep_above=true) {
-    basic_helmet(top=false, bottom=true);
-  }
+  maybe_render()
+    basic_helmet(nut_side=true, screw_side=false, top=false, bottom=true);
 }
 
 module basic_helmet_screw_side_top() {
-  cut_along_x(keep_above=false) {
-    basic_helmet(top=true, bottom=false);
-  }
+  maybe_render()
+    basic_helmet(nut_side=false, screw_side=true, top=true, bottom=false);
 }
 
 module basic_helmet_screw_side_bottom() {
-  cut_along_x(keep_above=false) {
-    basic_helmet(top=false, bottom=true);
-  }
+  maybe_render()
+    basic_helmet(nut_side=false, screw_side=true, top=false, bottom=true);
 }
 
-module basic_helmet(top=true, bottom=true) {
+module basic_helmet(nut_side=true, screw_side=true, top=true, bottom=true) {
   assert(top || bottom);
+
+  module x_slicer() {
+    if (nut_side != screw_side) {
+      maybe_render() {
+        cut_along_x(keep_above=nut_side) {
+          children();
+        }
+      }
+    } else {
+      children();
+    }
+  }
+
+  module z_slicer() {
+    if (top != bottom) {
+      maybe_render() {
+        cut_along_z(z=ra1_base_to_dec_center, keep_above=top) {
+          children();
+        }
+      }
+    } else {
+      children();
+    }
+  }
+
 
   module solid() {
     can_solid();
     dec_head_port();
+    if (bottom) {
+      cw_shaft_port_solid();
+    }
   }
 
   module cutouts() {
@@ -86,59 +149,87 @@ module basic_helmet(top=true, bottom=true) {
     dec_head_port_interior();
     if (bottom) {
       cw_shaft_port_interior();
+      mirrored([0, 1, 0]) {
+        if (nut_side) {
+          bosses_at_bottom_rim(solid=true, nut_side=true);
+        }
+        if (screw_side) {
+          bosses_at_bottom_rim(solid=true, nut_side=false);
+        }
+      }
     } else {
+      // !bottom.
       cw_shaft_port_solid();
+    }
+    if (top) {
+      mirrored([0, 1, 0]) {
+        if (nut_side) {
+          bosses_below_lid(solid=true, nut_side=true);
+        }
+        if (screw_side) {
+          bosses_below_lid(solid=true, nut_side=false);
+        }
+      }
     }
   }
 
-  module diff() {
+  module basic_body() {
+    maybe_render()
     difference() {
       solid();
       cutouts();
     }
   }
 
-
-
-  if (top != bottom) {
-    cut_along_z(z=ra1_base_to_dec_center, keep_above=top) {
-      diff();
-    }
-  } else {
-    diff();
+  module z_cut_body() {
+    z_slicer() basic_body();
   }
 
-
-*  cut_along_z(z=ra1_base_to_dec_center, keep_above=true)
-  difference() {
-    union() {
-      can_solid();
-      dec_head_port();
-      if (bottom) {
-        cw_shaft_port_solid();
-      }
-    }
-
-    can_interior();
-    dec_head_port_interior();
-    if (bottom) {
-      cw_shaft_port_interior();
-    } else {
-      cw_shaft_port_solid();
-    }
+  module x_and_z_cut_body() {
+    x_slicer() z_cut_body();
   }
+
+  module nut_side_gluing_shelf() {
+    can_gluing_shelf(a1=-80, a2=20);
+  }
+
+  x_and_z_cut_body();
 
   if (top) {
-    lid_alignment_tab();
+    if (nut_side)
+      lid_alignment_tab();
+
+    intersection() {
+      mirrored([0, 1, 0]) {
+        if (nut_side) {
+          bosses_below_lid(solid=false, nut_side=true);
+        }
+        if (screw_side) {
+          bosses_below_lid(solid=false, nut_side=false);
+        }
+      }
+      solid();
+    }
   }
 
   if (bottom) {
-    mirrored([1, 0, 0])
-    can_gluing_shelf(a1=-80, a2=20);
+    if (nut_side) nut_side_gluing_shelf();
+    if (screw_side) mirror([1, 0, 0]) nut_side_gluing_shelf();
 
-    difference() {
-      cw_shaft_port_solid();
-      cw_shaft_port_interior();
+    x_slicer() {
+      difference() {
+        cw_shaft_port_solid();
+        cutouts();
+      }
+    }
+
+    mirrored([0, 1, 0]) {
+      if (nut_side) {
+        bosses_at_bottom_rim(solid=false, nut_side=true);
+      }
+      if (screw_side) {
+        bosses_at_bottom_rim(solid=false, nut_side=false);
+      }
     }
   }
 }

@@ -20,7 +20,7 @@ ra_motor_clearance_radius_max = ra2_diam_plus_motor_max - ra2_radius;
 // touch the RA motor at the RA bearing.
 ra_motor_clearance_radius_min = ra2_radius + 25;
 
-// The closes distance to the RA bearing plate at which
+// The closest distance to the RA bearing plate at which
 // ra_motor_clearance_radius_max applies.
 ra_motor_max_clearance_z = ra2_len + ra3_len / 2;
 

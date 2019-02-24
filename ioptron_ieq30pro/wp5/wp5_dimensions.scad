@@ -7,10 +7,17 @@ include <../ieq30pro_wp_dimensions.scad>
 include <../../utils/metric_dimensions.scad>
 use <dict.scad>
 
+
+rtp_boss_diam = m4_washer_diam * 1.5;
+rtp_boss_height = m4_nut_diam2;
+
+rtrt_boss_diam = m4_washer_diam * 1.5;
+rtrt_boss_height = 0;  // Height in excess of that required for the diam.
+
 extra_ra_motor_clearance = 5;
 
 ra_motor_skirt_thickness = 5;
-ra_motor_skirt_rim = 10;
+ra_motor_skirt_rim = rtp_boss_diam;
 
 // DEC Head related dims.
 
@@ -24,17 +31,22 @@ dec_head_clutch_avoidance_radius = dec_clutch_handle_max_height + extra_dec_clut
 // Radius to leave empty so that there is room for the DEC head.
 dec_head_avoidance_radius = dec_head_base_radius + extra_dec_head_clearance;
 
+// NOTE: not sure where the *3 comes from. Why isn't that just *1 (i.e. no
+// multiplier.)
+dec_head_port_or = dec_clutch_handle_max_height + extra_dec_clutch_clearance*3 + dec_head_thickness;
 
 
 
-helmet_min_height_above_ra_bearing = ra1_base_to_dec_center + dec_head_clutch_avoidance_radius + dec_head_thickness;
+
+helmet_min_height_above_ra_bearing = ra1_base_to_dec_center + dec_head_port_or;
 
 lid_thickness = 5;
 lid_grip_height = 5;
-helmet_extra_height_above_dec_skirt = lid_thickness + lid_grip_height + 4;
+helmet_extra_height_above_dec_skirt = lid_thickness + lid_grip_height + rtp_boss_diam;
 
 can_height_above_ra1_base = helmet_min_height_above_ra_bearing + helmet_extra_height_above_dec_skirt;
-total_can_height = ra_motor_skirt_max_z + ra_bearing_gap + can_height_above_ra1_base;
+can_height_below_ra1_base = ra_motor_skirt_max_z + ra_bearing_gap;
+total_can_height = can_height_below_ra1_base + can_height_above_ra1_base;
 
 
 cw_shaft_port_dims =
@@ -42,9 +54,6 @@ cw_shaft_port_dims =
     SetDepth(10,
       SetInnerDiam(30,
         SetOuterDiam(30 + dec_head_thickness*2))));
-
-dec_head_port_or = dec_clutch_handle_max_height + extra_dec_clutch_clearance*3 + dec_head_thickness;
-
 
 dec_head_port_dims =
   SetHeight(dec_head_rain_plate_mid_z,
@@ -66,3 +75,4 @@ cone_support_diam = 10;
 cone_base_diam = 9;
 cone_height = 4.5;
 cone_hole_depth = 5; // The hole is a little deeper, with steeper sides, than the cone.
+
