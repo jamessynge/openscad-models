@@ -54,7 +54,7 @@ if (!$preview) {
     };
   };
 } else {
-  helmet_support_at_dec_head();
+  dec_chin_core();
 }
 
 module helmet_support_at_dec_head() {

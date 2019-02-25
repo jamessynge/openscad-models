@@ -26,6 +26,9 @@
 
 ### TO DOs for the top
 
+*  Put inverted can_gluing_shelf on the top side of each half, to prevent the
+   helmet from sliding down the can supports.
+
 ## TO DOs for the helmet supports
 
 ## TO DOs for the RA motor cover

@@ -29,7 +29,7 @@ show_axis_arrows = true;
 
 dec_head(show_axis_arrows=show_axis_arrows);
 
-module dec_head(show_axis_arrows=false, dec_clutch_angle=5) {
+module dec_head(show_axis_arrows=false, dec_clutch_angle=5, include_clamp_screws=true) {
   // echo("dec_head has", $children, "children");
   base_r = dec_head_base_diam / 2;
   inner_r = dec_head_diam1 / 2;
@@ -55,7 +55,7 @@ module dec_head(show_axis_arrows=false, dec_clutch_angle=5) {
     rotate([90,0,90])
       clutch(handle_angle=dec_clutch_angle);
 
-  dec_head_clamp_screws();
+  if (include_clamp_screws) dec_head_clamp_screws();
 
   if (show_axis_arrows) {
     color("red") {

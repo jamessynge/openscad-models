@@ -189,15 +189,14 @@ module basic_helmet(nut_side=true, screw_side=true, top=true, bottom=true) {
     x_slicer() z_cut_body();
   }
 
-  module nut_side_gluing_shelf() {
-    can_gluing_shelf(a1=-80, a2=20);
-  }
-
   x_and_z_cut_body();
 
   if (top) {
     if (nut_side)
       lid_alignment_tab();
+
+    if (nut_side) can_resting_shelf();
+    if (screw_side) mirror([1, 0, 0]) can_resting_shelf();
 
     intersection() {
       mirrored([0, 1, 0]) {
@@ -213,8 +212,8 @@ module basic_helmet(nut_side=true, screw_side=true, top=true, bottom=true) {
   }
 
   if (bottom) {
-    if (nut_side) nut_side_gluing_shelf();
-    if (screw_side) mirror([1, 0, 0]) nut_side_gluing_shelf();
+    if (nut_side) can_gluing_shelf();
+    if (screw_side) mirror([1, 0, 0]) can_gluing_shelf();
 
     x_slicer() {
       difference() {

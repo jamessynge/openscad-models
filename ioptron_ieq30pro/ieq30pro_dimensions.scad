@@ -300,6 +300,13 @@ clutch_handle_depth1 = 10.2;
 clutch_handle_depth2 = 13.7;
 clutch_screw_axis_height = clutch_base_height - clutch_base_diameter / 2;
 
+
+
+ra_clutch_flange_width = 28.7;
+dec_clutch_flange_width = 27.75;
+
+
+
 // Compute the angle of the circle of the DEC gear cover subtended by the
 // DEC clutch. See:
 //  https://en.wikipedia.org/wiki/Circular_segment

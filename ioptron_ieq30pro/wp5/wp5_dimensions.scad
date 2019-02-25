@@ -76,3 +76,13 @@ cone_base_diam = 9;
 cone_height = 4.5;
 cone_hole_depth = 5; // The hole is a little deeper, with steeper sides, than the cone.
 
+
+can_shelf_height = ra_motor_skirt_thickness;
+can_shelf_support_height = 2 * can_shelf_height;
+can_shelf_total_height = can_shelf_height + can_shelf_support_height;
+
+helmet_supports_height_above_ra_bearing = can_height_above_ra1_base - lid_grip_height - can_shelf_total_height;
+
+// Distance from RA axis to farthest point along DEC axis that is covered,
+// in either direction.
+helmet_supports_dec_axis_extent = ra1_radius+dec2_len;

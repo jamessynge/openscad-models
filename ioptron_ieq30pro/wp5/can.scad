@@ -22,9 +22,13 @@ translate([3*rim_or, 0, 0])
 translate([-3*rim_or, 0, 0])
   can_interior();
 
-difference() {
-  can_solid();
-  can_interior();
+union() {
+  difference() {
+    can_solid();
+    can_interior();
+  }
+  can_gluing_shelf();
+  can_resting_shelf();
 }
 
 module can_solid() {
@@ -74,20 +78,21 @@ module can_interior() {
 // A shelf/edge that extends up from a lower quarter to ease the process of
 // gluing the upper quarter to it. More sophisticated alignment cones or
 // screw/nut bosses can wait (e.g. this might be sufficient).
-module can_gluing_shelf(a1=0, a2=80) {
+// Defaults are for the nut-side of the helmet.
+module can_gluing_shelf(a1=-80, a2=20, z=ra1_base_to_dec_center) {
   module profile() {
-    v = ra_motor_skirt_thickness;
+    v = can_shelf_height;
     translate([helmet_ir, 0, 0])
     polygon([
       [-v, 0],
-      [1, -2*(v+1)],
+      [1, -can_shelf_support_height],
       [1, 0],
       [0, 0],
       [0, v],
       [-v, v],
     ]);
   }
-  translate([0, 0, ra1_base_to_dec_center])
+  translate([0, 0, z])
     rotate([0, 0, a1])
       rotate_extrude(angle=a2-a1)
         profile();
@@ -95,6 +100,31 @@ module can_gluing_shelf(a1=0, a2=80) {
 
 translate([200, 200, 0])
   can_gluing_shelf();
+
+// Adaptation of can_gluing_shelf for keeping the can from sliding down
+// the sides of the can/helmet. It will rest on top of the interior supports.
+module can_resting_shelf(a1=-60, a2=60, z=helmet_supports_height_above_ra_bearing+0.1) {
+  module profile() {
+    v = can_shelf_height;
+    translate([helmet_ir, v, 0])
+    mirror([0, 1, 0])
+    polygon([
+      [-v, 0],
+      [1, -can_shelf_support_height],
+      [1, 0],
+      [0, 0],
+      [0, v],
+      [-v, v],
+    ]);
+  }
+
+  translate([0, 0, z])
+    rotate([0, 0, a1])
+      rotate_extrude(angle=a2-a1)
+        profile();
+}
+
+
 
 // module can_alignment_cone(upper=true, lower=false) {
 //   module support() {
