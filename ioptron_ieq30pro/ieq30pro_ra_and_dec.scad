@@ -88,7 +88,6 @@ module ra_and_dec(dec_angle=0, include_polar_port=true, include_dec_head=true, i
     assert($children <= 4);
   }
 
-  raise_dec = ra1_base_to_dec_center;
   ra_to_dec(include_polar_port=include_polar_port, ra_clutch_angle=ra_clutch_angle);
 
   translate_to_dec12_plane() {

@@ -33,7 +33,7 @@ if (false) {
   rotate([0, 0, 180 * $t])
     ra_and_dec(dec_angle=dec_angle)
       animated_separated_helmet();
-} else if (true) {
+} else if (false) {
   ra_and_dec(dec_angle=dec_angle)
     basic_helmet(screw_side=false);
 } else if (false) {
@@ -44,7 +44,9 @@ if (false) {
     separated_helmet();
   }
 } else {
-    basic_helmet();
+    basic_helmet(screw_side=false, top=false);
+    translate([0, 0, 20])
+      basic_helmet(screw_side=false, bottom=false);
     *simple_lid();
 
 }
@@ -191,12 +193,24 @@ module basic_helmet(nut_side=true, screw_side=true, top=true, bottom=true) {
 
   x_and_z_cut_body();
 
+  if (nut_side) {
+    can_gluing_shelf_lips(top=top, bottom=bottom);
+  }
+  if (screw_side) {
+    mirror([1, 0, 0])
+      can_gluing_shelf_lips(top=top, bottom=bottom);
+  }
+
   if (top) {
     if (nut_side)
       lid_alignment_tab();
 
-    if (nut_side) can_resting_shelf();
-    if (screw_side) mirror([1, 0, 0]) can_resting_shelf();
+    // Omitting for now because the support height and the can interior height
+    // are not so well coordinated, and it appears that the lid will hit the
+    // shelf. Further, I've modified the gluing shelf so that it goes both
+    // up and down, which decreases the need for the resting shelf.
+    // if (nut_side) can_resting_shelf();
+    // if (screw_side) mirror([1, 0, 0]) can_resting_shelf();
 
     intersection() {
       mirrored([0, 1, 0]) {
@@ -212,8 +226,8 @@ module basic_helmet(nut_side=true, screw_side=true, top=true, bottom=true) {
   }
 
   if (bottom) {
-    if (nut_side) can_gluing_shelf();
-    if (screw_side) mirror([1, 0, 0]) can_gluing_shelf();
+    // if (nut_side) can_gluing_shelf();
+    // if (screw_side) mirror([1, 0, 0]) can_gluing_shelf();
 
     x_slicer() {
       difference() {

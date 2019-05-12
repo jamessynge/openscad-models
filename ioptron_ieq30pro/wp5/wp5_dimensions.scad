@@ -86,3 +86,9 @@ helmet_supports_height_above_ra_bearing = can_height_above_ra1_base - lid_grip_h
 // Distance from RA axis to farthest point along DEC axis that is covered,
 // in either direction.
 helmet_supports_dec_axis_extent = ra1_radius+dec2_len;
+
+
+// Assume that a part will be this much larger in OD, and this much smaller in ID.
+// This means that we should assume the helmet_ir is effectively this much
+// smaller, and the support should be double that smaller.
+extrusion_radial_spread = 0.3;

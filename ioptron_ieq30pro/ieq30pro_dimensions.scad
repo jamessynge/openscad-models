@@ -73,7 +73,17 @@ ra1_base_to_dec_center = ra1_base_to_dec + dec1_radius;
 ra1_base_to_dec_gear_cover =
     ra1_base_to_dec_center - dec2_radius;
 
-// Radius of the fillets that join the dec1 body to the ra1 body.
+////////////////////////////////////////////////////////////////////////////////
+// Dimensions related to the fillets that join the dec1 body to the ra1 body.
+
+// Smallest distance across the dec1 body from one fillet to the next.
+not_fillet_across_dec1 = 66.5;
+
+// It *appears* that the fillets are exactly 1/4 of a circle, so their diameter
+// is:
+ra_to_dec_fillet_diam = ra1_diam - not_fillet_across_dec1;
+ra_to_dec_fillet_radius_alt =  ra_to_dec_fillet_diam / 2;
+
 ra_to_dec_fillet_radius = ra1_radius - dec1_radius + 2;
 
 ////////////////////////////////////////////////////////////////////////////////

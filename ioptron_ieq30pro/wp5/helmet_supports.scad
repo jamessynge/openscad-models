@@ -15,6 +15,7 @@ use <dec_head_bearing_collar.scad>
 use <dec_head_port.scad>
 use <helmet.scad>
 use <helpers.scad>
+use <volumes.scad>
 
 include <../../utils/metric_dimensions.scad>
 use <../../utils/misc.scad>
@@ -36,16 +37,11 @@ dec_angle = 180 + 58 + 00000 * $t * 360; // DEC clutch handle "down" at closest 
 
 distance = 100; //200 * (cos(360 * $t) / 2 + 1/2);
 
-// Assume that a part will be this much larger in OD, and this much smaller in ID.
-// This means that we should assume the helmet_ir is effectively this much
-// smaller, and the support should be double that smaller.
-extrusion_radial_spread = 0.2;
-
 ra_and_dec(dec_angle=dec_angle, include_dec_head_clamp_screws=false) {
   union() {
-    translate([0, distance, 0])
+    *translate([0, distance, 0])
       helmet_support_over_dec_end();
-    translate([0, -distance, 0])
+    *translate([0, -distance, 0])
       helmet_support_over_cw_end();
     *basic_helmet();
   }
@@ -102,34 +98,7 @@ module helmet_support_over_cw_end() {
       }
     }
 
-    shared_helmet_support_cutouts(use_ra_to_dec=true);
-  }
-}
-
-module helmet_supports_outer_limits() {
-  // Approx. the whole inside of the helmet above the RA bearing, but allowing
-  // 1mm for the RA bearing.
-  ra_bearing_allowance = 1;
-  dec_bearing_allowance = 1;
-
-  intersection() {
-    union() {
-      // Approx. the whole inside of the helmet above the RA bearing, but allowing
-      // 1mm for the RA bearing.
-      cylinder(r=helmet_ir-extrusion_radial_spread, h=helmet_supports_height_above_ra_bearing);
-
-      // Approx. the inside of the DEC port.
-      translate_to_dec_bearing_plane(z_towards_dec_head=false) {
-        cylinder(h=dec2_len+ra1_radius, r=dec_head_port_or-extrusion_radial_spread);
-      }
-    }
-    x = 2 * helmet_ir - 2 * extrusion_radial_spread;
-    y = helmet_ir + ra1_radius + dec2_len - dec_bearing_allowance - extrusion_radial_spread;
-    d = helmet_ir + extrusion_radial_spread;
-    h = helmet_supports_height_above_ra_bearing - ra_bearing_allowance;
-    translate([-d, -d, 0]) {
-      cube([x, y, h]);
-    }
+    shared_helmet_support_cutouts(use_ra_to_dec=false);
   }
 }
 
@@ -145,48 +114,54 @@ module shared_helmet_support_cutouts(use_ra_to_dec=false) {
   translate([0, 0, helmet_supports_height_above_ra_bearing])
     cylinder(h=helmet_or, r=helmet_or*2);
 
-  // Cut out the ra1_to_dec body.
-  if (use_ra_to_dec) {
-    // Raise it up a bit so that there is room for a little slop in my
-    // measurements (sadly needed).
-    translate([0, 0, 0.5])
-      ra_to_dec(include_clutch=false, include_polar_port=false);
-  }
-  // And an approximation also.
-  translate([0, 0, -1]) {
-    h = 1.1 + (use_ra_to_dec ? ra1_base_to_dec : ra1_base_to_dec_center);
-    cylinder(h=h, r=ra1_radius+0.1);
-  }
 
-  // Cut a cuboid for the DEC motor.
-  translate_to_dec_bearing_plane(z_towards_dec_head=false) {
-    w = dec_motor_core_bottom_w + 1;
-    h = dec_center_to_dec_motor_top + 0.5;
-    d = ra1_radius + dec2_len + 0.02;
-    translate([-w/2+dec_motor_x_offset, -h, -0.01]) {
-      cube([w, h, d]);
-    }
-  }
+    ra_and_dec_avoidance();
 
-  // Cut a hole for the DEC head and DEC bearing cover. Needs to be big enough
-  // so the support can slide over both; have added a small amount, which may
-  // need adjusting based on printing success.
-  translate_to_dec_head_base(z_towards_dec_head=false) {
-    body_r = max(dec2_diam, dec_head_base_diam)/2;  // 97.66/2 at writing.
-    extra_r = 0.25;
-    r = body_r + extra_r;  // diameter = 98.16.
-    h = dec_bearing_gap + dec2_len + ra1_radius;
-    cylinder(h=h, r=r);
-  }
+  // // Cut out the ra1_to_dec body.
+  // if (use_ra_to_dec) {
+  //   // Raise it up a bit so that there is room for a little slop in my
+  //   // measurements (sadly needed).
 
-  // Cut a hole for the DEC body and CW shaft cap.
-  // Have added a small amount, which may need adjusting
-  // based on printing success.
-  translate_to_dec12_plane(z_towards_dec_head=false) {
-    extra_r = 0.25;
-    r = max(dec1_diam, cw_cap_diam)/2 + extra_r;
-    cylinder(h=dec1_len + cw_cap_total_height + 3, r=r);
-  }
+
+  //   ra_and_dec_avoidance();
+  //   // translate([0, 0, 0.5])
+  //   //   ra_to_dec(include_clutch=false, include_polar_port=false);
+  // }
+  // // And an approximation also.
+  // translate([0, 0, -1]) {
+  //   h = 1.1 + (use_ra_to_dec ? ra1_base_to_dec : ra1_base_to_dec_center);
+  //   cylinder(h=h, r=ra1_radius+extrusion_radial_spread);
+  // }
+
+  // // Cut a cuboid for the DEC motor.
+  // translate_to_dec_bearing_plane(z_towards_dec_head=false) {
+  //   w = dec_motor_core_bottom_w + 1;
+  //   h = dec_center_to_dec_motor_top + 0.5;
+  //   d = ra1_radius + dec2_len + 0.02;
+  //   translate([-w/2+dec_motor_x_offset, -h, -0.01]) {
+  //     cube([w, h, d]);
+  //   }
+  // }
+
+  // // Cut a hole for the DEC head and DEC bearing cover. Needs to be big enough
+  // // so the support can slide over both; have added a small amount, which may
+  // // need adjusting based on printing success.
+  // translate_to_dec_head_base(z_towards_dec_head=false) {
+  //   body_r = max(dec2_diam, dec_head_base_diam)/2;  // 97.66/2 at writing.
+  //   extra_r = extrusion_radial_spread;
+  //   r = body_r + extra_r;  // diameter = 98.16.
+  //   h = dec_bearing_gap + dec2_len + ra1_radius;
+  //   cylinder(h=h, r=r);
+  // }
+
+  // // Cut a hole for the DEC body and CW shaft cap.
+  // // Have added a small amount, which may need adjusting
+  // // based on printing success.
+  // translate_to_dec12_plane(z_towards_dec_head=false) {
+  //   extra_r = extrusion_radial_spread;
+  //   r = max(dec1_diam, cw_cap_diam)/2 + extra_r;
+  //   cylinder(h=dec1_len + cw_cap_total_height + 3, r=r);
+  // }
 
   // Cut out room for the RA clutch; I'm assuming it doesn't need to open
   // further than half way.
@@ -199,46 +174,97 @@ module shared_helmet_support_cutouts(use_ra_to_dec=false) {
   // ra_to_dec circle.
   //cylinder(d=ra1_diam, h=can_height_above_ra1_base);
 
+  // An oval for cutting out a space for the polar scope and a lot of room
+  // around it (i.e. material not obviously benefical for supporting the helmet).
   translate([0, 0, ra1_base_to_dec_center]) {
-    top_diam = (helmet_ir*2 + ra1_diam) / 2;
+//    top_diam = (helmet_ir*2 + ra1_diam) / 2;
+    top_diam = (helmet_ir-7) * 2;
     h_total = helmet_supports_height_above_ra_bearing - ra1_base_to_dec_center + 0.1;
     h1 = 15;
-    scale([1, 0.9, 1]) {
+    scale([1, 0.84, 1]) {
       cylinder(d1=0, d2=top_diam, h=h1);
       translate([0, 0, h1])
         cylinder(d=top_diam, h=h_total-h1);
     }
   }
 
-  // Need room for the DEC motor cable to run from the motor to hear the CW shaft.
+  // Need room for the DEC motor cable to run from the motor to near the CW shaft.
   cable_chase();
 
   // Now for something that should probably be handled by subtracting the
   // whole helmet: the gluing supports. There will be other things like these,
   // so should come up with a better way.
   if (true) {
-    mirrored([1, 0, 0]) can_gluing_shelf();
+    mirrored([1, 0, 0]) can_gluing_shelf_lips(overlap=true);
   } else {
     basic_helmet();
   }
 
+  mirrored([1, 0, 0]) {
+    translate([-ra1_radius-3, 0, ra1_base_to_dec_center+7.5]) {
+      rotate([0, 10, 0]) {
+        $fs=0.5;
+        dovetail_insert(final_delta=0.5);
+      }
+    }
+  }
 
-  mirrored([0, 1, 0])
-  translate([-70, 0, ra1_base_to_dec_center+20])
-    screw_hole();
+  // There's a lot of material over the ra_to_dec fillet on the side opposite
+  // the RA clutch. Cut out some of it.
+  *translate([ra1_radius+10, 0, (ra1_base_to_dec + ra1_base_to_dec_center)/2+5]) {
+    rotate([90, 0, 0]) {
+      symmetric_z_cylinder(d=25, l=100);
+    }
+  }
 
 
 
-  mirrored([0, 1, 0])
-  translate([65, 0, 15])
-    screw_hole();
+
+  *union() {
+    mirrored([0, 1, 0])
+    translate([-70, 0, ra1_base_to_dec_center+20])
+      screw_hole();
 
 
-  mirrored([1, 0, 0])
-  mirrored([0, 1, 0])
-  translate([75, 0, helmet_supports_height_above_ra_bearing-15])
-    screw_hole();
+
+    mirrored([0, 1, 0])
+    translate([65, 0, 15])
+      screw_hole();
+
+
+    mirrored([1, 0, 0])
+    mirrored([0, 1, 0])
+    translate([75, 0, helmet_supports_height_above_ra_bearing-15])
+      screw_hole();
+  }
 }
+
+module dec_head_test_region() {
+  hull() {
+    cylinder(r=ra1_radius+10, h=ra1_base_to_dec_center);
+    translate_to_dec_bearing_plane(z_towards_dec_head=false)
+      cylinder(d=dec2_diam+20, h=dec2_len);
+  }
+}
+*dec_head_test_region();
+
+module cw_shaft_test_region() {
+  intersection() {
+    hull() {
+      cylinder(r=ra1_radius+10, h=ra1_base_to_dec_center);
+      translate_to_dec12_plane(z_towards_dec_head=false) {
+        translate([0, 0, ra1_diam]) {
+          cylinder(d=dec1_diam+20, h=dec_len_beyond_ra);
+        }
+      }
+    }
+    *translate([-helmet_or, -helmet_or, 0]) {
+      cube([helmet_or*2, helmet_or, ra1_base_to_dec_center+10]);
+    }
+  }
+}
+*cw_shaft_test_region();
+
 
 // Experiment with building up the parts we might need, then cutting away,
 // rather than assuming a large solid to be cut.
@@ -304,7 +330,7 @@ module minimal_helmet_positive() {
   }
 }
 
-*difference() {
+difference() {
 minimal_helmet_positive();
 shared_helmet_support_cutouts();
 
@@ -363,40 +389,6 @@ module cable_chase() {
   
 *cable_chase();
 
-
-// Volume needed for the RA clutch, i.e. to be avoided by WP.
-// Relative to ra_and_dec coords.
-module ra_clutch_volume(half=true) {
-  e = 50;
-  translate([-ra1_radius+5, 0, 0])
-  rotate([0, -90, 0])
-    rotate([0, 0, -90])
-        linear_extrude(height=e)
-          ra_clutch_volume_profile(half=half);
-}
-*translate([0, 200, 0]) ra_clutch_volume();
-
-module ra_clutch_volume_profile(half=true) {
-  r = clutch_handle_length+5;
-  intersection() {
-    union() {
-      translate([0, clutch_screw_axis_height, 0])
-        intersection() {
-          circle(r=r);
-          translate([-r, 0, 0])
-            square(size=2*r);
-        }
-      translate([-r, 0, 0])
-        square([2*r, clutch_screw_axis_height]);
-    }
-    if (half) {
-      s = r + clutch_screw_axis_height + ra_clutch_flange_width;
-      translate([-ra_clutch_flange_width/2 - 2, 0, 0])
-        square(size=s);
-    }
-  }
-}
-*translate([200, 200, 0]) ra_clutch_volume_profile();
 
 // Screw hole axis is parallel to the Y axis, and ends at the X axis.
 // Hole is very long, but spreads out at a specified distance from the X
@@ -466,7 +458,7 @@ module nut_holder(hole_diam=m4_hole_diam, square_sides=m4_washer_diam+0.5, heigh
 *translate([340, 0, 0])
   nut_holder();
 
-module dovetail_insert(bar_length=30, bar_width=10, head_length=10, angle=45, fillet_radius=2, thickness=5) {
+module dovetail_insert(bar_length=20, bar_width=10, head_length=10, angle=45, fillet_radius=2, thickness=5, final_delta=0) {
   module quarter_profile() {
     p0 = [0, 0];
     p1 = [bar_width/2, 0];
@@ -500,11 +492,17 @@ module dovetail_insert(bar_length=30, bar_width=10, head_length=10, angle=45, fi
     }
   }
 
-  linear_extrude(height=thickness, convexity=4)
-    rounded_profile();
+  linear_extrude(height=thickness, convexity=4) {
+    if (final_delta) {
+      offset(delta=final_delta)
+        rounded_profile();
+    } else {
+      rounded_profile();
+    }
+  }
 }
 
-translate([95, 0, 0]) {
+*translate([95, 0, 0]) {
   $fs = 0.5;
   scale(1)
     dovetail_insert();
